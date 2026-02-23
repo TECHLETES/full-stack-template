@@ -5,7 +5,14 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import col, func, select
 
 from backend.api.deps import CurrentUser, SessionDep
-from backend.models import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate, Message
+from backend.models import (
+    Item,
+    ItemCreate,
+    ItemPublic,
+    ItemsPublic,
+    ItemUpdate,
+    Message,
+)
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -41,7 +48,9 @@ def read_items(
         )
         items = session.exec(statement).all()
 
-    return ItemsPublic(data=[ItemPublic.model_validate(item) for item in items], count=count)
+    return ItemsPublic(
+        data=[ItemPublic.model_validate(item) for item in items], count=count
+    )
 
 
 @router.get("/{id}", response_model=ItemPublic)

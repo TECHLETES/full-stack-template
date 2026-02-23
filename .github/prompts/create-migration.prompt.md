@@ -97,7 +97,7 @@ description: str = Field(min_length=1)  # Required
 def upgrade():
     # Step 1: Populate existing NULLs with default value
     op.execute("UPDATE project SET description = 'No description' WHERE description IS NULL")
-    
+
     # Step 2: Add constraint
     op.alter_column('project', 'description', existing_type=sa.String(), nullable=False)
 
@@ -136,7 +136,7 @@ status: ProjectStatus = ProjectStatus.ACTIVE
 def upgrade():
     # Create enum type (PostgreSQL specific)
     op.execute("CREATE TYPE projectstatus AS ENUM ('active', 'archived')")
-    
+
     # Add column with enum type
     op.add_column('project', sa.Column('status', sa.String(), server_default='active'))
 
@@ -156,20 +156,20 @@ def upgrade():
     # Step 1: Add new columns
     op.add_column('user', sa.Column('first_name', sa.String(length=255), nullable=True))
     op.add_column('user', sa.Column('last_name', sa.String(length=255), nullable=True))
-    
+
     # Step 2: Migrate data
     op.execute("""
         UPDATE "user"
-        SET 
+        SET
             first_name = SUBSTRING(full_name FROM 1 FOR POSITION(' ' IN full_name) - 1),
             last_name = SUBSTRING(full_name FROM POSITION(' ' IN full_name) + 1)
         WHERE full_name IS NOT NULL
     """)
-    
+
     # Step 3: Make new columns required
     op.alter_column('user', 'first_name', existing_type=sa.String(), nullable=False)
     op.alter_column('user', 'last_name', existing_type=sa.String(), nullable=False)
-    
+
     # Step 4: Drop old column
     op.drop_column('user', 'full_name')
 

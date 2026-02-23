@@ -5,6 +5,7 @@ import uuid
 import pytest
 from sqlmodel import Session
 
+from backend.crud import create_user
 from backend.crud_rbac import (
     add_permission_to_role,
     assign_role_to_user,
@@ -24,10 +25,8 @@ from backend.crud_rbac import (
 from backend.models import (
     PermissionCreate,
     RoleCreate,
-    User,
     UserCreate,
 )
-from backend.crud import create_user
 
 
 @pytest.fixture
@@ -56,9 +55,7 @@ def editor_role(session: Session):
 def create_permission_fixture(session: Session):
     """Create permissions for testing."""
 
-    def _create_permission(
-        name: str, resource: str, description: str | None = None
-    ):
+    def _create_permission(name: str, resource: str, description: str | None = None):
         perm_data = PermissionCreate(
             name=name,
             resource=resource,
@@ -96,9 +93,7 @@ class TestPermissions:
         assert perm.name == "items:read"
         assert perm.resource == "items"
 
-    def test_get_all_permissions(
-        self, session: Session, create_permission_fixture
-    ):
+    def test_get_all_permissions(self, session: Session, create_permission_fixture):
         """Test getting all permissions."""
         perm1 = create_permission_fixture(name="items:read", resource="items")
         perm2 = create_permission_fixture(name="items:write", resource="items")
@@ -114,9 +109,7 @@ class TestPermissions:
     ):
         """Test pagination of permission list."""
         for i in range(5):
-            create_permission_fixture(
-                name=f"perm:action{i}", resource="test"
-            )
+            create_permission_fixture(name=f"perm:action{i}", resource="test")
 
         perms, count = get_all_permissions(session=session, skip=0, limit=2)
         assert len(perms) == 2
@@ -226,9 +219,7 @@ class TestRolePermissions:
         perm_names = [p.name for p in role.permissions or []]
         assert "items:create" not in perm_names
 
-    def test_cannot_add_invalid_permission_to_role(
-        self, session: Session, admin_role
-    ):
+    def test_cannot_add_invalid_permission_to_role(self, session: Session, admin_role):
         """Test error when adding non-existent permission."""
         fake_perm_id = uuid.uuid4()
         success = add_permission_to_role(
@@ -240,9 +231,7 @@ class TestRolePermissions:
 class TestUserRoles:
     """Test user-role mapping."""
 
-    def test_assign_role_to_user(
-        self, session: Session, test_user, admin_role
-    ):
+    def test_assign_role_to_user(self, session: Session, test_user, admin_role):
         """Test assigning role to user."""
         success = assign_role_to_user(
             session=session, user_id=test_user.id, role_id=admin_role.id
@@ -253,9 +242,7 @@ class TestUserRoles:
         role_names = [r.name for r in user_roles]
         assert "Admin" in role_names
 
-    def test_remove_role_from_user(
-        self, session: Session, test_user, admin_role
-    ):
+    def test_remove_role_from_user(self, session: Session, test_user, admin_role):
         """Test removing role from user."""
         assign_role_to_user(
             session=session, user_id=test_user.id, role_id=admin_role.id
@@ -269,9 +256,7 @@ class TestUserRoles:
         user_roles = get_user_roles(session=session, user_id=test_user.id)
         assert len(user_roles) == 0
 
-    def test_user_has_role(
-        self, session: Session, test_user, admin_role
-    ):
+    def test_user_has_role(self, session: Session, test_user, admin_role):
         """Test checking if user has role."""
         assign_role_to_user(
             session=session, user_id=test_user.id, role_id=admin_role.id
@@ -345,12 +330,8 @@ class TestUserPermissions:
         create_permission_fixture,
     ):
         """Test user permissions with multiple roles."""
-        admin_perm = create_permission_fixture(
-            name="admin:manage", resource="admin"
-        )
-        editor_perm = create_permission_fixture(
-            name="editor:edit", resource="editor"
-        )
+        admin_perm = create_permission_fixture(name="admin:manage", resource="admin")
+        editor_perm = create_permission_fixture(name="editor:edit", resource="editor")
 
         add_permission_to_role(
             session=session, role_id=admin_role.id, permission_id=admin_perm.id

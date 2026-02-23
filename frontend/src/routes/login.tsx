@@ -6,9 +6,8 @@ import {
 } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
-import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { isEntraEnabled } from "@/auth/entra"
+import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { EntraLoginButton } from "@/components/Auth/EntraLogin"
 import { AuthLayout } from "@/components/Common/AuthLayout"
 import {

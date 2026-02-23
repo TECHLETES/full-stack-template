@@ -3,7 +3,68 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+import type { AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+
+export class AuthEntraService {
+    /**
+     * Entra Login
+     * Authenticate via Microsoft Entra.
+     *
+     * Accepts a Microsoft access token (obtained via MSAL on the frontend),
+     * fetches user info from Microsoft Graph, and returns an application JWT.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns Token Successful Response
+     * @throws ApiError
+     */
+    public static entraLogin(data: AuthEntraEntraLoginData): CancelablePromise<AuthEntraEntraLoginResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/auth/entra/login',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Entra Login Url
+     * Get Microsoft login URL for frontend redirect.
+     * @param data The data for the request.
+     * @param data.redirectUri
+     * @param data.tenantId
+     * @returns EntraLoginUrlResponse Successful Response
+     * @throws ApiError
+     */
+    public static getEntraLoginUrl(data: AuthEntraGetEntraLoginUrlData): CancelablePromise<AuthEntraGetEntraLoginUrlResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/auth/entra/login-url',
+            query: {
+                redirect_uri: data.redirectUri,
+                tenant_id: data.tenantId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Entra Config
+     * Return Entra configuration for the frontend (public info only).
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static getEntraConfig(): CancelablePromise<AuthEntraGetEntraConfigResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/auth/entra/config'
+        });
+    }
+}
 
 export class ItemsService {
     /**
@@ -228,6 +289,466 @@ export class PrivateService {
             url: '/api/v1/private/users/',
             body: data.requestBody,
             mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class RbacService {
+    /**
+     * List Permissions
+     * List all permissions with pagination.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns PermissionsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listPermissions(data: RbacListPermissionsData = {}): CancelablePromise<RbacListPermissionsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/permissions',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Permission Endpoint
+     * Create a new permission (Admin only).
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns PermissionPublic Successful Response
+     * @throws ApiError
+     */
+    public static createPermissionEndpoint(data: RbacCreatePermissionEndpointData): CancelablePromise<RbacCreatePermissionEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/rbac/permissions',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Permission Endpoint
+     * Get permission by ID.
+     * @param data The data for the request.
+     * @param data.permissionId
+     * @returns PermissionPublic Successful Response
+     * @throws ApiError
+     */
+    public static getPermissionEndpoint(data: RbacGetPermissionEndpointData): CancelablePromise<RbacGetPermissionEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/permissions/{permission_id}',
+            path: {
+                permission_id: data.permissionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Permission Endpoint
+     * Update a permission (Admin only).
+     * @param data The data for the request.
+     * @param data.permissionId
+     * @param data.requestBody
+     * @returns PermissionPublic Successful Response
+     * @throws ApiError
+     */
+    public static updatePermissionEndpoint(data: RbacUpdatePermissionEndpointData): CancelablePromise<RbacUpdatePermissionEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/rbac/permissions/{permission_id}',
+            path: {
+                permission_id: data.permissionId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Permission Endpoint
+     * Delete a permission (Admin only).
+     * @param data The data for the request.
+     * @param data.permissionId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static deletePermissionEndpoint(data: RbacDeletePermissionEndpointData): CancelablePromise<RbacDeletePermissionEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/rbac/permissions/{permission_id}',
+            path: {
+                permission_id: data.permissionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * List Roles
+     * List all roles with pagination.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns RolesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listRoles(data: RbacListRolesData = {}): CancelablePromise<RbacListRolesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/roles',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Role Endpoint
+     * Create a new role (Admin only).
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns RolePublic Successful Response
+     * @throws ApiError
+     */
+    public static createRoleEndpoint(data: RbacCreateRoleEndpointData): CancelablePromise<RbacCreateRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/rbac/roles',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Role Endpoint
+     * Get role by ID.
+     * @param data The data for the request.
+     * @param data.roleId
+     * @returns RolePublic Successful Response
+     * @throws ApiError
+     */
+    public static getRoleEndpoint(data: RbacGetRoleEndpointData): CancelablePromise<RbacGetRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/roles/{role_id}',
+            path: {
+                role_id: data.roleId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Role Endpoint
+     * Update a role (Admin only).
+     * @param data The data for the request.
+     * @param data.roleId
+     * @param data.requestBody
+     * @returns RolePublic Successful Response
+     * @throws ApiError
+     */
+    public static updateRoleEndpoint(data: RbacUpdateRoleEndpointData): CancelablePromise<RbacUpdateRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/rbac/roles/{role_id}',
+            path: {
+                role_id: data.roleId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Role Endpoint
+     * Delete a role (Admin only).
+     * @param data The data for the request.
+     * @param data.roleId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static deleteRoleEndpoint(data: RbacDeleteRoleEndpointData): CancelablePromise<RbacDeleteRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/rbac/roles/{role_id}',
+            path: {
+                role_id: data.roleId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Add Permission To Role Endpoint
+     * Add permission to role (Admin only).
+     * @param data The data for the request.
+     * @param data.roleId
+     * @param data.permissionId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static addPermissionToRoleEndpoint(data: RbacAddPermissionToRoleEndpointData): CancelablePromise<RbacAddPermissionToRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/rbac/roles/{role_id}/permissions/{permission_id}',
+            path: {
+                role_id: data.roleId,
+                permission_id: data.permissionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Remove Permission From Role Endpoint
+     * Remove permission from role (Admin only).
+     * @param data The data for the request.
+     * @param data.roleId
+     * @param data.permissionId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static removePermissionFromRoleEndpoint(data: RbacRemovePermissionFromRoleEndpointData): CancelablePromise<RbacRemovePermissionFromRoleEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/rbac/roles/{role_id}/permissions/{permission_id}',
+            path: {
+                role_id: data.roleId,
+                permission_id: data.permissionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Assign Role To User Endpoint
+     * Assign role to user (Admin only).
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.roleId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static assignRoleToUserEndpoint(data: RbacAssignRoleToUserEndpointData): CancelablePromise<RbacAssignRoleToUserEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/rbac/users/{user_id}/roles/{role_id}',
+            path: {
+                user_id: data.userId,
+                role_id: data.roleId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Remove Role From User Endpoint
+     * Remove role from user (Admin only).
+     * @param data The data for the request.
+     * @param data.userId
+     * @param data.roleId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static removeRoleFromUserEndpoint(data: RbacRemoveRoleFromUserEndpointData): CancelablePromise<RbacRemoveRoleFromUserEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/rbac/users/{user_id}/roles/{role_id}',
+            path: {
+                user_id: data.userId,
+                role_id: data.roleId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get User Roles Endpoint
+     * Get all roles for a user.
+     * @param data The data for the request.
+     * @param data.userId
+     * @returns RolesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getUserRolesEndpoint(data: RbacGetUserRolesEndpointData): CancelablePromise<RbacGetUserRolesEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/users/{user_id}/roles',
+            path: {
+                user_id: data.userId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get User Permissions Endpoint
+     * Get all permissions for a user (via their roles).
+     * @param data The data for the request.
+     * @param data.userId
+     * @returns PermissionsPublic Successful Response
+     * @throws ApiError
+     */
+    public static getUserPermissionsEndpoint(data: RbacGetUserPermissionsEndpointData): CancelablePromise<RbacGetUserPermissionsEndpointResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/users/{user_id}/permissions',
+            path: {
+                user_id: data.userId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Permissions Catalog
+     * Get the catalog of available permissions in the application.
+     *
+     * This endpoint returns the predefined permissions that can be assigned to roles.
+     * Useful for UI to display what permissions are available.
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static getPermissionsCatalog(): CancelablePromise<RbacGetPermissionsCatalogResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/rbac/permissions-catalog'
+        });
+    }
+}
+
+export class TenantsService {
+    /**
+     * List Tenants
+     * List all configured Microsoft tenants. Requires superuser.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns MicrosoftTenantsPublic Successful Response
+     * @throws ApiError
+     */
+    public static listTenants(data: TenantsListTenantsData = {}): CancelablePromise<TenantsListTenantsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/tenants/',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Tenant
+     * Add a new Microsoft tenant. Requires superuser.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns MicrosoftTenantPublic Successful Response
+     * @throws ApiError
+     */
+    public static createTenant(data: TenantsCreateTenantData): CancelablePromise<TenantsCreateTenantResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/tenants/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Tenant
+     * Update a Microsoft tenant. Requires superuser.
+     * @param data The data for the request.
+     * @param data.tenantId
+     * @param data.requestBody
+     * @returns MicrosoftTenantPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateTenant(data: TenantsUpdateTenantData): CancelablePromise<TenantsUpdateTenantResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/tenants/{tenant_id}',
+            path: {
+                tenant_id: data.tenantId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Tenant
+     * Delete a Microsoft tenant. Requires superuser.
+     * @param data The data for the request.
+     * @param data.tenantId
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteTenant(data: TenantsDeleteTenantData): CancelablePromise<TenantsDeleteTenantResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/tenants/{tenant_id}',
+            path: {
+                tenant_id: data.tenantId
+            },
             errors: {
                 422: 'Validation Error'
             }

@@ -1,9 +1,12 @@
+import logging
 from urllib.parse import urlencode
 from uuid import uuid4
 
 import httpx
 
 from backend.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class EntraAuthClient:
@@ -93,7 +96,7 @@ class EntraAuthClient:
             resp = client.post(token_url, data=payload)
             if resp.status_code == 200:
                 token_response = resp.json()
-                return token_response["access_token"]  # type: ignore[return-value]
+                return str(token_response["access_token"])
             raise Exception(f"Failed to get service principal token: {resp.text}")
 
     def sync_app_roles_to_manifest(self, roles: list[dict[str, str]]) -> bool:
@@ -157,5 +160,5 @@ class EntraAuthClient:
                 return update_resp.status_code == 200
 
         except Exception as e:
-            print(f"Failed to sync roles to Entra: {e}")
+            logger.error(f"Failed to sync roles to Entra: {e}")
             return False

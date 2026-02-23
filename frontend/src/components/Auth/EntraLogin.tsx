@@ -9,7 +9,10 @@ interface EntraLoginButtonProps {
   onError?: (error: Error) => void
 }
 
-export function EntraLoginButton({ onSuccess, onError }: EntraLoginButtonProps) {
+export function EntraLoginButton({
+  onSuccess,
+  onError,
+}: EntraLoginButtonProps) {
   const { instance } = useMsal()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -28,7 +31,7 @@ export function EntraLoginButton({ onSuccess, onError }: EntraLoginButtonProps) 
           scopes: ["User.Read"],
           account: response.account,
         })
-        
+
         // Extract roles from ID token claims
         const roles = response.idTokenClaims?.roles || []
         onSuccess(tokenResponse.accessToken, roles as string[])
@@ -49,7 +52,12 @@ export function EntraLoginButton({ onSuccess, onError }: EntraLoginButtonProps) 
       loading={isLoading}
       data-testid="entra-login-button"
     >
-      <svg className="mr-2 h-4 w-4" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+      <svg
+        className="mr-2 h-4 w-4"
+        viewBox="0 0 21 21"
+        fill="none"
+        aria-hidden="true"
+      >
         <rect x="1" y="1" width="9" height="9" fill="#f25022" />
         <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
         <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />

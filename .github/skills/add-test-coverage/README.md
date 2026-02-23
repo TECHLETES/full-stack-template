@@ -71,12 +71,12 @@ def test_create_item(db: Session) -> None:
     from app import crud
     from backend.models import ItemCreate
     from tests.utils.user import create_random_user
-    
+
     user = create_random_user(db)
     item_in = ItemCreate(title="Laptop", description="Dell XPS")
-    
+
     item = crud.create_item(session=db, item_in=item_in, owner_id=user.id)
-    
+
     assert item.id
     assert item.title == "Laptop"
     assert item.owner_id == user.id
@@ -96,7 +96,7 @@ def test_create_item_endpoint_success(
         headers=normal_user_token_headers,
         json=data,
     )
-    
+
     assert response.status_code == 200
     content = response.json()
     assert content["title"] == data["title"]
@@ -113,7 +113,7 @@ test("User can create an item", async ({ page }) => {
   await page.getByLabel("Title").fill("Laptop")
   await page.getByLabel("Description").fill("Dell XPS")
   await page.getByRole("button", { name: "Create" }).click()
-  
+
   await expect(page.getByText("Item created successfully")).toBeVisible()
   await expect(page.getByText("Laptop")).toBeVisible()
 })
@@ -158,7 +158,7 @@ def test_user_cant_read_other_user_item(
 ) -> None:
     # Create as different user
     item = create_random_item(db)
-    
+
     # Try to read as normal user
     response = client.get(f"/api/v1/items/{item.id}", headers=normal_user_headers)
     assert response.status_code == 404  # Treated as not found
@@ -171,7 +171,7 @@ def test_user_cant_read_other_user_item(
 def test_delete_item(db: Session) -> None:
     item = create_random_item(db)
     crud.delete_item(session=db, db_item=item)
-    
+
     # Verify deleted
     result = crud.read_item(session=db, item_id=item.id, owner_id=item.owner_id)
     assert result is None

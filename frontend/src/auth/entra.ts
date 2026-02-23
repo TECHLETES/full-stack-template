@@ -30,13 +30,15 @@ export const getMsalInstance = (): PublicClientApplication => {
 
 export const initEntra = async (): Promise<void> => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/entra/config`)
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/v1/auth/entra/config`,
+    )
     if (!response.ok) return
-    
+
     entraConfig = await response.json()
-    
+
     if (!entraConfig?.client_id) return
-    
+
     const msalConfig: Configuration = {
       auth: {
         clientId: entraConfig.client_id,
@@ -56,7 +58,7 @@ export const initEntra = async (): Promise<void> => {
         },
       },
     }
-    
+
     msalInstance = new PublicClientApplication(msalConfig)
   } catch (error) {
     console.error("Failed to initialize Entra:", error)

@@ -1,12 +1,10 @@
 """RBAC endpoints for managing roles and permissions."""
 
 import uuid
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session
 
-from backend.api.deps import CurrentUser, SessionDep
+from backend.api.deps import SessionDep
 from backend.api.deps_rbac import require_role
 from backend.core.rbac import DEFAULT_PERMISSIONS
 from backend.crud_rbac import (
@@ -28,18 +26,14 @@ from backend.crud_rbac import (
     update_role,
 )
 from backend.models import (
-    Permission,
     PermissionCreate,
     PermissionPublic,
     PermissionsPublic,
     PermissionUpdate,
-    Role,
     RoleCreate,
-    RolePermission,
     RolePublic,
     RolesPublic,
     RoleUpdate,
-    User,
 )
 
 router = APIRouter(prefix="/rbac", tags=["rbac"])
@@ -133,17 +127,13 @@ def list_roles(
     """List all roles with pagination."""
     roles, count = get_all_roles(session=session, skip=skip, limit=limit)
     return RolesPublic(
-        data=[
-            RolePublic.model_validate(r, from_attributes=True) for r in roles
-        ],
+        data=[RolePublic.model_validate(r, from_attributes=True) for r in roles],
         count=count,
     )
 
 
 @router.get("/roles/{role_id}", response_model=RolePublic)
-def get_role_endpoint(
-    *, session: SessionDep, role_id: uuid.UUID
-) -> RolePublic:
+def get_role_endpoint(*, session: SessionDep, role_id: uuid.UUID) -> RolePublic:
     """Get role by ID."""
     role = get_role(session=session, role_id=role_id)
     if not role:
@@ -156,9 +146,7 @@ def get_role_endpoint(
     response_model=RolePublic,
     dependencies=[Depends(require_role("Admin"))],
 )
-def create_role_endpoint(
-    *, session: SessionDep, role_in: RoleCreate
-) -> RolePublic:
+def create_role_endpoint(*, session: SessionDep, role_in: RoleCreate) -> RolePublic:
     """Create a new role (Admin only)."""
     role = create_role(session=session, role_in=role_in)
     return RolePublic.model_validate(role, from_attributes=True)
@@ -187,9 +175,7 @@ def update_role_endpoint(
     "/roles/{role_id}",
     dependencies=[Depends(require_role("Admin"))],
 )
-def delete_role_endpoint(
-    *, session: SessionDep, role_id: uuid.UUID
-) -> dict[str, str]:
+def delete_role_endpoint(*, session: SessionDep, role_id: uuid.UUID) -> dict[str, str]:
     """Delete a role (Admin only)."""
     if not delete_role(session=session, role_id=role_id):
         raise HTTPException(
@@ -215,9 +201,7 @@ def add_permission_to_role_endpoint(
     if not add_permission_to_role(
         session=session, role_id=role_id, permission_id=permission_id
     ):
-        raise HTTPException(
-            status_code=404, detail="Role or permission not found"
-        )
+        raise HTTPException(status_code=404, detail="Role or permission not found")
     return {"message": "Permission added to role"}
 
 
@@ -269,23 +253,17 @@ def remove_role_from_user_endpoint(
     role_id: uuid.UUID,
 ) -> dict[str, str]:
     """Remove role from user (Admin only)."""
-    if not remove_role_from_user(
-        session=session, user_id=user_id, role_id=role_id
-    ):
+    if not remove_role_from_user(session=session, user_id=user_id, role_id=role_id):
         raise HTTPException(status_code=404, detail="Assignment not found")
     return {"message": "Role removed from user"}
 
 
 @router.get("/users/{user_id}/roles", response_model=RolesPublic)
-def get_user_roles_endpoint(
-    *, session: SessionDep, user_id: uuid.UUID
-) -> RolesPublic:
+def get_user_roles_endpoint(*, session: SessionDep, user_id: uuid.UUID) -> RolesPublic:
     """Get all roles for a user."""
     roles = get_user_roles(session=session, user_id=user_id)
     return RolesPublic(
-        data=[
-            RolePublic.model_validate(r, from_attributes=True) for r in roles
-        ],
+        data=[RolePublic.model_validate(r, from_attributes=True) for r in roles],
         count=len(roles),
     )
 
@@ -306,7 +284,7 @@ def get_user_permissions_endpoint(
 
 
 @router.get("/permissions-catalog")
-def get_permissions_catalog() -> dict[str, list[dict]]:
+def get_permissions_catalog() -> dict[str, list[dict[str, str]]]:
     """
     Get the catalog of available permissions in the application.
 

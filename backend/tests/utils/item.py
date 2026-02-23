@@ -1,9 +1,9 @@
 from sqlmodel import Session
 
-from app import crud
+from backend import crud
 from backend.models import Item, ItemCreate
-from tests.utils.user import create_random_user
-from tests.utils.utils import random_lower_string
+from backend.tests.utils.user import create_random_user
+from backend.tests.utils.utils import random_lower_string
 
 
 def create_random_item(db: Session) -> Item:

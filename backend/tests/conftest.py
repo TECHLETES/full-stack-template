@@ -8,8 +8,8 @@ from backend.core.config import settings
 from backend.core.db import engine, init_db
 from backend.main import app
 from backend.models import Item, MicrosoftTenant, User, UserTenantRole
-from tests.utils.user import authentication_token_from_email
-from tests.utils.utils import get_superuser_token_headers
+from backend.tests.utils.user import authentication_token_from_email
+from backend.tests.utils.utils import get_superuser_token_headers
 
 
 @pytest.fixture(scope="session", autouse=True)

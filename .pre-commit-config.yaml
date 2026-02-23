@@ -21,7 +21,7 @@ repos:
     hooks:
       - id: local-biome-check
         name: biome check
-        entry: npm run lint
+        entry: bun run lint
         language: system
         types: [text]
         files: ^frontend/
@@ -42,7 +42,7 @@ repos:
 
       - id: local-mypy
         name: mypy check
-        entry: uv run mypy backend/app
+        entry: uv run mypy backend
         require_serial: true
         language: unsupported
         pass_filenames: false

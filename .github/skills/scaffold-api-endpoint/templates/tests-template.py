@@ -78,7 +78,7 @@ def test_read_projects_pagination(
             headers=normal_user_token_headers,
             json={"title": f"Project {i}"},
         )
-    
+
     # Test skip and limit
     response = client.get(
         "/api/v1/projects/?skip=0&limit=2",
@@ -97,7 +97,7 @@ def test_read_project(
 ) -> None:
     """Test reading a single project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     response = client.get(
         f"/api/v1/projects/{project.id}",
@@ -130,10 +130,10 @@ def test_read_project_permission_denied(
 ) -> None:
     """Test accessing another user's project."""
     from tests.utils.project import create_random_project
-    
+
     # Create project as superuser
     project = create_random_project(db)  # This will use random user, not current
-    
+
     # Normal user should not see it
     response = client.get(
         f"/api/v1/projects/{project.id}",
@@ -149,7 +149,7 @@ def test_update_project(
 ) -> None:
     """Test updating a project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     data = {"title": "Updated Title", "description": "Updated description"}
     response = client.patch(
@@ -170,10 +170,10 @@ def test_update_project_partial(
 ) -> None:
     """Test partial update (only some fields)."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     original_description = project.description
-    
+
     # Update only title
     data = {"title": "New Title"}
     response = client.patch(
@@ -195,14 +195,14 @@ def test_delete_project(
 ) -> None:
     """Test deleting a project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     response = client.delete(
         f"/api/v1/projects/{project.id}",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
-    
+
     # Verify it's deleted
     response = client.get(
         f"/api/v1/projects/{project.id}",
@@ -239,7 +239,7 @@ import uuid
 
 from sqlmodel import Session
 
-from app import crud
+from backend import crud
 from backend.models import Project, ProjectCreate
 from tests.utils.user import create_random_user
 

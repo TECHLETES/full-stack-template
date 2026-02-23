@@ -161,7 +161,7 @@ def read_projects(
     # Count total
     count_stmt = select(func.count()).select_from(Project).where(Project.owner_id == owner_id)
     count = session.exec(count_stmt).one()
-    
+
     # Get paginated results
     stmt = (
         select(Project)
@@ -295,7 +295,7 @@ def update_project(
     )
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     project = crud.update_project(
         session=session,
         db_project=project,
@@ -317,7 +317,7 @@ def delete_project(
     )
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     crud.delete_project(session=session, db_project=project)
     return Message(message="Project deleted successfully")
 ```
@@ -387,7 +387,7 @@ def test_read_project(
     db: Session,
 ) -> None:
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     response = client.get(
         f"/api/v1/projects/{project.id}",
@@ -405,7 +405,7 @@ def test_update_project(
     db: Session,
 ) -> None:
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     data = {"title": "Updated Title"}
     response = client.patch(
@@ -424,14 +424,14 @@ def test_delete_project(
     db: Session,
 ) -> None:
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     response = client.delete(
         f"/api/v1/projects/{project.id}",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
-    
+
     # Verify it's deleted
     response = client.get(
         f"/api/v1/projects/{project.id}",

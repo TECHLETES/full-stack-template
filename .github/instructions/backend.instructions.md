@@ -201,11 +201,11 @@ def read_users(session: Session, skip: int = 0, limit: int = 100) -> UsersPublic
     # Get total count
     count_statement = select(func.count()).select_from(User)
     count = session.exec(count_statement).one()
-    
+
     # Get paginated results
     statement = select(User).order_by(col(User.created_at).desc()).offset(skip).limit(limit)
     users = session.exec(statement).all()
-    
+
     return UsersPublic(data=users, count=count)
 ```
 
@@ -269,7 +269,7 @@ def read_items(
     """Get user's items with pagination."""
     count_stmt = select(func.count(Item)).where(Item.owner_id == current_user.id)
     count = session.exec(count_stmt).one()
-    
+
     stmt = (
         select(Item)
         .where(Item.owner_id == current_user.id)
@@ -314,7 +314,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         token_data = TokenPayload(**payload)
     except (InvalidTokenError, ValidationError):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials")
-    
+
     user = session.get(User, token_data.sub)
     if not user or not user.is_active:
         raise HTTPException(status_code=404, detail="User not found")
@@ -598,23 +598,23 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "local"
     DEBUG: bool = ENVIRONMENT == "local"
     API_V1_STR: str = "/api/v1"
-    
+
     # Security
     SECRET_KEY: str = Field(..., min_length=32)
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
-    
+
     # Database
     DATABASE_URL: str = Field(..., validation_alias="DATABASE_URL")
-    
+
     # Email
     SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 1025
     EMAILS_ENABLED: bool = False
-    
+
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:3000"]
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,

@@ -1,44 +1,27 @@
 """Dependencies for RBAC authorization."""
 
-from typing import Annotated
+from collections.abc import Callable
 
-from fastapi import Depends, HTTPException
-from sqlmodel import Session
+from fastapi import HTTPException
 
-from backend.api.deps import SessionDep
+from backend.api.deps import CurrentUser, SessionDep
 from backend.crud_rbac import user_has_permission, user_has_role
 from backend.models import User
 
 
-async def get_current_user_with_rbac(
-    current_user: Annotated[User, Depends(lambda: None)],
-) -> User:
+def require_role(role_name: str) -> Callable[[CurrentUser, SessionDep], User]:
     """
-    Get current user (assumes get_current_user dependency already exists).
-    This is a placeholder that should be integrated with existing auth.
-    """
-    return current_user
-
-
-def require_role(role_name: str):
-    """
-    Dependency to require a specific role.
+    Dependency factory to require a specific RBAC role.
 
     Usage:
-        @router.get("/admin")
-        async def admin_only(
-            current_user: Annotated[User, Depends(require_role("Admin"))],
-            session: SessionDep,
-        ):
-            return {"message": "Admin access granted"}
+        @router.get("/admin", dependencies=[Depends(require_role("Admin"))])
+        async def admin_only(): ...
+
+        # Or as a typed parameter:
+        async def admin_only(current_user: Annotated[User, Depends(require_role("Admin"))]):
     """
 
-    async def check_role(
-        current_user: User, session: SessionDep
-    ) -> User:
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-
+    def check_role(current_user: CurrentUser, session: SessionDep) -> User:
         if not user_has_role(
             session=session, user_id=current_user.id, role_name=role_name
         ):
@@ -48,28 +31,21 @@ def require_role(role_name: str):
             )
         return current_user
 
-    return Depends(check_role)
+    return check_role
 
 
-def require_permission(permission_name: str):
+def require_permission(
+    permission_name: str,
+) -> Callable[[CurrentUser, SessionDep], User]:
     """
-    Dependency to require a specific permission.
+    Dependency factory to require a specific permission.
 
     Usage:
-        @router.delete("/items/{item_id}")
-        async def delete_item(
-            current_user: Annotated[User, Depends(require_permission("items:delete"))],
-            session: SessionDep,
-        ):
-            return {"message": "Item deleted"}
+        @router.delete("/items/{item_id}", dependencies=[Depends(require_permission("items:delete"))])
+        async def delete_item(): ...
     """
 
-    async def check_permission(
-        current_user: User, session: SessionDep
-    ) -> User:
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-
+    def check_permission(current_user: CurrentUser, session: SessionDep) -> User:
         if not user_has_permission(
             session=session,
             user_id=current_user.id,
@@ -81,79 +57,57 @@ def require_permission(permission_name: str):
             )
         return current_user
 
-    return Depends(check_permission)
+    return check_permission
 
 
-def require_any_role(*role_names: str):
+def require_any_role(*role_names: str) -> Callable[[CurrentUser, SessionDep], User]:
     """
-    Dependency to require any of the specified roles.
+    Dependency factory to require any of the specified roles.
 
     Usage:
-        @router.get("/reports")
-        async def get_reports(
-            current_user: Annotated[User, Depends(require_any_role("Admin", "Editor"))],
-            session: SessionDep,
-        ):
-            return {"message": "Reports access"}
+        @router.get("/reports", dependencies=[Depends(require_any_role("Admin", "Editor"))])
+        async def get_reports(): ...
     """
 
-    async def check_any_role(
-        current_user: User, session: SessionDep
-    ) -> User:
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-
-        has_any_role = any(
+    def check_any_role(current_user: CurrentUser, session: SessionDep) -> User:
+        has_any = any(
             user_has_role(session=session, user_id=current_user.id, role_name=role)
             for role in role_names
         )
-
-        if not has_any_role:
-            roles_str = ", ".join(role_names)
+        if not has_any:
             raise HTTPException(
                 status_code=403,
-                detail=f"User does not have any of required roles: {roles_str}",
+                detail=f"User does not have any of required roles: {', '.join(role_names)}",
             )
         return current_user
 
-    return Depends(check_any_role)
+    return check_any_role
 
 
-def require_all_permissions(*permission_names: str):
+def require_all_permissions(
+    *permission_names: str,
+) -> Callable[[CurrentUser, SessionDep], User]:
     """
-    Dependency to require all of the specified permissions.
+    Dependency factory to require all of the specified permissions.
 
     Usage:
-        @router.post("/projects/{project_id}/users")
-        async def add_user_to_project(
-            current_user: Annotated[User, Depends(
-                require_all_permissions("users:create", "users:manage_roles")
-            )],
-            session: SessionDep,
-        ):
-            return {"message": "User added"}
+        @router.post("/endpoint", dependencies=[Depends(require_all_permissions("users:create", "users:manage_roles"))])
+        async def endpoint(): ...
     """
 
-    async def check_all_permissions(
-        current_user: User, session: SessionDep
-    ) -> User:
-        if not current_user:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-
-        missing_perms = [
+    def check_all_permissions(current_user: CurrentUser, session: SessionDep) -> User:
+        missing = [
             perm
             for perm in permission_names
             if not user_has_permission(
                 session=session, user_id=current_user.id, permission_name=perm
             )
         ]
-
-        if missing_perms:
-            perms_str = ", ".join(missing_perms)
+        if missing:
             raise HTTPException(
                 status_code=403,
-                detail=f"User is missing required permissions: {perms_str}",
+                detail=f"User is missing required permissions: {', '.join(missing)}",
             )
         return current_user
 
-    return Depends(check_all_permissions)
+    return check_all_permissions

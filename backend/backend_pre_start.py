@@ -15,7 +15,7 @@ from backend.crud_rbac import (
     get_permission_by_name,
     get_role_by_name,
 )
-from backend.models import Permission, PermissionCreate, RoleCreate
+from backend.models import PermissionCreate, RoleCreate
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,20 +47,20 @@ def init_rbac(db_engine: Engine) -> None:
             # Create default permissions if they don't exist
             logger.info("Initializing RBAC permissions...")
             for permission_group in DEFAULT_PERMISSIONS.values():
-                for perm in permission_group:
+                for perm_dict in permission_group:
                     existing = get_permission_by_name(
-                        session=session, name=perm["name"]
+                        session=session, name=perm_dict["name"]
                     )
                     if not existing:
                         create_permission(
                             session=session,
                             permission_in=PermissionCreate(
-                                name=perm["name"],
-                                description=perm.get("display", perm["name"]),
-                                resource=perm["resource"],
+                                name=perm_dict["name"],
+                                description=perm_dict.get("display", perm_dict["name"]),
+                                resource=perm_dict["resource"],
                             ),
                         )
-                        logger.info(f"Created permission: {perm['name']}")
+                        logger.info(f"Created permission: {perm_dict['name']}")
 
             # Create default system roles if they don't exist
             logger.info("Initializing RBAC system roles...")
@@ -71,9 +71,7 @@ def init_rbac(db_engine: Engine) -> None:
                     # Get permission IDs
                     permission_ids = []
                     for perm_name in role_config["permissions"]:
-                        perm = get_permission_by_name(
-                            session=session, name=perm_name
-                        )
+                        perm = get_permission_by_name(session=session, name=perm_name)
                         if perm:
                             permission_ids.append(perm.id)
 
@@ -128,4 +126,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

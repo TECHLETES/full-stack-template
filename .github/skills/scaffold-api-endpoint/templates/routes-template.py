@@ -11,7 +11,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import Session
 
-from app import crud
+from backend import crud
 from backend.api.deps import CurrentUser, SessionDep
 from backend.models import (
     Message,
@@ -34,7 +34,7 @@ def read_projects(
 ) -> Any:
     """
     Retrieve projects for the current user.
-    
+
     Returns paginated list with total count.
     """
     projects, count = crud.read_projects(
@@ -101,7 +101,7 @@ def update_project(
             status_code=404,
             detail="Project not found",
         )
-    
+
     project = crud.update_project(
         session=session,
         db_project=project,
@@ -127,7 +127,7 @@ def delete_project(
             status_code=404,
             detail="Project not found",
         )
-    
+
     crud.delete_project(session=session, db_project=project)
     return Message(message="Project deleted successfully")
 ```
@@ -246,7 +246,7 @@ def admin_delete_project(
     project = session.get(Project, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
-    
+
     crud.delete_project(session=session, db_project=project)
     return Message(message="Project deleted successfully")
 ```

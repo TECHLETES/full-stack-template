@@ -62,7 +62,7 @@ Skip if you already have an Azure subscription and tenant.
 - **Supported account types:**
   - *Single-tenant:* `Accounts in this organizational directory only`
   - *Multi-tenant:* `Accounts in any organizational directory (Any Azure AD directory – Multitenant)`
-- **Redirect URI:** 
+- **Redirect URI:**
   - Type: `Single-page application (SPA)`
   - URI: `http://localhost:5173` (for local development)
   - *For production, add: `https://yourdomain.com` (without trailing slash)*

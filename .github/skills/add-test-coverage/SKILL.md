@@ -97,16 +97,16 @@ from app import crud
 def test_create_project(db: Session) -> None:
     """Test creating a project via CRUD."""
     from tests.utils.project import create_random_user
-    
+
     user = create_random_user(db)
     project_in = ProjectCreate(title="Test", description="Desc")
-    
+
     project = crud.create_project(
         session=db,
         project_in=project_in,
         owner_id=user.id,
     )
-    
+
     assert project.id
     assert project.title == "Test"
     assert project.owner_id == user.id
@@ -115,40 +115,40 @@ def test_create_project(db: Session) -> None:
 def test_read_project_returns_none_if_not_found(db: Session) -> None:
     """Test reading non-existent project."""
     from tests.utils.project import create_random_user
-    
+
     user = create_random_user(db)
     project = crud.read_project(
         session=db,
         owner_id=user.id,
         project_id=uuid.uuid4(),
     )
-    
+
     assert project is None
 
 
 def test_update_project(db: Session) -> None:
     """Test updating a project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     updated = ProjectUpdate(title="Updated")
-    
+
     result = crud.update_project(
         session=db,
         db_project=project,
         project_in=updated,
     )
-    
+
     assert result.title == "Updated"
 
 
 def test_delete_project(db: Session) -> None:
     """Test deleting a project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     crud.delete_project(session=db, db_project=project)
-    
+
     # Verify deleted
     result = crud.read_project(
         session=db,
@@ -188,7 +188,7 @@ def test_create_project_succeeds(
         headers=normal_user_token_headers,
         json=data,
     )
-    
+
     assert response.status_code == 200
     content = response.json()
     assert content["title"] == data["title"]
@@ -206,7 +206,7 @@ def test_create_project_validation_fails(
         headers=normal_user_token_headers,
         json=data,
     )
-    
+
     assert response.status_code == 422  # Validation error
 
 
@@ -224,16 +224,16 @@ def test_read_project_forbidden_for_other_user(
 ) -> None:
     """Test user can't read another user's project."""
     from tests.utils.project import create_random_project
-    
+
     # Create as superuser (different user)
     project = create_random_project(db)
-    
+
     # Normal user tries to read
     response = client.get(
         f"/api/v1/projects/{project.id}",
         headers=normal_user_token_headers,
     )
-    
+
     assert response.status_code == 404  # Treated as not found
 
 
@@ -244,16 +244,16 @@ def test_update_project_partial(
 ) -> None:
     """Test partial update (only title, description stays same)."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
     original_desc = project.description
-    
+
     response = client.patch(
         f"/api/v1/projects/{project.id}",
         headers=normal_user_token_headers,
         json={"title": "New Title"},
     )
-    
+
     assert response.status_code == 200
     content = response.json()
     assert content["title"] == "New Title"
@@ -267,16 +267,16 @@ def test_delete_project_succeeds(
 ) -> None:
     """Test deleting a project."""
     from tests.utils.project import create_random_project
-    
+
     project = create_random_project(db)
-    
+
     response = client.delete(
         f"/api/v1/projects/{project.id}",
         headers=normal_user_token_headers,
     )
-    
+
     assert response.status_code == 200
-    
+
     # Verify deleted
     response = client.get(
         f"/api/v1/projects/{project.id}",
@@ -419,41 +419,41 @@ import { expect, test } from "@playwright/test"
 
 test("User can create an item", async ({ page }) => {
   await page.goto("/items")
-  
+
   // Click create button
   await page.getByRole("button", { name: "Add Item" }).click()
-  
+
   // Fill form
   await page.getByLabel("Title").fill("Test Item")
   await page.getByLabel("Description").fill("A test item")
-  
+
   // Submit
   await page.getByRole("button", { name: "Create" }).click()
-  
+
   // Verify success
   await expect(
     page.getByText("Item created successfully")
   ).toBeVisible()
-  
+
   // Verify item in list
   await expect(page.getByText("Test Item")).toBeVisible()
 })
 
 test("User can edit an item", async ({ page }) => {
   await page.goto("/items")
-  
+
   // Find item row
   const row = page.locator("table tbody tr").first()
-  
+
   // Click edit
   await row.getByRole("button", { name: "Edit" }).click()
-  
+
   // Update title
   await page.getByLabel("Title").fill("Updated Title")
-  
+
   // Submit
   await page.getByRole("button", { name: "Save" }).click()
-  
+
   // Verify
   await expect(page.getByText("Item updated successfully")).toBeVisible()
   await expect(page.getByText("Updated Title")).toBeVisible()
@@ -461,20 +461,20 @@ test("User can edit an item", async ({ page }) => {
 
 test("User can delete an item", async ({ page }) => {
   await page.goto("/items")
-  
+
   // Count initial items
   const initialCount = await page.locator("table tbody tr").count()
-  
+
   // Delete first item
   const row = page.locator("table tbody tr").first()
   await row.getByRole("button", { name: "Delete" }).click()
-  
+
   // Accept confirmation
   await page.getByRole("button", { name: "Confirm" }).click()
-  
+
   // Verify success message
   await expect(page.getByText("Item deleted successfully")).toBeVisible()
-  
+
   // Verify count decreased
   const newCount = await page.locator("table tbody tr").count()
   expect(newCount).toBe(initialCount - 1)
@@ -482,18 +482,18 @@ test("User can delete an item", async ({ page }) => {
 
 test("Search filters items", async ({ page }) => {
   await page.goto("/items")
-  
+
   // Type in search
   await page.getByPlaceholder("Search items...").fill("test")
-  
+
   // Wait for results
   await page.waitForTimeout(500)
-  
+
   // Verify only matching items shown
   const rows = page.locator("table tbody tr")
   const count = await rows.count()
   expect(count).toBeGreaterThanOrEqual(0)
-  
+
   // Each visible row should contain "test"
   for (let i = 0; i < count; i++) {
     const row = rows.nth(i)
@@ -537,11 +537,11 @@ test("Admin can delete user", async ({ page }) => {
     password: "password123",
     full_name: "Test User",
   })
-  
+
   await page.goto("/admin")
   await page.getByText(newUser.email).click()
   await page.getByRole("button", { name: "Delete" }).click()
-  
+
   // Cleanup
   await deleteTestUser(newUser.id)
 })
@@ -655,7 +655,7 @@ import pytest
 ])
 def test_project_title_validation(title: str, valid: bool, db: Session) -> None:
     project_in = ProjectCreate(title=title)
-    
+
     if not valid:
         with pytest.raises(ValidationError):
             project_in.model_validate(project_in.model_dump())
@@ -673,7 +673,7 @@ from unittest.mock import patch
 def test_user_creation_sends_email(mock_send: Mock, db: Session) -> None:
     user_in = UserCreate(email="new@example.com", password="pass")
     crud.create_user(session=db, user_create=user_in)
-    
+
     # Verify email was called
     mock_send.assert_called_once()
     call_args = mock_send.call_args
@@ -685,13 +685,13 @@ def test_user_creation_sends_email(mock_send: Mock, db: Session) -> None:
 ```python
 def test_create_duplicate_email_fails(db: Session) -> None:
     from tests.utils.user import create_random_user
-    
+
     # Create first user
     user1 = create_random_user(db)
-    
+
     # Try to create with same email
     user_in = UserCreate(email=user1.email, password="password")
-    
+
     with pytest.raises(IntegrityError):
         crud.create_user(session=db, user_create=user_in)
 ```

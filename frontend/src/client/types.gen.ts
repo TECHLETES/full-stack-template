@@ -16,6 +16,16 @@ export type Body_login_login_access_token = {
     client_secret?: (string | null);
 };
 
+export type EntraLoginRequest = {
+    access_token: string;
+    tenant_id?: (string | null);
+    roles?: Array<(string)>;
+};
+
+export type EntraLoginUrlResponse = {
+    login_url: string;
+};
+
 export type HTTPValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -47,9 +57,62 @@ export type Message = {
     message: string;
 };
 
+export type MicrosoftTenantCreate = {
+    tenant_id: string;
+    tenant_name: string;
+    is_enabled?: boolean;
+    auto_create_users?: boolean;
+};
+
+export type MicrosoftTenantPublic = {
+    tenant_id: string;
+    tenant_name: string;
+    is_enabled?: boolean;
+    auto_create_users?: boolean;
+    id: string;
+    created_at?: (string | null);
+    created_by?: (string | null);
+};
+
+export type MicrosoftTenantsPublic = {
+    data: Array<MicrosoftTenantPublic>;
+    count: number;
+};
+
+export type MicrosoftTenantUpdate = {
+    tenant_name?: (string | null);
+    is_enabled?: (boolean | null);
+    auto_create_users?: (boolean | null);
+};
+
 export type NewPassword = {
     token: string;
     new_password: string;
+};
+
+export type PermissionCreate = {
+    name: string;
+    description?: (string | null);
+    resource: string;
+};
+
+export type PermissionPublic = {
+    name: string;
+    description?: (string | null);
+    resource: string;
+    id: string;
+    created_at?: (string | null);
+};
+
+export type PermissionsPublic = {
+    data: Array<PermissionPublic>;
+    count: number;
+};
+
+export type PermissionUpdate = {
+    name?: (string | null);
+    description?: (string | null);
+    resource?: (string | null);
 };
 
 export type PrivateUserCreate = {
@@ -57,6 +120,33 @@ export type PrivateUserCreate = {
     password: string;
     full_name: string;
     is_verified?: boolean;
+};
+
+export type RoleCreate = {
+    name: string;
+    description?: (string | null);
+    is_system?: boolean;
+    permission_ids?: Array<(string)>;
+};
+
+export type RolePublic = {
+    name: string;
+    description?: (string | null);
+    is_system?: boolean;
+    id: string;
+    created_at?: (string | null);
+    permissions?: Array<PermissionPublic>;
+};
+
+export type RolesPublic = {
+    data: Array<RolePublic>;
+    count: number;
+};
+
+export type RoleUpdate = {
+    name?: (string | null);
+    description?: (string | null);
+    permission_ids?: (Array<(string)> | null);
 };
 
 export type Token = {
@@ -84,6 +174,9 @@ export type UserPublic = {
     full_name?: (string | null);
     id: string;
     created_at?: (string | null);
+    azure_user_id?: (string | null);
+    azure_tenant_id?: (string | null);
+    azure_roles?: Array<(string)>;
 };
 
 export type UserRegister = {
@@ -119,6 +212,23 @@ export type ValidationError = {
         [key: string]: unknown;
     };
 };
+
+export type AuthEntraEntraLoginData = {
+    requestBody: EntraLoginRequest;
+};
+
+export type AuthEntraEntraLoginResponse = (Token);
+
+export type AuthEntraGetEntraLoginUrlData = {
+    redirectUri: string;
+    tenantId?: (string | null);
+};
+
+export type AuthEntraGetEntraLoginUrlResponse = (EntraLoginUrlResponse);
+
+export type AuthEntraGetEntraConfigResponse = ({
+    [key: string]: unknown;
+});
 
 export type ItemsReadItemsData = {
     limit?: number;
@@ -183,6 +293,154 @@ export type PrivateCreateUserData = {
 };
 
 export type PrivateCreateUserResponse = (UserPublic);
+
+export type RbacListPermissionsData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type RbacListPermissionsResponse = (PermissionsPublic);
+
+export type RbacCreatePermissionEndpointData = {
+    requestBody: PermissionCreate;
+};
+
+export type RbacCreatePermissionEndpointResponse = (PermissionPublic);
+
+export type RbacGetPermissionEndpointData = {
+    permissionId: string;
+};
+
+export type RbacGetPermissionEndpointResponse = (PermissionPublic);
+
+export type RbacUpdatePermissionEndpointData = {
+    permissionId: string;
+    requestBody: PermissionUpdate;
+};
+
+export type RbacUpdatePermissionEndpointResponse = (PermissionPublic);
+
+export type RbacDeletePermissionEndpointData = {
+    permissionId: string;
+};
+
+export type RbacDeletePermissionEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacListRolesData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type RbacListRolesResponse = (RolesPublic);
+
+export type RbacCreateRoleEndpointData = {
+    requestBody: RoleCreate;
+};
+
+export type RbacCreateRoleEndpointResponse = (RolePublic);
+
+export type RbacGetRoleEndpointData = {
+    roleId: string;
+};
+
+export type RbacGetRoleEndpointResponse = (RolePublic);
+
+export type RbacUpdateRoleEndpointData = {
+    requestBody: RoleUpdate;
+    roleId: string;
+};
+
+export type RbacUpdateRoleEndpointResponse = (RolePublic);
+
+export type RbacDeleteRoleEndpointData = {
+    roleId: string;
+};
+
+export type RbacDeleteRoleEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacAddPermissionToRoleEndpointData = {
+    permissionId: string;
+    roleId: string;
+};
+
+export type RbacAddPermissionToRoleEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacRemovePermissionFromRoleEndpointData = {
+    permissionId: string;
+    roleId: string;
+};
+
+export type RbacRemovePermissionFromRoleEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacAssignRoleToUserEndpointData = {
+    roleId: string;
+    userId: string;
+};
+
+export type RbacAssignRoleToUserEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacRemoveRoleFromUserEndpointData = {
+    roleId: string;
+    userId: string;
+};
+
+export type RbacRemoveRoleFromUserEndpointResponse = ({
+    [key: string]: (string);
+});
+
+export type RbacGetUserRolesEndpointData = {
+    userId: string;
+};
+
+export type RbacGetUserRolesEndpointResponse = (RolesPublic);
+
+export type RbacGetUserPermissionsEndpointData = {
+    userId: string;
+};
+
+export type RbacGetUserPermissionsEndpointResponse = (PermissionsPublic);
+
+export type RbacGetPermissionsCatalogResponse = ({
+    [key: string]: Array<{
+        [key: string]: (string);
+    }>;
+});
+
+export type TenantsListTenantsData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type TenantsListTenantsResponse = (MicrosoftTenantsPublic);
+
+export type TenantsCreateTenantData = {
+    requestBody: MicrosoftTenantCreate;
+};
+
+export type TenantsCreateTenantResponse = (MicrosoftTenantPublic);
+
+export type TenantsUpdateTenantData = {
+    requestBody: MicrosoftTenantUpdate;
+    tenantId: string;
+};
+
+export type TenantsUpdateTenantResponse = (MicrosoftTenantPublic);
+
+export type TenantsDeleteTenantData = {
+    tenantId: string;
+};
+
+export type TenantsDeleteTenantResponse = (Message);
 
 export type UsersReadUsersData = {
     limit?: number;

@@ -8,9 +8,9 @@ from backend.core.config import settings
 from backend.core.security import get_password_hash, verify_password
 from backend.crud import create_user
 from backend.models import User, UserCreate
+from backend.tests.utils.user import user_authentication_headers
+from backend.tests.utils.utils import random_email, random_lower_string
 from backend.utils import generate_password_reset_token
-from tests.utils.user import user_authentication_headers
-from tests.utils.utils import random_email, random_lower_string
 
 
 def test_get_access_token(client: TestClient) -> None:

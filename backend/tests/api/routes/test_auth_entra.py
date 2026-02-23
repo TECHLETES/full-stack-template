@@ -71,9 +71,7 @@ def test_entra_login_creates_user(
     # Verify user was created
     from sqlmodel import select
 
-    user = db.exec(
-        select(User).where(User.email == "entra-test@example.com")
-    ).first()
+    user = db.exec(select(User).where(User.email == "entra-test@example.com")).first()
     assert user is not None
     assert user.azure_user_id == "azure-user-id-123"
     assert user.full_name == "Entra Test User"

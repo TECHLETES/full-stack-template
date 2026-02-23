@@ -204,7 +204,9 @@ def list_tenants(
     count_stmt = select(MicrosoftTenant)
     tenants = session.exec(count_stmt.offset(skip).limit(limit)).all()
     count = session.exec(select(func.count()).select_from(MicrosoftTenant)).one()
-    return MicrosoftTenantsPublic(data=[MicrosoftTenantPublic.model_validate(t) for t in tenants], count=count)
+    return MicrosoftTenantsPublic(
+        data=[MicrosoftTenantPublic.model_validate(t) for t in tenants], count=count
+    )
 
 
 @tenant_router.post("/", response_model=MicrosoftTenantPublic)
@@ -219,9 +221,7 @@ def create_tenant(
         raise HTTPException(status_code=403, detail="Not enough privileges")
 
     existing = session.exec(
-        select(MicrosoftTenant).where(
-            MicrosoftTenant.tenant_id == tenant_in.tenant_id
-        )
+        select(MicrosoftTenant).where(MicrosoftTenant.tenant_id == tenant_in.tenant_id)
     ).first()
     if existing:
         raise HTTPException(status_code=400, detail="Tenant already exists")

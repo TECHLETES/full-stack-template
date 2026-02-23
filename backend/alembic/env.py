@@ -22,6 +22,9 @@ fileConfig(config.config_file_name)
 from backend.models import SQLModel  # noqa
 from backend.core.config import settings # noqa
 
+# Import models to ensure they're registered with metadata
+import backend.models as models  # noqa
+
 target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,

@@ -70,6 +70,49 @@ export const Body_login_login_access_tokenSchema = {
     title: 'Body_login-login_access_token'
 } as const;
 
+export const EntraLoginRequestSchema = {
+    properties: {
+        access_token: {
+            type: 'string',
+            title: 'Access Token'
+        },
+        tenant_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Tenant Id'
+        },
+        roles: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Roles',
+            default: []
+        }
+    },
+    type: 'object',
+    required: ['access_token'],
+    title: 'EntraLoginRequest'
+} as const;
+
+export const EntraLoginUrlResponseSchema = {
+    properties: {
+        login_url: {
+            type: 'string',
+            title: 'Login Url'
+        }
+    },
+    type: 'object',
+    required: ['login_url'],
+    title: 'EntraLoginUrlResponse'
+} as const;
+
 export const HTTPValidationErrorSchema = {
     properties: {
         detail: {
@@ -221,6 +264,151 @@ export const MessageSchema = {
     title: 'Message'
 } as const;
 
+export const MicrosoftTenantCreateSchema = {
+    properties: {
+        tenant_id: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Tenant Id'
+        },
+        tenant_name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Tenant Name'
+        },
+        is_enabled: {
+            type: 'boolean',
+            title: 'Is Enabled',
+            default: true
+        },
+        auto_create_users: {
+            type: 'boolean',
+            title: 'Auto Create Users',
+            default: true
+        }
+    },
+    type: 'object',
+    required: ['tenant_id', 'tenant_name'],
+    title: 'MicrosoftTenantCreate'
+} as const;
+
+export const MicrosoftTenantPublicSchema = {
+    properties: {
+        tenant_id: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Tenant Id'
+        },
+        tenant_name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Tenant Name'
+        },
+        is_enabled: {
+            type: 'boolean',
+            title: 'Is Enabled',
+            default: true
+        },
+        auto_create_users: {
+            type: 'boolean',
+            title: 'Auto Create Users',
+            default: true
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        created_by: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'uuid'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created By'
+        }
+    },
+    type: 'object',
+    required: ['tenant_id', 'tenant_name', 'id'],
+    title: 'MicrosoftTenantPublic'
+} as const;
+
+export const MicrosoftTenantUpdateSchema = {
+    properties: {
+        tenant_name: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Tenant Name'
+        },
+        is_enabled: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Is Enabled'
+        },
+        auto_create_users: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Auto Create Users'
+        }
+    },
+    type: 'object',
+    title: 'MicrosoftTenantUpdate'
+} as const;
+
+export const MicrosoftTenantsPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/MicrosoftTenantPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'MicrosoftTenantsPublic'
+} as const;
+
 export const NewPasswordSchema = {
     properties: {
         token: {
@@ -237,6 +425,145 @@ export const NewPasswordSchema = {
     type: 'object',
     required: ['token', 'new_password'],
     title: 'NewPassword'
+} as const;
+
+export const PermissionCreateSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        resource: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Resource'
+        }
+    },
+    type: 'object',
+    required: ['name', 'resource'],
+    title: 'PermissionCreate'
+} as const;
+
+export const PermissionPublicSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        resource: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Resource'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        }
+    },
+    type: 'object',
+    required: ['name', 'resource', 'id'],
+    title: 'PermissionPublic'
+} as const;
+
+export const PermissionUpdateSchema = {
+    properties: {
+        name: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        resource: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Resource'
+        }
+    },
+    type: 'object',
+    title: 'PermissionUpdate'
+} as const;
+
+export const PermissionsPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/PermissionPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'PermissionsPublic'
 } as const;
 
 export const PrivateUserCreateSchema = {
@@ -262,6 +589,163 @@ export const PrivateUserCreateSchema = {
     type: 'object',
     required: ['email', 'password', 'full_name'],
     title: 'PrivateUserCreate'
+} as const;
+
+export const RoleCreateSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        is_system: {
+            type: 'boolean',
+            title: 'Is System',
+            default: false
+        },
+        permission_ids: {
+            items: {
+                type: 'string',
+                format: 'uuid'
+            },
+            type: 'array',
+            title: 'Permission Ids'
+        }
+    },
+    type: 'object',
+    required: ['name'],
+    title: 'RoleCreate'
+} as const;
+
+export const RolePublicSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        is_system: {
+            type: 'boolean',
+            title: 'Is System',
+            default: false
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        permissions: {
+            items: {
+                '$ref': '#/components/schemas/PermissionPublic'
+            },
+            type: 'array',
+            title: 'Permissions'
+        }
+    },
+    type: 'object',
+    required: ['name', 'id'],
+    title: 'RolePublic'
+} as const;
+
+export const RoleUpdateSchema = {
+    properties: {
+        name: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Name'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 500
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        permission_ids: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string',
+                        format: 'uuid'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Permission Ids'
+        }
+    },
+    type: 'object',
+    title: 'RoleUpdate'
+} as const;
+
+export const RolesPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/RolePublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'RolesPublic'
 } as const;
 
 export const TokenSchema = {
@@ -389,6 +873,36 @@ export const UserPublicSchema = {
                 }
             ],
             title: 'Created At'
+        },
+        azure_user_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Azure User Id'
+        },
+        azure_tenant_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Azure Tenant Id'
+        },
+        azure_roles: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Azure Roles',
+            default: []
         }
     },
     type: 'object',

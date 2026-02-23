@@ -52,7 +52,7 @@ def read_projects(
         .limit(limit)
     )
     projects = session.exec(statement).all()
-    
+
     return projects, count
 
 
@@ -149,7 +149,7 @@ def search_projects(
 ) -> list[Project]:
     """Search projects by title."""
     statement = select(Project).where(
-        (Project.owner_id == owner_id) 
+        (Project.owner_id == owner_id)
         & (Project.title.ilike(f"%{search}%"))
     )
     return session.exec(statement).all()
@@ -181,7 +181,7 @@ def read_projects_sorted(
         .limit(limit)
     )
     projects = session.exec(statement).all()
-    
+
     return projects, count
 ```
 

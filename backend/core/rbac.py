@@ -14,11 +14,19 @@ DEFAULT_PERMISSIONS = {
         {"name": "users:read", "display": "Read Users", "resource": "users"},
         {"name": "users:update", "display": "Update Users", "resource": "users"},
         {"name": "users:delete", "display": "Delete Users", "resource": "users"},
-        {"name": "users:manage_roles", "display": "Manage User Roles", "resource": "users"},
+        {
+            "name": "users:manage_roles",
+            "display": "Manage User Roles",
+            "resource": "users",
+        },
     ],
     "reports": [
         {"name": "reports:view", "display": "View Reports", "resource": "reports"},
-        {"name": "reports:download", "display": "Download Reports", "resource": "reports"},
+        {
+            "name": "reports:download",
+            "display": "Download Reports",
+            "resource": "reports",
+        },
         {"name": "reports:share", "display": "Share Reports", "resource": "reports"},
     ],
 }

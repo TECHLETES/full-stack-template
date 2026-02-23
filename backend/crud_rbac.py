@@ -2,6 +2,7 @@
 
 import uuid
 
+from sqlalchemy import delete
 from sqlmodel import Session, select
 
 from backend.models import (
@@ -15,7 +16,6 @@ from backend.models import (
     User,
     UserRole,
 )
-
 
 # --- Permission CRUD ---
 
@@ -38,9 +38,7 @@ def get_permission(*, session: Session, permission_id: uuid.UUID) -> Permission 
     ).first()
 
 
-def get_permission_by_name(
-    *, session: Session, name: str
-) -> Permission | None:
+def get_permission_by_name(*, session: Session, name: str) -> Permission | None:
     """Get permission by name."""
     return session.exec(select(Permission).where(Permission.name == name)).first()
 
@@ -50,9 +48,7 @@ def get_all_permissions(
 ) -> tuple[list[Permission], int]:
     """Get all permissions with pagination."""
     count = session.exec(select(Permission)).all().__len__()
-    permissions = session.exec(
-        select(Permission).offset(skip).limit(limit)
-    ).all()
+    permissions = list(session.exec(select(Permission).offset(skip).limit(limit)).all())
     return permissions, count
 
 
@@ -71,9 +67,7 @@ def update_permission(
     return db_permission
 
 
-def delete_permission(
-    *, session: Session, permission_id: uuid.UUID
-) -> bool:
+def delete_permission(*, session: Session, permission_id: uuid.UUID) -> bool:
     """Delete a permission."""
     db_permission = get_permission(session=session, permission_id=permission_id)
     if not db_permission:
@@ -123,13 +117,11 @@ def get_all_roles(
 ) -> tuple[list[Role], int]:
     """Get all roles with pagination."""
     count = session.exec(select(Role)).all().__len__()
-    roles = session.exec(select(Role).offset(skip).limit(limit)).all()
+    roles = list(session.exec(select(Role).offset(skip).limit(limit)).all())
     return roles, count
 
 
-def update_role(
-    *, session: Session, db_role: Role, role_in: RoleUpdate
-) -> Role:
+def update_role(*, session: Session, db_role: Role, role_in: RoleUpdate) -> Role:
     """Update a role and optionally update its permissions."""
     role_data = role_in.model_dump(exclude_unset=True, exclude={"permission_ids"})
     db_role.sqlmodel_update(role_data)
@@ -137,12 +129,10 @@ def update_role(
     # Update permissions if provided
     if role_in.permission_ids is not None:
         # Remove existing permissions
-        session.exec(
-            select(RolePermission).where(RolePermission.role_id == db_role.id)
+        to_delete = delete(RolePermission).where(
+            RolePermission.role_id == db_role.id  # type: ignore[arg-type]
         )
-        session.query(RolePermission).filter(
-            RolePermission.role_id == db_role.id
-        ).delete()
+        session.exec(to_delete)
 
         # Add new permissions
         for permission_id in role_in.permission_ids:
@@ -258,9 +248,7 @@ def remove_role_from_user(
     return True
 
 
-def get_user_roles(
-    *, session: Session, user_id: uuid.UUID
-) -> list[Role]:
+def get_user_roles(*, session: Session, user_id: uuid.UUID) -> list[Role]:
     """Get all roles for a user."""
     user = session.exec(select(User).where(User.id == user_id)).first()
     if not user:
@@ -268,9 +256,7 @@ def get_user_roles(
     return user.roles or []
 
 
-def get_user_permissions(
-    *, session: Session, user_id: uuid.UUID
-) -> list[Permission]:
+def get_user_permissions(*, session: Session, user_id: uuid.UUID) -> list[Permission]:
     """Get all permissions for a user (via their roles)."""
     roles = get_user_roles(session=session, user_id=user_id)
     permissions: set[Permission] = set()
@@ -279,9 +265,7 @@ def get_user_permissions(
     return list(permissions)
 
 
-def get_users_with_role(
-    *, session: Session, role_id: uuid.UUID
-) -> list[User]:
+def get_users_with_role(*, session: Session, role_id: uuid.UUID) -> list[User]:
     """Get all users with a specific role."""
     role = get_role(session=session, role_id=role_id)
     if not role:
@@ -289,9 +273,7 @@ def get_users_with_role(
     return role.users or []
 
 
-def user_has_role(
-    *, session: Session, user_id: uuid.UUID, role_name: str
-) -> bool:
+def user_has_role(*, session: Session, user_id: uuid.UUID, role_name: str) -> bool:
     """Check if user has a specific role by name."""
     roles = get_user_roles(session=session, user_id=user_id)
     return any(role.name == role_name for role in roles)

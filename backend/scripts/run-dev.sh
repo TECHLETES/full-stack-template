@@ -54,5 +54,3 @@ uv run python initial_data.py
 # Start FastAPI dev server with auto-reload in current terminal
 echo "✨ Starting FastAPI development server..."
 uv run fastapi dev main.py
-
-

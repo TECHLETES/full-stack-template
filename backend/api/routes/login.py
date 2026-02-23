@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app import crud
+from backend import crud
 from backend.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from backend.core import security
 from backend.core.config import settings

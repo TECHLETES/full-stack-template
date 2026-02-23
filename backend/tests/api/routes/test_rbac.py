@@ -2,21 +2,21 @@
 
 import pytest
 from fastapi.testclient import TestClient
-
-from backend.main import app
-from backend.models import UserCreate
-from backend.crud import create_user
 from sqlmodel import Session
+
+from backend.crud import create_user
+from backend.main import app
+from backend.models import User, UserCreate
 
 
 @pytest.fixture
-def client():
+def client() -> TestClient:
     """Create a test client."""
     return TestClient(app)
 
 
 @pytest.fixture
-def admin_user(session: Session):
+def admin_user(session: Session) -> User:
     """Create an admin user for testing."""
     user_in = UserCreate(
         email="admin@example.com",
@@ -28,7 +28,7 @@ def admin_user(session: Session):
 
 
 @pytest.fixture
-def token(client: TestClient, admin_user):
+def token(client: TestClient, admin_user: User) -> str:
     """Get auth token for admin user."""
     response = client.post(
         "/api/v1/login/access-token",
@@ -40,7 +40,7 @@ def token(client: TestClient, admin_user):
 class TestPermissionsEndpoints:
     """Test permissions API endpoints."""
 
-    def test_get_permissions_catalog(self, client: TestClient):
+    def test_get_permissions_catalog(self, client: TestClient) -> None:
         """Test getting permissions catalog (public endpoint)."""
         response = client.get("/api/v1/rbac/permissions-catalog")
         assert response.status_code == 200
@@ -49,7 +49,7 @@ class TestPermissionsEndpoints:
         assert "users" in data
         assert "reports" in data
 
-    def test_list_permissions(self, client: TestClient):
+    def test_list_permissions(self, client: TestClient) -> None:
         """Test listing all permissions."""
         response = client.get("/api/v1/rbac/permissions")
         assert response.status_code == 200
@@ -57,9 +57,7 @@ class TestPermissionsEndpoints:
         assert "data" in data
         assert "count" in data
 
-    def test_create_permission_requires_admin(
-        self, client: TestClient, token: str
-    ):
+    def test_create_permission_requires_admin(self, client: TestClient, token: str) -> None:
         """Test that creating permission requires admin role."""
         # First, try without auth
         response = client.post(
@@ -72,7 +70,7 @@ class TestPermissionsEndpoints:
         )
         assert response.status_code == 401
 
-    def test_permissions_catalog_structure(self, client: TestClient):
+    def test_permissions_catalog_structure(self, client: TestClient) -> None:
         """Test that permissions catalog has correct structure."""
         response = client.get("/api/v1/rbac/permissions-catalog")
         assert response.status_code == 200
@@ -90,7 +88,7 @@ class TestPermissionsEndpoints:
 class TestRolesEndpoints:
     """Test roles API endpoints."""
 
-    def test_list_roles(self, client: TestClient):
+    def test_list_roles(self, client: TestClient) -> None:
         """Test listing all roles."""
         response = client.get("/api/v1/rbac/roles")
         assert response.status_code == 200
@@ -101,17 +99,15 @@ class TestRolesEndpoints:
         role_names = [role["name"] for role in data["data"]]
         assert "Admin" in role_names or len(role_names) >= 0
 
-    def test_list_roles_with_pagination(self, client: TestClient):
+    def test_list_roles_with_pagination(self, client: TestClient) -> None:
         """Test listing roles with pagination."""
-        response = client.get(
-            "/api/v1/rbac/roles", params={"skip": 0, "limit": 10}
-        )
+        response = client.get("/api/v1/rbac/roles", params={"skip": 0, "limit": 10})
         assert response.status_code == 200
         data = response.json()
         assert "data" in data
         assert len(data["data"]) <= 10
 
-    def test_get_role_by_id(self, client: TestClient):
+    def test_get_role_by_id(self, client: TestClient) -> None:
         """Test getting a role by ID."""
         # First get a role
         list_response = client.get("/api/v1/rbac/roles")
@@ -126,7 +122,7 @@ class TestRolesEndpoints:
             assert data["id"] == role_id
             assert "name" in data
 
-    def test_get_nonexistent_role_returns_404(self, client: TestClient):
+    def test_get_nonexistent_role_returns_404(self, client: TestClient) -> None:
         """Test that getting non-existent role returns 404."""
         import uuid
 
@@ -138,7 +134,7 @@ class TestRolesEndpoints:
 class TestUserRolesEndpoints:
     """Test user roles endpoints."""
 
-    def test_get_user_roles(self, client: TestClient, admin_user):
+    def test_get_user_roles(self, client: TestClient, admin_user: User) -> None:
         """Test getting user roles endpoint."""
         response = client.get(f"/api/v1/rbac/users/{admin_user.id}/roles")
         assert response.status_code == 200
@@ -146,11 +142,9 @@ class TestUserRolesEndpoints:
         assert "data" in data
         assert "count" in data
 
-    def test_get_user_permissions(self, client: TestClient, admin_user):
+    def test_get_user_permissions(self, client: TestClient, admin_user: User) -> None:
         """Test getting user permissions endpoint."""
-        response = client.get(
-            f"/api/v1/rbac/users/{admin_user.id}/permissions"
-        )
+        response = client.get(f"/api/v1/rbac/users/{admin_user.id}/permissions")
         assert response.status_code == 200
         data = response.json()
         assert "data" in data
@@ -160,9 +154,7 @@ class TestUserRolesEndpoints:
 class TestIntegration:
     """Integration tests for RBAC system."""
 
-    def test_default_roles_are_created_on_startup(
-        self, client: TestClient
-    ):
+    def test_default_roles_are_created_on_startup(self, client: TestClient) -> None:
         """Test that default system roles exist."""
         response = client.get("/api/v1/rbac/roles")
         assert response.status_code == 200
@@ -173,9 +165,7 @@ class TestIntegration:
         # We expect at least one
         assert len(role_names) > 0
 
-    def test_default_permissions_catalog_completeness(
-        self, client: TestClient
-    ):
+    def test_default_permissions_catalog_completeness(self, client: TestClient) -> None:
         """Test that default permissions catalog is complete."""
         response = client.get("/api/v1/rbac/permissions-catalog")
         assert response.status_code == 200

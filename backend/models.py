@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import EmailStr
 from sqlalchemy import Column, DateTime
@@ -8,7 +8,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 def get_datetime_utc() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # Shared properties
@@ -46,6 +46,25 @@ class UpdatePassword(SQLModel):
     new_password: str = Field(min_length=8, max_length=128)
 
 
+# Many-to-many junction tables (must be defined before table models that reference them)
+class RolePermission(SQLModel, table=True):
+    role_id: uuid.UUID = Field(
+        foreign_key="role.id", primary_key=True, ondelete="CASCADE"
+    )
+    permission_id: uuid.UUID = Field(
+        foreign_key="permission.id", primary_key=True, ondelete="CASCADE"
+    )
+
+
+class UserRole(SQLModel, table=True):
+    user_id: uuid.UUID = Field(
+        foreign_key="user.id", primary_key=True, ondelete="CASCADE"
+    )
+    role_id: uuid.UUID = Field(
+        foreign_key="role.id", primary_key=True, ondelete="CASCADE"
+    )
+
+
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -63,11 +82,7 @@ class User(UserBase, table=True):
     tenant_roles: list["UserTenantRole"] = Relationship(
         back_populates="user", cascade_delete=True
     )
-    roles: list["Role"] = Relationship(
-        back_populates="users",
-        link_model="UserRole",
-        cascade_delete=True,
-    )
+    roles: list["Role"] = Relationship(back_populates="users", link_model=UserRole)
 
 
 # Properties to return via API, id is always required
@@ -143,31 +158,9 @@ class PermissionCreate(PermissionBase):
 
 
 class PermissionUpdate(SQLModel):
-    name: str | None = Field(default=None, max_length=255)  # type: ignore
+    name: str | None = Field(default=None, max_length=255)
     description: str | None = Field(default=None, max_length=500)
-    resource: str | None = Field(default=None, max_length=255)  # type: ignore
-
-
-class Permission(PermissionBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    created_at: datetime | None = Field(
-        default_factory=get_datetime_utc,
-        sa_type=DateTime(timezone=True),  # type: ignore
-    )
-    roles: list["Role"] = Relationship(
-        back_populates="permissions",
-        link_model="RolePermission",
-    )
-
-
-class PermissionPublic(PermissionBase):
-    id: uuid.UUID
-    created_at: datetime | None = None
-
-
-class PermissionsPublic(SQLModel):
-    data: list[PermissionPublic]
-    count: int
+    resource: str | None = Field(default=None, max_length=255)
 
 
 class RoleBase(SQLModel):
@@ -181,9 +174,31 @@ class RoleCreate(RoleBase):
 
 
 class RoleUpdate(SQLModel):
-    name: str | None = Field(default=None, max_length=255)  # type: ignore
+    name: str | None = Field(default=None, max_length=255)
     description: str | None = Field(default=None, max_length=500)
     permission_ids: list[uuid.UUID] | None = None
+
+
+class Permission(PermissionBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    roles: list["Role"] = Relationship(
+        back_populates="permissions",
+        link_model=RolePermission,
+    )
+
+
+class PermissionPublic(PermissionBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+
+
+class PermissionsPublic(SQLModel):
+    data: list[PermissionPublic]
+    count: int
 
 
 class Role(RoleBase, table=True):
@@ -192,13 +207,13 @@ class Role(RoleBase, table=True):
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
-    permissions: list["Permission"] = Relationship(
+    permissions: list[Permission] = Relationship(
         back_populates="roles",
-        link_model="RolePermission",
+        link_model=RolePermission,
     )
     users: list["User"] = Relationship(
         back_populates="roles",
-        link_model="UserRole",
+        link_model=UserRole,
     )
 
 
@@ -213,26 +228,6 @@ class RolesPublic(SQLModel):
     count: int
 
 
-# Many-to-many: Role ↔ Permission
-class RolePermission(SQLModel, table=True):
-    role_id: uuid.UUID = Field(
-        foreign_key="role.id", primary_key=True, ondelete="CASCADE"
-    )
-    permission_id: uuid.UUID = Field(
-        foreign_key="permission.id", primary_key=True, ondelete="CASCADE"
-    )
-
-
-# Many-to-many: User ↔ Role
-class UserRole(SQLModel, table=True):
-    user_id: uuid.UUID = Field(
-        foreign_key="user.id", primary_key=True, ondelete="CASCADE"
-    )
-    role_id: uuid.UUID = Field(
-        foreign_key="role.id", primary_key=True, ondelete="CASCADE"
-    )
-
-
 # --- User-Tenant Role Mapping ---
 
 
@@ -243,9 +238,7 @@ class UserTenantRoleBase(SQLModel):
 class UserTenantRole(UserTenantRoleBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", ondelete="CASCADE")
-    tenant_id: uuid.UUID = Field(
-        foreign_key="microsofttenant.id", ondelete="CASCADE"
-    )
+    tenant_id: uuid.UUID = Field(foreign_key="microsofttenant.id", ondelete="CASCADE")
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore

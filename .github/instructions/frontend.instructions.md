@@ -103,9 +103,9 @@ export * from './types.gen';      // All Pydantic types from backend
 import { UsersService, ItemsService, LoginService, type ItemPublic } from "@/client"
 
 // List items
-const items = await ItemsService.readItems({ 
-  skip: 0, 
-  limit: 10 
+const items = await ItemsService.readItems({
+  skip: 0,
+  limit: 10
 })
 
 // Create item
@@ -239,8 +239,8 @@ const MyForm = () => {
       e.preventDefault()
       mutate(formData)
     }}>
-      <LoadingButton 
-        type="submit" 
+      <LoadingButton
+        type="submit"
         disabled={isPending}
         loading={isPending}
       >
@@ -647,7 +647,7 @@ const MyComponent = () => {
   }
 
   return (
-    <button 
+    <button
       onClick={() => handleCreate({ title: "New" })}
       disabled={mutation.isPending}
     >
@@ -798,23 +798,23 @@ import { firstSuperuser, firstSuperuserPassword } from "./config.ts"
 
 test("Log in with valid credentials", async ({ page }) => {
   await page.goto("/login")
-  
+
   await page.getByTestId("email-input").fill(firstSuperuser)
   await page.getByTestId("password-input").fill(firstSuperuserPassword)
   await page.getByRole("button", { name: "Log In" }).click()
-  
+
   await page.waitForURL("/")
   await expect(page.getByText("Welcome back")).toBeVisible()
 })
 
 test("Create item from admin panel", async ({ page }) => {
   await page.goto("/admin")
-  
+
   await page.getByRole("button", { name: "Add Item" }).click()
   await page.getByLabel("Title").fill("Test Item")
   await page.getByLabel("Description").fill("A test item")
   await page.getByRole("button", { name: "Create" }).click()
-  
+
   await expect(page.getByText("Item created successfully")).toBeVisible()
   await expect(page.getByText("Test Item")).toBeVisible()
 })
@@ -855,7 +855,7 @@ import { createItem } from "./utils/privateApi"
 test("View created item", async ({ page, context }) => {
   const client = new ApiClient({ ... })
   const item = await createItem(client, { title: "Test" })
-  
+
   await page.goto(`/items/${item.id}`)
   await expect(page.getByText("Test")).toBeVisible()
 })
@@ -904,7 +904,7 @@ export const extractErrorMessage = (err: ApiError): string => {
   if (Array.isArray(errDetail) && errDetail.length > 0) {
     return errDetail[0].msg
   }
-  
+
   return errDetail || "Something went wrong."
 }
 
