@@ -1,9 +1,18 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from pydantic.networks import EmailStr
 
 from app.api.deps import get_current_active_superuser
+from app.core.config import settings
 from app.models import Message
 from app.utils import generate_test_email, send_email
+
+
+class AppConfig(BaseModel):
+    """Public application configuration"""
+
+    signup_enabled: bool
+
 
 router = APIRouter(prefix="/utils", tags=["utils"])
 
@@ -29,3 +38,11 @@ def test_email(email_to: EmailStr) -> Message:
 @router.get("/health-check/")
 async def health_check() -> bool:
     return True
+
+
+@router.get("/config", response_model=AppConfig)
+async def get_app_config() -> AppConfig:
+    """
+    Get public application configuration.
+    """
+    return AppConfig(signup_enabled=settings.SIGNUP_ENABLED)

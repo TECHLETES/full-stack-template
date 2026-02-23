@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
+import useAppConfig from "@/hooks/useAppConfig"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
 const formSchema = z
@@ -59,6 +60,7 @@ export const Route = createFileRoute("/signup")({
 
 function SignUp() {
   const { signUpMutation } = useAuth()
+  const { config, isLoading, error } = useAppConfig()
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -70,6 +72,38 @@ function SignUp() {
       confirm_password: "",
     },
   })
+
+  if (isLoading) {
+    return (
+      <AuthLayout>
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </AuthLayout>
+    )
+  }
+
+  if (error || !config?.signup_enabled) {
+    return (
+      <AuthLayout>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-2xl font-bold">Sign Up Unavailable</h1>
+          </div>
+          <p className="text-center text-sm text-muted-foreground">
+            User registration is currently disabled. Please contact the
+            administrator if you need an account.
+          </p>
+          <RouterLink
+            to="/login"
+            className="text-center underline underline-offset-4"
+          >
+            Back to Login
+          </RouterLink>
+        </div>
+      </AuthLayout>
+    )
+  }
 
   const onSubmit = (data: FormData) => {
     if (signUpMutation.isPending) return

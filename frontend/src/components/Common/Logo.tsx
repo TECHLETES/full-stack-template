@@ -2,10 +2,10 @@ import { Link } from "@tanstack/react-router"
 
 import { useTheme } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
-import icon from "/assets/images/fastapi-icon.svg"
-import iconLight from "/assets/images/fastapi-icon-light.svg"
-import logo from "/assets/images/fastapi-logo.svg"
-import logoLight from "/assets/images/fastapi-logo-light.svg"
+import icon from "/assets/images/techletes-icon.svg"
+import iconLight from "/assets/images/techletes-icon-light.svg"
+import logo from "/assets/images/techletes-logo.svg"
+import logoLight from "/assets/images/techletes-logo-light.svg"
 
 interface LogoProps {
   variant?: "full" | "icon" | "responsive"

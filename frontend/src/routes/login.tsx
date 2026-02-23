@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
+import useAppConfig from "@/hooks/useAppConfig"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
 const formSchema = z.object({
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       {
-        title: "Log In - FastAPI Template",
+        title: "Log In - Techletes Fullstack Template",
       },
     ],
   }),
@@ -52,6 +53,7 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const { loginMutation } = useAuth()
+  const { config } = useAppConfig()
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -129,12 +131,14 @@ function Login() {
             </LoadingButton>
           </div>
 
-          <div className="text-center text-sm">
-            Don't have an account yet?{" "}
-            <RouterLink to="/signup" className="underline underline-offset-4">
-              Sign up
-            </RouterLink>
-          </div>
+          {config?.signup_enabled && (
+            <div className="text-center text-sm">
+              Don't have an account yet?{" "}
+              <RouterLink to="/signup" className="underline underline-offset-4">
+                Sign up
+              </RouterLink>
+            </div>
+          )}
         </form>
       </Form>
     </AuthLayout>
