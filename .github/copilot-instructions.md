@@ -1,0 +1,338 @@
+---
+name: FastAPI Full-Stack Template Workspace
+description: Workspace instructions for the full-stack FastAPI template with React frontend
+---
+
+# FastAPI Full-Stack Template — Workspace Instructions
+
+## Project Overview
+
+This is a production-ready full-stack template combining:
+- **Backend**: FastAPI + SQLModel ORM + PostgreSQL
+- **Frontend**: React + TypeScript + Vite + shadcn/ui
+- **Infrastructure**: Docker Compose, Traefik, CI/CD with GitHub Actions
+
+**Monorepo Structure**: `uv` workspaces for Python + Node.js workspace (Bun/npm) for frontend.
+
+---
+
+## Quick Development Commands
+
+### Full Stack (Recommended)
+```bash
+docker compose up --build
+# Services: Frontend (3000) | API (8000) | API Docs (8000/docs) | DB Admin (8080)
+```
+
+### Backend Only
+```bash
+cd backend
+uv sync                          # Install dependencies
+uv run fastapi dev app/main.py   # Start API server (auto-reload)
+./scripts/test.sh                # Run tests
+./scripts/lint.sh                # Lint + format
+```
+
+### Frontend Only
+```bash
+cd frontend
+npm install                      # Install dependencies
+npm run dev                      # Start dev server (hot reload)
+npm run test                     # Run Playwright tests
+npm run generate-client          # Regenerate API client from OpenAPI spec
+```
+
+---
+
+## Architecture & Key Components
+
+### Backend (`/backend`)
+- **Entry**: `app/main.py` — FastAPI app setup, CORS, middleware
+- **API Routes**: `app/api/routes/` — endpoints organized by domain (users, items, login, etc.)
+- **Models**: `app/models.py` — SQLModel definitions (User, Item with relationships)
+- **CRUD**: `app/crud.py` — database operations (create, read, update, delete)
+- **Auth**: `app/core/security.py` — JWT tokens, password hashing (pwdlib with argon2/bcrypt)
+- **Config**: `app/core/config.py` — Pydantic settings, env vars (SECRET_KEY, DATABASE_URL, etc.)
+- **DB**: `app/core/db.py` — database session management
+- **Migrations**: `alembic/` — SQLAlchemy auto-migration scripts
+- **Tests**: `tests/` — pytest fixtures, unit/integration tests
+
+**Database**: PostgreSQL via SQLModel (async-compatible), migrations via Alembic.
+
+### Frontend (`/frontend`)
+- **Entry**: `src/main.tsx` — React app root, routing, theme provider
+- **Client**: `src/client/` — auto-generated API client from OpenAPI spec (OpenAPI Generator)
+- **Schema**: `src/client/schemas.gen.ts` — generated TypeScript types from backend
+- **Routes**: `src/routes/` — TanStack Router (file-based routing)
+- **Components**: `src/components/` — reusable UI (Admin, Items, UserSettings, etc.)
+- **Hooks**: `src/hooks/` — custom hooks (useAuth, useCustomToast, etc.)
+- **Tests**: `tests/` — Playwright E2E tests (auth.setup.ts, *.spec.ts)
+
+**Build**: Vite (fast HMR), TypeScript strict mode, Tailwind + shadcn/ui components, Dark mode support.
+
+### Infrastructure
+- **Compose**: `compose.yml` — PostgreSQL, backend, frontend, Adminer, Traefik (reverse proxy)
+- **Dockerfiles**: Optimized multi-stage builds for both backend & frontend
+- **CI/CD**: GitHub Actions workflows for testing, coverage, Docker builds
+- **Docs**: `docs/` — DEV_SETUP.md, deployment.md, release-notes.md
+
+---
+
+## Development Workflow
+
+### 1. Backend Changes
+```bash
+cd backend
+# Edit app/models.py, app/crud.py, app/api/routes/*, core/config.py, etc.
+# Server auto-reloads on save (when running: uv run fastapi dev app/main.py)
+
+# After editing models.py:
+alembic revision --autogenerate -m "description"
+alembic upgrade head
+
+# Lint & format:
+./scripts/lint.sh  # Ruff (E, W, F, I, B, C4, UP, etc.), strict Mypy
+
+# Test:
+./scripts/test.sh  # Pytest with coverage
+```
+
+### 2. Frontend Changes
+```bash
+cd frontend
+# Edit src/components/*, src/routes/*, src/hooks/*, etc.
+# HMR (hot reload) enabled automatically
+
+# After backend API changes:
+npm run generate-client  # Regenerates src/client/schemas.gen.ts, sdk.gen.ts
+
+# Lint & format:
+npm run lint  # Biome (formatting, linting)
+
+# Test E2E:
+npm run test  # Playwright tests (integration with running backend)
+```
+
+### 3. Database
+1. Edit `backend/app/models.py` (add fields, relationships)
+2. Run: `cd backend && alembic revision --autogenerate -m "add new field"`
+3. Run: `alembic upgrade head` to apply
+4. Restart backend if using Docker Compose
+
+---
+
+## Code Patterns & Conventions
+
+### Backend
+
+**SQLModel + Relationships**:
+- All models inherit from `SQLModel` and use `table=True` for DB models
+- Primary keys: UUID (default_factory=uuid.uuid4)
+- Timestamps: `created_at` with timezone-aware UTC
+- Use `Relationship` for Foreign Keys with cascade delete
+
+**Auth**:
+- JWT tokens (configurable expiry)
+- Passwords: hashed with pwdlib (Argon2/Bcrypt)
+- Depends on `get_current_user` middleware
+- Email-based password recovery
+
+**API Routes** (`app/api/routes/`):
+- Organized by domain (users.py, items.py, login.py, etc.)
+- Use dependency injection for auth & DB sessions
+- Return Pydantic models (not SQLModel table models)
+- FastAPI auto-generates OpenAPI schema
+
+**Validation**:
+- Pydantic models for input/output validation
+- EmailStr for emails, Field(min_length=..., max_length=...) for strings
+- Custom validators with `@field_validator`
+
+### Frontend
+
+**React + TypeScript**:
+- Strict TypeScript mode enabled
+- Hooks-based components (no class components)
+- File-based routing with TanStack Router (`src/routes/` subdirectories = URL structure)
+
+**API Integration**:
+- Use auto-generated client: `import { ... } from '@/client'`
+- Types from `src/client/schemas.gen.ts`
+- Error handling with custom toast hook: `useCustomToast()`
+
+**UI Components**:
+- All from shadcn/ui or custom in `src/components/ui/`
+- Tailwind CSS for styling
+- Dark mode provider: `<ThemeProvider>` in root layout
+
+**Testing**:
+- Playwright for E2E tests (`tests/*.spec.ts`)
+- `tests/auth.setup.ts` handles login flow reuse
+- `tests/utils/privateApi.ts` for API helpers, `mailcatcher.ts` for email testing
+
+---
+
+## Environment & Configuration
+
+### Backend Config (`app/core/config.py`)
+Load from `.env` via Pydantic Settings:
+- `SECRET_KEY` — JWT signing key (generate: `python -c "import secrets; print(secrets.token_urlsafe(32))"`)
+- `DATABASE_URL` — PostgreSQL connection
+- `ENVIRONMENT` — "local", "staging", "production"
+- `FIRST_SUPERUSER` / `FIRST_SUPERUSER_PASSWORD` — initial admin account
+- `SMTP_HOST`, `SMTP_PORT` — email sending (Mailcatcher for dev)
+- `BACKEND_CORS_ORIGINS` — allowed frontend origins
+- `SENTRY_DSN` — error tracking (optional)
+
+### Frontend Config
+- `.env.local` for local overrides
+- `vite.config.ts` — Vite settings (API proxy to `http://localhost:8000`)
+- `playwright.config.ts` — E2E test settings (baseURL, workers, timeout)
+
+---
+
+## Testing Strategy
+
+### Backend (`pytest`)
+- `tests/api/routes/` — route/endpoint tests
+- `tests/crud/` — database operation tests
+- `tests/utils/` — helper functions (seed data, users, items)
+- `conftest.py` — fixtures (client, async session, test user)
+- **Run**: `cd backend && ./scripts/test.sh` or `pytest`
+- **Coverage**: tracked in CI, see badge in README
+
+### Frontend (`Playwright`)
+- `tests/auth.setup.ts` — shared login flow (reuses tokens)
+- `tests/login.spec.ts`, `tests/admin.spec.ts`, etc. — feature tests
+- `tests/utils/mailcatcher.ts` — email verification helpers
+- **Run**: `cd frontend && npm run test` or `npm run test:ui`
+- **Note**: Requires running backend API
+
+---
+
+## Common Tasks
+
+### Add a New API Endpoint
+1. Add model to `backend/app/models.py` (if needed)
+2. Add route in `backend/app/api/routes/newfeature.py` with proper dependencies
+3. Register route in `backend/app/api/main.py` via `APIRouter`
+4. Add tests in `backend/tests/api/routes/test_newfeature.py`
+5. Frontend: run `npm run generate-client` to regenerate types
+6. Use new client in `src/components/` or route
+
+### Add a New Frontend Page
+1. Create route file in `src/routes/` (e.g., `src/routes/mypage.tsx`)
+2. Add components in `src/components/MyPage/`
+3. Use auto-generated client types: `import { ItemPublic } from '@/client'`
+4. Add E2E test in `tests/mypage.spec.ts`
+5. Link from sidebar in `src/components/Sidebar/`
+
+### Update TypeScript Client
+After backend changes:
+```bash
+cd frontend
+npm run generate-client  # Updates src/client/schemas.gen.ts, sdk.gen.ts
+```
+
+### Database Migration
+```bash
+cd backend
+# After editing app/models.py:
+alembic revision --autogenerate -m "descriptive name"
+alembic upgrade head
+```
+
+### Linting & Formatting
+```bash
+# Backend
+cd backend && ./scripts/lint.sh  # Ruff + Mypy
+
+# Frontend
+cd frontend && npm run lint      # Biome
+```
+
+---
+
+## Debugging & Troubleshooting
+
+### Backend Issues
+- **Server won't start**: Check `.env` DATABASE_URL, run `docker compose up db` first
+- **Import errors**: Run `cd backend && uv sync`
+- **Migration conflicts**: Check `alembic/versions/`, remove conflicting files if safe
+- **Type errors**: Run `mypy app` locally for type checking before testing
+
+### Frontend Issues
+- **Client out of sync**: Run `npm run generate-client` after backend changes
+- **Playwright timeouts**: Ensure backend is running on `http://localhost:8000`
+- **Node modules broken**: Delete `node_modules/` and `.pnp.cjs`, run `npm install`
+
+### Database Issues
+- **Postgres won't connect**: Check compose.yml env vars, ensure `docker compose up db` runs
+- **Migration issues**: Drop testdb, restart container, re-run migrations
+- **Admin panel (Adminer)**: http://localhost:8080 for manual inspection
+
+---
+
+## Key Tools & Versions
+
+| Tool | Purpose | Location |
+|------|---------|----------|
+| `uv` | Python package manager | root→backend dependency |
+| `pytest` | Backend testing | backend/pyproject.toml |
+| `ruff` | Python linter/formatter | backend/pyproject.toml |
+| `mypy` | Type checking | backend/pyproject.toml |
+| `alembic` | Database migrations | backend/alembic/ |
+| `bun` / `npm` | Node package manager | frontend |
+| `vite` | Frontend bundler | frontend/vite.config.ts |
+| `playwright` | E2E testing | frontend/playwright.config.ts |
+| `biome` | TypeScript linter | frontend/biome.json |
+| `docker compose` | Local dev env | compose.yml (all-in-one command) |
+| `openapi-ts` | Generate client from OpenAPI | frontend/openapi-ts.config.ts |
+
+---
+
+## File-Based Routing (Frontend)
+
+TanStack Router uses file structure in `src/routes/`:
+```
+src/routes/
+  __root.tsx          → Root layout <RootComponent>
+  _layout.tsx         → Wrapper layout (e.g., with sidebar)
+  _layout/
+    index.tsx         → / (home/dashboard)
+    admin.tsx         → /admin
+    items.tsx         → /items
+    user-settings.tsx → /user-settings
+    login.tsx         → /login (outside _layout)
+    signup.tsx        → /signup
+    recover-password.tsx → /recover-password
+    reset-password.tsx  → /reset-password
+```
+
+---
+
+## When to Ask Me (Agent) Questions
+
+- **Architecture decisions**: Suggest where to add new features (backend route + DB model vs frontend component)
+- **File organization**: Clarify if code belongs in routes, components, utils, or hooks
+- **API design**: Review endpoint design before implementation
+- **Type safety**: Help with TypeScript schema validation
+- **Performance**: Suggest optimizations for queries, caching, pagination
+- **Testing**: Recommend test coverage, fixtures, mocking strategies
+
+---
+
+## Links & References
+
+- [FastAPI Docs](https://fastapi.tiangolo.com)
+- [SQLModel Docs](https://sqlmodel.tiangolo.com)
+- [React Docs](https://react.dev)
+- [Vite Docs](https://vitejs.dev)
+- [TanStack Router](https://tanstack.com/router/latest)
+- [Playwright Docs](https://playwright.dev)
+- [Docker Compose Docs](https://docs.docker.com/compose)
+
+---
+
+**Auto-reload enabled** in dev mode. Edit code → save → see changes immediately.
+Keep backend API running during frontend development. Keep frontend running during E2E tests.
