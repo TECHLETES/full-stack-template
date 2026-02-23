@@ -1,3 +1,4 @@
+import { MsalProvider } from "@azure/msal-react"
 import {
   MutationCache,
   QueryCache,
@@ -7,6 +8,7 @@ import {
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
+import { getMsalInstance, initEntra, isEntraEnabled } from "./auth/entra"
 import { ApiError, OpenAPI } from "./client"
 import { ThemeProvider } from "./components/theme-provider"
 import { Toaster } from "./components/ui/sonner"
@@ -40,13 +42,28 @@ declare module "@tanstack/react-router" {
   }
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+function AppContent() {
+  return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster richColors closeButton />
       </QueryClientProvider>
     </ThemeProvider>
+  )
+}
+
+// Initialize Entra before rendering
+await initEntra()
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    {isEntraEnabled() ? (
+      <MsalProvider instance={getMsalInstance()}>
+        <AppContent />
+      </MsalProvider>
+    ) : (
+      <AppContent />
+    )}
   </StrictMode>,
 )

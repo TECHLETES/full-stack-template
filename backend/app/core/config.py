@@ -95,6 +95,19 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     SIGNUP_ENABLED: bool = True
 
+    # Microsoft Entra (Azure AD) Configuration
+    AZURE_CLIENT_ID: str = ""
+    AZURE_CLIENT_SECRET: str = ""
+    AZURE_TENANT_ID: str = ""
+    AZURE_AUTHORITY: str = "https://login.microsoftonline.com"
+    AZURE_IS_MULTI_TENANT: bool = False
+    AZURE_GRAPH_SCOPE: str = "https://graph.microsoft.com/.default"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def azure_enabled(self) -> bool:
+        return bool(self.AZURE_CLIENT_ID and self.AZURE_CLIENT_SECRET)
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (

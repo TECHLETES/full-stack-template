@@ -55,3 +55,19 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+def require_role(*required_roles: str):  # type: ignore[no-untyped-def]
+    """Dependency to check if user has any of the required Azure roles."""
+
+    def check_role(current_user: CurrentUser) -> User:
+        if current_user.is_superuser:
+            return current_user
+        if not any(role in (current_user.azure_roles or []) for role in required_roles):
+            raise HTTPException(
+                status_code=403,
+                detail=f"User does not have required roles: {list(required_roles)}",
+            )
+        return current_user
+
+    return check_role

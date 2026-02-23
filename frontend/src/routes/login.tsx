@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
+import { isEntraEnabled } from "@/auth/entra"
+import { EntraLoginButton } from "@/components/Auth/EntraLogin"
 import { AuthLayout } from "@/components/Common/AuthLayout"
 import {
   Form,
@@ -20,8 +22,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
+import { Separator } from "@/components/ui/separator"
 import useAppConfig from "@/hooks/useAppConfig"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
+import useEntraAuth from "@/hooks/useEntraAuth"
 
 const formSchema = z.object({
   username: z.email(),
@@ -53,6 +57,7 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const { loginMutation } = useAuth()
+  const { entraLoginMutation } = useEntraAuth()
   const { config } = useAppConfig()
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -69,6 +74,10 @@ function Login() {
     loginMutation.mutate(data)
   }
 
+  const handleEntraLogin = (accessToken: string) => {
+    entraLoginMutation.mutate({ access_token: accessToken })
+  }
+
   return (
     <AuthLayout>
       <Form {...form}>
@@ -79,6 +88,25 @@ function Login() {
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">Login to your account</h1>
           </div>
+
+          {isEntraEnabled() && (
+            <>
+              <EntraLoginButton
+                onSuccess={handleEntraLogin}
+                onError={(error) => console.error("Entra login failed:", error)}
+              />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <Separator className="w-full" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="grid gap-4">
             <FormField

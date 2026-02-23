@@ -2,7 +2,8 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import EmailStr
-from sqlalchemy import DateTime
+from sqlalchemy import Column, DateTime
+from sqlalchemy.types import JSON
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -48,23 +49,108 @@ class UpdatePassword(SQLModel):
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    hashed_password: str
+    hashed_password: str = Field(default="")
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
     )
+    # Microsoft Entra fields
+    azure_user_id: str | None = Field(default=None, index=True)
+    azure_tenant_id: str | None = Field(default=None)
+    azure_roles: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    tenant_roles: list["UserTenantRole"] = Relationship(
+        back_populates="user", cascade_delete=True
+    )
 
 
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
     created_at: datetime | None = None
+    azure_user_id: str | None = None
+    azure_tenant_id: str | None = None
+    azure_roles: list[str] = []
 
 
 class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
+
+
+# --- Microsoft Tenant Models ---
+
+
+class MicrosoftTenantBase(SQLModel):
+    tenant_id: str = Field(unique=True, index=True, max_length=255)
+    tenant_name: str = Field(max_length=255)
+    is_enabled: bool = True
+    auto_create_users: bool = True
+
+
+class MicrosoftTenantCreate(MicrosoftTenantBase):
+    pass
+
+
+class MicrosoftTenantUpdate(SQLModel):
+    tenant_name: str | None = Field(default=None, max_length=255)
+    is_enabled: bool | None = None
+    auto_create_users: bool | None = None
+
+
+class MicrosoftTenant(MicrosoftTenantBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    created_by: uuid.UUID | None = Field(
+        default=None, foreign_key="user.id", ondelete="SET NULL"
+    )
+    tenant_roles: list["UserTenantRole"] = Relationship(
+        back_populates="tenant", cascade_delete=True
+    )
+
+
+class MicrosoftTenantPublic(MicrosoftTenantBase):
+    id: uuid.UUID
+    created_at: datetime | None = None
+    created_by: uuid.UUID | None = None
+
+
+class MicrosoftTenantsPublic(SQLModel):
+    data: list[MicrosoftTenantPublic]
+    count: int
+
+
+# --- User-Tenant Role Mapping ---
+
+
+class UserTenantRoleBase(SQLModel):
+    roles: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+
+
+class UserTenantRole(UserTenantRoleBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", ondelete="CASCADE")
+    tenant_id: uuid.UUID = Field(
+        foreign_key="microsofttenant.id", ondelete="CASCADE"
+    )
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    user: User | None = Relationship(back_populates="tenant_roles")
+    tenant: MicrosoftTenant | None = Relationship(back_populates="tenant_roles")
+
+
+class UserTenantRolePublic(SQLModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    tenant_id: uuid.UUID
+    roles: list[str] = []
+    created_at: datetime | None = None
 
 
 # Shared properties

@@ -13,6 +13,8 @@
     "test:ui": "bunx playwright test --ui"
   },
   "dependencies": {
+    "@azure/msal-browser": "^4.29.0",
+    "@azure/msal-react": "^3.0.27",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-checkbox": "^1.3.3",

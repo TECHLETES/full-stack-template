@@ -308,8 +308,10 @@ This template is continuously improved with new capabilities for Techletes proje
 - ✅ Update project docs when adding new features
 - ✅ Add skills/instructions for new patterns (in `.github/` folder)
 
+**Implemented integrations:**
+- ✅ **Microsoft Entra ID** — Single sign-on and enterprise authentication (multi-tenant support)
+
 **Planned integrations & enhancements:**
-- 🔐 **Microsoft Entra ID** — Single sign-on and enterprise authentication
 - 🤖 **Mistral AI** — Ready-to-use LLM integration patterns
 - 📊 **Data Connectors** — Common data source patterns (SQL, APIs, files)
 - 🔍 **Advanced Search** — Full-text and semantic search capabilities
@@ -323,7 +325,92 @@ git pull --no-commit upstream master   # Pull from template
 
 ---
 
-## File-Based Routing (Frontend)
+## Microsoft Entra ID (Azure AD) Integration
+
+This template includes enterprise-ready Microsoft Entra ID authentication with multi-tenant support. The feature is **opt-in** — leave `AZURE_CLIENT_ID` empty to keep email/password-only authentication.
+
+### Quickstart
+
+1. **Register app in Azure Entra** — Follow [docs/ENTRA_SETUP.md](docs/ENTRA_SETUP.md)
+2. **Set environment variables in `.env`:**
+   ```bash
+   AZURE_CLIENT_ID=<your-client-id>
+   AZURE_CLIENT_SECRET=<your-client-secret>
+   AZURE_TENANT_ID=<your-tenant-id>
+   AZURE_IS_MULTI_TENANT=False  # or True for multi-tenant
+   ```
+3. **Run migrations:** `cd backend && alembic upgrade head`
+4. **Restart:** `docker compose up --build`
+
+### Architecture
+
+- **Backend**: `app/core/auth_entra.py` — Microsoft Graph API client for token validation
+- **Frontend**: `src/auth/entra.ts` — MSAL initialization; `src/components/Auth/EntraLogin.tsx` — login button
+- **Routes**: `app/api/routes/auth_entra.py` — endpoints: `/auth/entra/login`, `/auth/entra/config`, `/tenants/` CRUD
+- **Models**: Extended `User` with `azure_user_id`, `azure_tenant_id`, `azure_roles`; new `MicrosoftTenant` and `UserTenantRole` models
+
+### How It Works
+
+1. Frontend fetches public config from `/api/v1/auth/entra/config`
+2. Initializes MSAL with CLIENT_ID and TENANT_ID
+3. User clicks "Sign in with Microsoft" → redirects to Microsoft login
+4. Returns with access token → sent to backend `/auth/entra/login`
+5. Backend validates token via Microsoft Graph (using CLIENT_SECRET internally)
+6. Backend returns JWT for all subsequent API calls
+
+### Testing
+
+```bash
+# Check if Entra is enabled:
+curl http://localhost:8000/api/v1/auth/entra/config
+
+# Run backend tests (includes Entra mocks):
+cd backend && ./scripts/test.sh
+
+# Manual test: Click "Sign in with Microsoft" on login page
+```
+
+### Single-Tenant vs Multi-Tenant
+
+**Single-Tenant** (default):
+- Users can only log in with accounts from your registered tenant
+- Set `AZURE_IS_MULTI_TENANT=False`
+
+**Multi-Tenant**:
+- Users from any Azure AD tenant can register
+- Set `AZURE_IS_MULTI_TENANT=True`
+- Admin must approve tenant registrations via `/api/v1/tenants` routes
+
+### Common Tasks
+
+**Enable Entra in existing project:**
+```bash
+# 1. Update .env with Azure credentials
+# 2. Run migrations: cd backend && alembic upgrade head
+# 3. Restart: docker compose up --build
+```
+
+**Disable Entra (keep email/password):**
+```bash
+# 1. Remove AZURE_CLIENT_ID from .env (leave empty)
+# 2. Restart — login page reverts to email/password form only
+```
+
+### Troubleshooting
+
+**"Sign in with Microsoft" button doesn't appear:**
+- Check: Is `AZURE_CLIENT_ID` set in `.env`?
+- Check: Browser console for MSAL config errors
+- Run: `curl http://localhost:8000/api/v1/auth/entra/config` to verify backend config
+
+**Login redirects to Microsoft but returns with error:**
+- Check: Is redirect URI `http://localhost:5173` registered in Azure app?
+- Check: Are API permissions set (openid, profile, email, User.Read)?
+- Check: Is `.env` correctly configured?
+
+**See detailed troubleshooting:** [docs/ENTRA_SETUP.md](docs/ENTRA_SETUP.md#testing-the-integration)
+
+---
 
 TanStack Router uses file structure in `src/routes/`:
 ```
