@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from app.core.config import settings
-from app.models import MicrosoftTenant, User
+from app.models import User
 
 
 def test_get_entra_config_when_disabled(client: TestClient) -> None:
@@ -159,7 +159,6 @@ def test_entra_login_invalid_token(
 def test_entra_login_multi_tenant_unauthorized(
     mock_entra_client_class: MagicMock,
     client: TestClient,
-    db: Session,
 ) -> None:
     """Test that multi-tenant login rejects unauthorized tenants."""
     mock_client = MagicMock()

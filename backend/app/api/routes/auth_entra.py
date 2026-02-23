@@ -197,7 +197,7 @@ def list_tenants(
     count_stmt = select(MicrosoftTenant)
     tenants = session.exec(count_stmt.offset(skip).limit(limit)).all()
     count = session.exec(select(func.count()).select_from(MicrosoftTenant)).one()
-    return MicrosoftTenantsPublic(data=tenants, count=count)
+    return MicrosoftTenantsPublic(data=[MicrosoftTenantPublic.model_validate(t) for t in tenants], count=count)
 
 
 @tenant_router.post("/", response_model=MicrosoftTenantPublic)

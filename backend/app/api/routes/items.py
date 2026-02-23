@@ -41,7 +41,7 @@ def read_items(
         )
         items = session.exec(statement).all()
 
-    return ItemsPublic(data=items, count=count)
+    return ItemsPublic(data=[ItemPublic.model_validate(item) for item in items], count=count)
 
 
 @router.get("/{id}", response_model=ItemPublic)

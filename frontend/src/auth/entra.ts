@@ -3,10 +3,17 @@ import {
   LogLevel,
   PublicClientApplication,
 } from "@azure/msal-browser"
-import type { EntraConfigResponse } from "@/client"
+
+interface EntraConfig {
+  enabled: boolean
+  client_id: string | null
+  tenant_id: string | null
+  is_multi_tenant: boolean
+  authority: string | null
+}
 
 let msalInstance: PublicClientApplication | null = null
-let entraConfig: EntraConfigResponse | null = null
+let entraConfig: EntraConfig | null = null
 
 export const loginScopes = ["openid", "profile", "email", "User.Read"]
 
