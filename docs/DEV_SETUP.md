@@ -26,10 +26,10 @@ docker compose up --build
 ### 2. Backend Only Development
 
 ```bash
-cd /home/development/recaipe/backend
-
 # Install dependencies
 uv sync
+
+cd /home/development/recaipe/backend
 
 # Start backend server
 uv run fastapi dev app/main.py
