@@ -41,7 +41,7 @@ fi
 # Set PYTHONPATH to enable app module imports
 export PYTHONPATH="${PWD}:$PYTHONPATH"
 
-uv run python app/backend_pre_start.py
+uv run python backend_pre_start.py
 
 # Run migrations and setup
 echo "🔄 Running database migrations..."
@@ -49,10 +49,10 @@ uv run alembic upgrade head
 
 # Initialize database with sample data
 echo "🌱 Initializing database with sample data..."
-uv run python app/initial_data.py
+uv run python initial_data.py
 
 # Start FastAPI dev server with auto-reload in current terminal
 echo "✨ Starting FastAPI development server..."
-uv run fastapi dev app/main.py
+uv run fastapi dev main.py
 
 

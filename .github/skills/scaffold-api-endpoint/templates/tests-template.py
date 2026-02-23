@@ -12,7 +12,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.models import ProjectCreate
+from backend.models import ProjectCreate
 
 
 def test_create_project(
@@ -240,7 +240,7 @@ import uuid
 from sqlmodel import Session
 
 from app import crud
-from app.models import Project, ProjectCreate
+from backend.models import Project, ProjectCreate
 from tests.utils.user import create_random_user
 
 

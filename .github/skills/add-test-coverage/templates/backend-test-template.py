@@ -21,7 +21,7 @@ def test_create_resource(db: Session) -> None:
     3. Assert success and properties
     """
     from app import crud
-    from app.models import ResourceCreate
+    from backend.models import ResourceCreate
     from tests.utils.resource import create_random_user
     
     user = create_random_user(db)
@@ -101,7 +101,7 @@ def test_read_resources_list(db: Session) -> None:
 def test_update_resource_full(db: Session) -> None:
     """Test full update of a resource."""
     from app import crud
-    from app.models import ResourceUpdate
+    from backend.models import ResourceUpdate
     from tests.utils.resource import create_random_resource
     
     resource = create_random_resource(db)
@@ -129,7 +129,7 @@ def test_update_resource_partial(db: Session) -> None:
     3. Assert updated field and unchanged field
     """
     from app import crud
-    from app.models import ResourceUpdate
+    from backend.models import ResourceUpdate
     from tests.utils.resource import create_random_resource
     
     resource = create_random_resource(db)
@@ -187,7 +187,7 @@ def test_create_resource_validation(title: str, valid: bool, db: Session) -> Non
     - Use parametrize to test multiple scenarios
     - Test valid and invalid cases
     """
-    from app.models import ResourceCreate
+    from backend.models import ResourceCreate
     from pydantic import ValidationError
     
     try:

@@ -1,7 +1,7 @@
 ---
 name: Backend Pattern Guidelines
 description: CRUD patterns, SQLModel modeling, API design, authentication, and database migrations for FastAPI backend
-applyTo: backend/app/**/*.py, backend/tests/**/*.py
+applyTo: backend/**/*.py, backend/tests/**/*.py
 ---
 
 # Backend Development Instructions
@@ -130,7 +130,7 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
 ### Password Hashing
 
 ```python
-from app.core.security import get_password_hash, verify_password
+from backend.core.security import get_password_hash, verify_password
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
     db_obj = User.model_validate(
@@ -255,7 +255,7 @@ Routes are organized by domain in `app/api/routes/`:
 ```python
 # app/api/routes/items.py
 from fastapi import APIRouter, Depends, HTTPException
-from app.api.deps import SessionDep, CurrentUser
+from backend.api.deps import SessionDep, CurrentUser
 
 router = APIRouter(prefix="/items", tags=["items"])
 

@@ -69,7 +69,7 @@ npm run test 2>&1 | grep -i "error\|warning"
 # backend/tests/crud/test_item.py
 def test_create_item(db: Session) -> None:
     from app import crud
-    from app.models import ItemCreate
+    from backend.models import ItemCreate
     from tests.utils.user import create_random_user
     
     user = create_random_user(db)

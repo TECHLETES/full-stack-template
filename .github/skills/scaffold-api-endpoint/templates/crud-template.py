@@ -1,6 +1,6 @@
 # CRUD Operations Template
 
-Use this as a starting point for your CRUD functions. Add these to `backend/app/crud.py`.
+Use this as a starting point for your CRUD functions. Add these to `backend/crud.py`.
 
 ## Complete Example: Project CRUD
 
@@ -10,7 +10,7 @@ from typing import Any
 
 from sqlmodel import Session, select, func, col
 
-from app.models import Project, ProjectCreate, ProjectUpdate
+from backend.models import Project, ProjectCreate, ProjectUpdate
 
 def create_project(
     *,

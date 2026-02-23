@@ -5,11 +5,11 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlmodel import func, select
 
-from app.api.deps import CurrentUser, SessionDep
-from app.core import security
-from app.core.auth_entra import EntraAuthClient
-from app.core.config import settings
-from app.models import (
+from backend.api.deps import CurrentUser, SessionDep
+from backend.core import security
+from backend.core.auth_entra import EntraAuthClient
+from backend.core.config import settings
+from backend.models import (
     Message,
     MicrosoftTenant,
     MicrosoftTenantCreate,

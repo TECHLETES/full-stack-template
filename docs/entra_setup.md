@@ -170,7 +170,7 @@ The frontend automatically fetches the public configuration from the backend API
 ```bash
 docker compose up --build
 # OR for development:
-# Backend: cd backend && uv run fastapi dev app/main.py
+# Backend: cd backend && uv run fastapi dev main.py
 # Frontend: cd frontend && npm run dev
 ```
 

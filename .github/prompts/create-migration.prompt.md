@@ -33,7 +33,7 @@ Provide these details for the best results:
 
 ### Scenario 1: Add a New Column
 
-**Changes in `backend/app/models.py`:**
+**Changes in `backend/models.py`:**
 ```python
 class Project(ProjectBase, table=True):
     # ...existing fields...
@@ -57,7 +57,7 @@ alembic upgrade head        # Re-apply
 
 ### Scenario 2: Add a Relationship
 
-**Changes in `backend/app/models.py`:**
+**Changes in `backend/models.py`:**
 ```python
 class Project(ProjectBase, table=True):
     # ...existing fields...
@@ -202,7 +202,7 @@ psql -d app -c "SELECT COUNT(*) FROM \"user\" WHERE first_name IS NULL;"  # Shou
 
 ### Step 1: Generate
 
-After editing `backend/app/models.py`:
+After editing `backend/models.py`:
 
 ```bash
 cd backend
@@ -264,7 +264,7 @@ alembic current       # Should show applied migration
 alembic history -v    # Should show full history
 
 # Type check
-mypy app/
+mypy
 
 # No import errors
 cd backend && uv sync

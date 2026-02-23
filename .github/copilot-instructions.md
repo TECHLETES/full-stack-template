@@ -35,7 +35,7 @@ docker compose up --build
 ```bash
 cd backend
 uv sync                          # Install dependencies
-uv run fastapi dev app/main.py   # Start API server (auto-reload)
+uv run fastapi dev main.py   # Start API server (auto-reload)
 ./scripts/test.sh                # Run tests
 ./scripts/lint.sh                # Lint + format
 ```
@@ -54,13 +54,13 @@ npm run generate-client          # Regenerate API client from OpenAPI spec
 ## Architecture & Key Components
 
 ### Backend (`/backend`)
-- **Entry**: `app/main.py` — FastAPI app setup, CORS, middleware
-- **API Routes**: `app/api/routes/` — endpoints organized by domain (users, items, login, etc.)
-- **Models**: `app/models.py` — SQLModel definitions (User, Item with relationships)
-- **CRUD**: `app/crud.py` — database operations (create, read, update, delete)
-- **Auth**: `app/core/security.py` — JWT tokens, password hashing (pwdlib with argon2/bcrypt)
-- **Config**: `app/core/config.py` — Pydantic settings, env vars (SECRET_KEY, DATABASE_URL, etc.)
-- **DB**: `app/core/db.py` — database session management
+- **Entry**: `main.py` — FastAPI app setup, CORS, middleware
+- **API Routes**: `api/routes/` — endpoints organized by domain (users, items, login, etc.)
+- **Models**: `models.py` — SQLModel definitions (User, Item with relationships)
+- **CRUD**: `crud.py` — database operations (create, read, update, delete)
+- **Auth**: `core/security.py` — JWT tokens, password hashing (pwdlib with argon2/bcrypt)
+- **Config**: `core/config.py` — Pydantic settings, env vars (SECRET_KEY, DATABASE_URL, etc.)
+- **DB**: `core/db.py` — database session management
 - **Migrations**: `alembic/` — SQLAlchemy auto-migration scripts
 - **Tests**: `tests/` — pytest fixtures, unit/integration tests
 
@@ -90,8 +90,8 @@ npm run generate-client          # Regenerate API client from OpenAPI spec
 ### 1. Backend Changes
 ```bash
 cd backend
-# Edit app/models.py, app/crud.py, app/api/routes/*, core/config.py, etc.
-# Server auto-reloads on save (when running: uv run fastapi dev app/main.py)
+# Edit models.py, crud.py, api/routes/*, core/config.py, etc.
+# Server auto-reloads on save (when running: uv run fastapi dev main.py)
 
 # After editing models.py:
 alembic revision --autogenerate -m "description"
@@ -121,7 +121,7 @@ npm run test  # Playwright tests (integration with running backend)
 ```
 
 ### 3. Database
-1. Edit `backend/app/models.py` (add fields, relationships)
+1. Edit `backend/models.py` (add fields, relationships)
 2. Run: `cd backend && alembic revision --autogenerate -m "add new field"`
 3. Run: `alembic upgrade head` to apply
 4. Restart backend if using Docker Compose
@@ -144,7 +144,7 @@ npm run test  # Playwright tests (integration with running backend)
 - Depends on `get_current_user` middleware
 - Email-based password recovery
 
-**API Routes** (`app/api/routes/`):
+**API Routes** (`api/routes/`):
 - Organized by domain (users.py, items.py, login.py, etc.)
 - Use dependency injection for auth & DB sessions
 - Return Pydantic models (not SQLModel table models)
@@ -181,7 +181,7 @@ npm run test  # Playwright tests (integration with running backend)
 
 ## Environment & Configuration
 
-### Backend Config (`app/core/config.py`)
+### Backend Config (`core/config.py`)
 Load from `.env` via Pydantic Settings:
 - `SECRET_KEY` — JWT signing key (generate: `python -c "import secrets; print(secrets.token_urlsafe(32))"`)
 - `DATABASE_URL` — PostgreSQL connection
@@ -220,9 +220,9 @@ Load from `.env` via Pydantic Settings:
 ## Common Tasks
 
 ### Add a New API Endpoint
-1. Add model to `backend/app/models.py` (if needed)
-2. Add route in `backend/app/api/routes/newfeature.py` with proper dependencies
-3. Register route in `backend/app/api/main.py` via `APIRouter`
+1. Add model to `backend/models.py` (if needed)
+2. Add route in `backend/api/routes/newfeature.py` with proper dependencies
+3. Register route in `backend/api/main.py` via `APIRouter`
 4. Add tests in `backend/tests/api/routes/test_newfeature.py`
 5. Frontend: run `npm run generate-client` to regenerate types
 6. Use new client in `src/components/` or route
@@ -244,7 +244,7 @@ npm run generate-client  # Updates src/client/schemas.gen.ts, sdk.gen.ts
 ### Database Migration
 ```bash
 cd backend
-# After editing app/models.py:
+# After editing models.py:
 alembic revision --autogenerate -m "descriptive name"
 alembic upgrade head
 ```
@@ -344,9 +344,9 @@ This template includes enterprise-ready Microsoft Entra ID authentication with m
 
 ### Architecture
 
-- **Backend**: `app/core/auth_entra.py` — Microsoft Graph API client for token validation
+- **Backend**: `core/auth_entra.py` — Microsoft Graph API client for token validation
 - **Frontend**: `src/auth/entra.ts` — MSAL initialization; `src/components/Auth/EntraLogin.tsx` — login button
-- **Routes**: `app/api/routes/auth_entra.py` — endpoints: `/auth/entra/login`, `/auth/entra/config`, `/tenants/` CRUD
+- **Routes**: `api/routes/auth_entra.py` — endpoints: `/auth/entra/login`, `/auth/entra/config`, `/tenants/` CRUD
 - **Models**: Extended `User` with `azure_user_id`, `azure_tenant_id`, `azure_roles`; new `MicrosoftTenant` and `UserTenantRole` models
 
 ### How It Works

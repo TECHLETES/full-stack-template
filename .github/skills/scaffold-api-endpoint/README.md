@@ -52,7 +52,7 @@ Real example following this skill:
 # - Owner: User (one user → many projects)
 
 # Step 2-3: Model + migration (see templates/model-template.py)
-# Add to backend/app/models.py:
+# Add to backend/models.py:
 class Project(ProjectBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     owner_id: uuid.UUID = Field(foreign_key="user.id", ondelete="CASCADE")
@@ -62,9 +62,9 @@ class Project(ProjectBase, table=True):
 alembic revision --autogenerate -m "add project model"
 
 # Step 4-5: CRUD + routes (see templates/crud-template.py, routes-template.py)
-# Add crud.create_project(), crud.read_projects(), etc. to backend/app/crud.py
-# Create backend/app/api/routes/projects.py with GET/POST/PATCH/DELETE endpoints
-# Register in backend/app/api/main.py
+# Add crud.create_project(), crud.read_projects(), etc. to backend/crud.py
+# Create backend/api/routes/projects.py with GET/POST/PATCH/DELETE endpoints
+# Register in backend/api/main.py
 
 # Step 6-7: Lint + test
 ./scripts/lint.sh          # Format code

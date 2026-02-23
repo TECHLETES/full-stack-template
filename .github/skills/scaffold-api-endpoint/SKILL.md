@@ -20,7 +20,7 @@ Generate a full-stack CRUD endpoint for a new resource: database model, CRUD ope
 
 - ✅ SQLModel database model with relationships and validation
 - ✅ CRUD operations in `crud.py` (create, read, update, delete patterns)
-- ✅ API routes in `app/api/routes/` with dependency injection
+- ✅ API routes in `api/routes/` with dependency injection
 - ✅ Input/output models (Create, Update, Public, list wrapper)
 - ✅ Integration tests in `tests/api/routes/`
 - ✅ Database migration (Alembic)
@@ -47,7 +47,7 @@ Before starting, clarify:
 
 Use the SQLModel template: [model-template.py](./templates/model-template.py)
 
-**In `backend/app/models.py`, add:**
+**In `backend/models.py`, add:**
 
 ```python
 import uuid
@@ -129,12 +129,12 @@ alembic upgrade head      # Re-apply
 
 Use the CRUD template: [crud-template.py](./templates/crud-template.py)
 
-**In `backend/app/crud.py`, add:**
+**In `backend/crud.py`, add:**
 
 ```python
 import uuid
 from sqlmodel import Session, select, func, col
-from app.models import Project, ProjectCreate, ProjectUpdate
+from backend.models import Project, ProjectCreate, ProjectUpdate
 
 def create_project(
     *,
@@ -210,7 +210,7 @@ def delete_project(
 
 Use the route template: [routes-template.py](./templates/routes-template.py)
 
-**Create `backend/app/api/routes/projects.py`:**
+**Create `backend/api/routes/projects.py`:**
 
 ```python
 import uuid
@@ -220,8 +220,8 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import Session
 
 from app import crud
-from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
-from app.models import (
+from backend.api.deps import CurrentUser, SessionDep, get_current_active_superuser
+from backend.models import (
     Project,
     ProjectCreate,
     ProjectPublic,
@@ -322,10 +322,10 @@ def delete_project(
     return Message(message="Project deleted successfully")
 ```
 
-**Register the route** in `backend/app/api/main.py`:
+**Register the route** in `backend/api/main.py`:
 
 ```python
-from app.api.routes import projects
+from backend.api.routes import projects
 
 api_router = APIRouter()
 api_router.include_router(projects.router)
@@ -344,7 +344,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.models import ProjectCreate
+from backend.models import ProjectCreate
 
 
 def test_create_project(
@@ -445,7 +445,7 @@ def test_delete_project(
 ```python
 import uuid
 from sqlmodel import Session
-from app.models import Project, ProjectCreate
+from backend.models import Project, ProjectCreate
 from tests.utils.user import create_random_user
 
 def create_random_project(db: Session) -> Project:
@@ -487,8 +487,8 @@ cd backend
 ./scripts/lint.sh
 
 # Or manually
-ruff check --fix app/
-mypy app/
+ruff check --fix
+mypy
 ```
 
 ### 9. Generate Frontend Client
@@ -572,9 +572,9 @@ def read_projects(...):
 
 | Issue | Solution |
 |-------|----------|
-| **Migration not generated** | Check that `backend/app/models.py` has `table=True` on DB model |
+| **Migration not generated** | Check that `backend/models.py` has `table=True` on DB model |
 | **Import errors after changes** | Run `cd backend && uv sync` |
-| **Tests fail with 404** | Verify route is registered in `app/api/main.py` |
+| **Tests fail with 404** | Verify route is registered in `api/main.py` |
 | **TypeScript types not updated** | Run `cd frontend && npm run generate-client` |
 | **Unique constraint violations** | Check for duplicate titles; implement deduplication logic |
 | **Cascade delete not working** | Verify `cascade_delete=True` on Relationship and `ondelete="CASCADE"` on FK |

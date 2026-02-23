@@ -1,6 +1,6 @@
 # API Routes Template
 
-Use this as a starting point for your route file. Create as `backend/app/api/routes/projects.py`.
+Use this as a starting point for your route file. Create as `backend/api/routes/projects.py`.
 
 ## Complete Example: Project Routes
 
@@ -12,8 +12,8 @@ from fastapi import APIRouter, HTTPException
 from sqlmodel import Session
 
 from app import crud
-from app.api.deps import CurrentUser, SessionDep
-from app.models import (
+from backend.api.deps import CurrentUser, SessionDep
+from backend.models import (
     Message,
     Project,
     ProjectCreate,
@@ -134,7 +134,7 @@ def delete_project(
 
 ## Route Registration
 
-After creating `backend/app/api/routes/projects.py`, register in `backend/app/api/main.py`:
+After creating `backend/api/routes/projects.py`, register in `backend/api/main.py`:
 
 ```python
 from .routes import projects
@@ -235,7 +235,7 @@ def read_projects(
 ### Admin-Only Endpoints
 
 ```python
-from app.api.deps import get_current_active_superuser
+from backend.api.deps import get_current_active_superuser
 
 @router.delete("/{project_id}", dependencies=[Depends(get_current_active_superuser)])
 def admin_delete_project(
@@ -253,9 +253,9 @@ def admin_delete_project(
 
 ## After Creating Routes
 
-1. Save as `backend/app/api/routes/projects.py`
-2. Register in `backend/app/api/main.py`
+1. Save as `backend/api/routes/projects.py`
+2. Register in `backend/api/main.py`
 3. Run `cd backend && ./scripts/lint.sh` to format
-4. Start server: `uv run fastapi dev app/main.py`
+4. Start server: `uv run fastapi dev main.py`
 5. Check `/docs` → "projects" should appear
 6. Test endpoints in interactive docs

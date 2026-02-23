@@ -16,7 +16,7 @@ Use this checklist when scaffolding a new CRUD endpoint. Check items off as you 
 - [ ] Create X database model (table=True, with ID, timestamps, FK, relationships)
 - [ ] Create XPublic model (for responses, no secrets)
 - [ ] Create XsPublic wrapper (for paginated lists: data + count)
-- [ ] Add model import to `backend/app/models.py`
+- [ ] Add model import to `backend/models.py`
 - [ ] Add relationship to parent model (e.g., User.projects)
 
 ## Phase 3: Database Migration
@@ -35,14 +35,14 @@ Use this checklist when scaffolding a new CRUD endpoint. Check items off as you 
 - [ ] Test each CRUD function locally if possible
 
 ## Phase 5: API Routes
-- [ ] Create `backend/app/api/routes/projects.py`
+- [ ] Create `backend/api/routes/projects.py`
 - [ ] Add `GET /projects/` (list with pagination)
 - [ ] Add `POST /projects/` (create)
 - [ ] Add `GET /projects/{id}` (read single)
 - [ ] Add `PATCH /projects/{id}` (update)
 - [ ] Add `DELETE /projects/{id}` (delete)
 - [ ] Add docstrings to each route
-- [ ] Register router in `backend/app/api/main.py`
+- [ ] Register router in `backend/api/main.py`
 
 ## Phase 6: Linting & Type Checking
 - [ ] Run: `cd backend && ./scripts/lint.sh`
@@ -65,7 +65,7 @@ Use this checklist when scaffolding a new CRUD endpoint. Check items off as you 
 - [ ] Coverage acceptable (>80%)
 
 ## Phase 8: API Verification
-- [ ] Start backend: `cd backend && uv run fastapi dev app/main.py`
+- [ ] Start backend: `cd backend && uv run fastapi dev main.py`
 - [ ] Open `http://localhost:8000/docs`
 - [ ] Verify `/projects` endpoint appears
 - [ ] Test each endpoint in interactive docs
@@ -109,7 +109,7 @@ Use this checklist when scaffolding a new CRUD endpoint. Check items off as you 
 |-------|-----|
 | Migration not generated | Verify `table=True` on DB model in models.py |
 | Import errors | Run `cd backend && uv sync` |
-| Route not appearing in docs | Verify router registered in `app/api/main.py` |
+| Route not appearing in docs | Verify router registered in `api/main.py` |
 | Tests fail with 404 | Check route registered, check auth headers |
 | Type errors in CRUD | Use `model_validate()`, not direct instantiation |
 | Frontend types not updated | Run `npm run generate-client` |
@@ -135,7 +135,7 @@ pytest tests/api/routes/test_projects.py --cov=app --cov-report=html
 cd backend && ./scripts/lint.sh
 
 # Type check only
-mypy app/
+mypy
 
 # Frontend tests
 cd frontend && npm run test
@@ -148,10 +148,10 @@ npm run test:ui
 
 | File | Path |
 |------|------|
-| Database model | `backend/app/models.py` |
-| CRUD operations | `backend/app/crud.py` |
-| API routes | `backend/app/api/routes/projects.py` |
-| Route registration | `backend/app/api/main.py` |
+| Database model | `backend/models.py` |
+| CRUD operations | `backend/crud.py` |
+| API routes | `backend/api/routes/projects.py` |
+| Route registration | `backend/api/main.py` |
 | Migration | `backend/alembic/versions/xxxx_add_project_model.py` |
 | Tests | `backend/tests/api/routes/test_projects.py` |
 | Test utilities | `backend/tests/utils/project.py` |

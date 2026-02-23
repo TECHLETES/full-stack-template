@@ -141,7 +141,7 @@ class ProjectPublic(ProjectBase):
 
 ## After Creating the Model
 
-1. Add model to `backend/app/models.py`
+1. Add model to `backend/models.py`
 2. Add relationship to parent model (e.g., add to `User`)
 3. Create migration: `alembic revision --autogenerate -m "add project model"`
 4. Test migration: `alembic upgrade head` then `alembic downgrade -1` then `alembic upgrade head`

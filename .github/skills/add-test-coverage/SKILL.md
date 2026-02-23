@@ -90,7 +90,7 @@ Test database operations directly:
 import uuid
 import pytest
 from sqlmodel import Session
-from app.models import ProjectCreate
+from backend.models import ProjectCreate
 from app import crud
 
 
@@ -174,7 +174,7 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from app.models import ProjectCreate
+from backend.models import ProjectCreate
 
 
 def test_create_project_succeeds(
@@ -302,10 +302,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, delete
 
-from app.core.config import settings
-from app.core.db import engine, init_db
-from app.main import app
-from app.models import User, Item
+from backend.core.config import settings
+from backend.core.db import engine, init_db
+from backend.main import app
+from backend.models import User, Item
 
 @pytest.fixture(scope="session", autouse=True)
 def db() -> Generator[Session, None, None]:

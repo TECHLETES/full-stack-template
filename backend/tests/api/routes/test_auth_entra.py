@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from app.core.config import settings
-from app.models import User
+from backend.core.config import settings
+from backend.models import User
 
 
 def test_get_entra_config_when_disabled(client: TestClient) -> None:

@@ -32,7 +32,7 @@ uv sync
 cd /home/development/recaipe/backend
 
 # Start backend server
-uv run fastapi dev app/main.py
+uv run fastapi dev main.py
 ```
 
 **Backend available at:** http://localhost:8000
@@ -54,7 +54,7 @@ npm run dev
 ## Development Workflow
 
 ### Making Backend Changes
-1. Edit files in `backend/app/`
+1. Edit files in `backend/`
 2. Server auto-reloads on save
 3. Run tests: `cd backend && ./scripts/test.sh`
 4. Check API docs at http://localhost:8000/docs
@@ -66,7 +66,7 @@ npm run dev
 4. Regenerate client after API changes: `npm run generate-client`
 
 ### Database Changes
-1. Edit models in `backend/app/models.py`
+1. Edit models in `backend/models.py`
 2. Create migration: `cd backend && alembic revision --autogenerate -m "description"`
 3. Apply migration: `alembic upgrade head`
 
@@ -114,9 +114,9 @@ cd frontend && npm run test
 ```
 recaipe/
 ├── backend/          # FastAPI backend
-│   ├── app/         # Application code
 │   ├── tests/       # Backend tests
-│   └── scripts/     # Dev scripts
+│   ├── scripts/     # Dev scripts
+│   ├── alembic/     # Database migrations
 ├── frontend/        # React frontend
 │   ├── src/         # Source code
 │   └── tests/       # Frontend tests

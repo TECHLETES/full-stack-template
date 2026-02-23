@@ -9,7 +9,7 @@ This is our internal company template for building modern full-stack application
 Since this template is cloned for each project, contributions should:
 
 1. **Maintain backward compatibility** — Existing projects should continue to work after pulling updates
-2. **Keep the core structure** — Don't reorganize `backend/app/`, `frontend/src/`, or `docker-compose.yml` without discussion
+2. **Keep the core structure** — Don't reorganize `backend/`, `frontend/src/`, or `docker-compose.yml` without discussion
 3. **Document changes** — Update `.github/copilot-instructions.md` or add new skill files (in `.github/skills/` or `.github/instructions/`)
 4. **Include tests** — All new features should include comprehensive test coverage
 5. **Consider all projects** — Changes should be useful across different project types (data pipelines, AI apps, dashboards, etc.)

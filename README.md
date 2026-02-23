@@ -99,8 +99,8 @@ This will ask for project name, stack name, credentials, and other configuration
 
 1. **Clone the template** to your project directory
 2. **Update `.env` files** with your project credentials and settings
-3. **Customize models** in `backend/app/models.py` for your domain
-4. **Add API routes** in `backend/app/api/routes/`
+3. **Customize models** in `backend/models.py` for your domain
+4. **Add API routes** in `backend/api/routes/`
 5. **Build frontend pages** in `frontend/src/routes/` and `frontend/src/components/`
 6. **Integrate company services** (Microsoft Entra, Mistral AI, data connectors, etc.)
 7. **Deploy** using Docker Compose or your preferred platform
