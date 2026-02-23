@@ -1,0 +1,5 @@
+uv sync
+
+direnv allow
+
+

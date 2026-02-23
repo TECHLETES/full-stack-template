@@ -1,0 +1,23 @@
+# Caddyfile for production deployment
+{$DOMAIN} {
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+	handle /docs {
+		reverse_proxy backend:8000
+	}
+	handle /redoc {
+		reverse_proxy backend:8000
+	}
+	handle /openapi.json {
+		reverse_proxy backend:8000
+	}
+	handle {
+		reverse_proxy frontend:80
+	}
+	encode gzip
+}
+
+adminer.{$DOMAIN} {
+	reverse_proxy adminer:8080
+}
