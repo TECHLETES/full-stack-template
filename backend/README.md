@@ -1,5 +1,7 @@
 # FastAPI Project - Backend
 
+**Part of the Techletes Full-Stack Template** — See parent [README.md](../README.md) for template overview.
+
 ## Requirements
 
 * [Docker](https://www.docker.com/).

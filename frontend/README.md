@@ -1,5 +1,7 @@
 # FastAPI Project - Frontend
 
+**Part of the Techletes Full-Stack Template** — See parent [README.md](../README.md) for template overview.
+
 The frontend is built with [Vite](https://vitejs.dev/), [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [TanStack Query](https://tanstack.com/query), [TanStack Router](https://tanstack.com/router) and [Tailwind CSS](https://tailwindcss.com/).
 
 ## Requirements

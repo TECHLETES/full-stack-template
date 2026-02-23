@@ -1,8 +1,22 @@
-# Full Stack FastAPI Template
+# 🚀 Techletes Full Stack FastAPI Template
+
+**A modern, production-ready full-stack template for building custom data and AI applications at Techletes.**
 
 <a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Docker+Compose%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Docker%20Compose/badge.svg" alt="Test Docker Compose"></a>
 <a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Backend%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Backend/badge.svg" alt="Test Backend"></a>
 <a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>
+
+---
+
+## About This Template
+
+This is **Techletes' internal company template** for building full-stack applications. It's designed to be:
+- **Cloned and customized** for each new project
+- **Extensible** with company-specific integrations (Microsoft Entra, Mistral AI, custom data connectors, etc.)
+- **Production-ready** with security, testing, and deployment best practices built-in
+- **Maintainable** by providing consistent patterns and architectural guidance for all company projects
+
+Perfect for rapid development of custom solutions in data, AI, and business applications.
 
 ## Technology Stack and Features
 
@@ -22,9 +36,18 @@
 - 📫 Email based password recovery.
 - 📬 [Mailcatcher](https://mailcatcher.me) for local email testing during development.
 - ✅ Tests with [Pytest](https://pytest.org).
-- 📞 [Traefik](https://traefik.io) as a reverse proxy / load balancer.
-- 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Traefik proxy to handle automatic HTTPS certificates.
+- 📞 [Caddy](https://caddyserver.com/) as a reverse proxy / load balancer.
+- 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Caddy proxy to handle automatic HTTPS certificates.
 - 🏭 CI (continuous integration) and CD (continuous deployment) based on GitHub Actions.
+
+### Planned Company Integrations & Extensions
+
+Future versions will include built-in support for:
+- 🔐 **Microsoft Entra ID** — Single sign-on (SSO) for enterprise authentication
+- 🤖 **Mistral AI** — Ready-to-integrate LLM models for AI-powered features
+- 📊 **Data Connectors** — Common data source integrations (SQL, APIs, files)
+- 🔍 **Search** — Full-text search, semantic search, and filtering patterns
+- 📈 **Analytics** — Built-in metrics and monitoring patterns
 
 ### Dashboard Login
 
@@ -46,77 +69,84 @@
 
 [![API docs](img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
 
-## How To Use It
+## Quick Start – Clone for Your Project
 
-You can **just fork or clone** this repository and use it as is.
+This template is designed to be **cloned and customized** for each new Techletes project.
 
-✨ It just works. ✨
+### Option 1: Simple Clone (Recommended)
 
-### How to Use a Private Repository
-
-If you want to have a private repository, GitHub won't allow you to simply fork it as it doesn't allow changing the visibility of forks.
-
-But you can do the following:
-
-- Create a new GitHub repo, for example `my-full-stack`.
-- Clone this repository manually, set the name with the name of the project you want to use, for example `my-full-stack`:
+For a quick start, simply clone this repository:
 
 ```bash
-git clone git@github.com:fastapi/full-stack-fastapi-template.git my-full-stack
+git clone https://github.com/Techletes/full-stack-template.git my-project
+cd my-project
+# Update .env files and customize as needed
+docker compose up --build
 ```
 
-- Enter into the new directory:
+### Option 2: Clone with Copier (Automated Setup)
+
+Use [Copier](https://copier.readthedocs.io) to automatically configure project details:
 
 ```bash
-cd my-full-stack
+pipx install copier
+copier copy https://github.com/Techletes/full-stack-template.git my-project
 ```
 
-- Set the new origin to your new repository, copy it from the GitHub interface, for example:
+This will ask for project name, stack name, credentials, and other configuration.
+
+### Customization Workflow
+
+1. **Clone the template** to your project directory
+2. **Update `.env` files** with your project credentials and settings
+3. **Customize models** in `backend/app/models.py` for your domain
+4. **Add API routes** in `backend/app/api/routes/`
+5. **Build frontend pages** in `frontend/src/routes/` and `frontend/src/components/`
+6. **Integrate company services** (Microsoft Entra, Mistral AI, data connectors, etc.)
+7. **Deploy** using Docker Compose or your preferred platform
+
+See [development.md](./development.md) for detailed guidance.
+
+### Set Up Your Project Repository
+
+Each Techletes project should have its own repository. If you want a private repository hosting your project:
+
+- Create a new private GitHub repository under the Techletes organization
+- Clone this template repository:
 
 ```bash
-git remote set-url origin git@github.com:octocat/my-full-stack.git
+git clone https://github.com/Techletes/full-stack-template.git my-project
+cd my-project
 ```
 
-- Add this repo as another "remote" to allow you to get updates later:
+- Point the repository to your new project repository:
 
 ```bash
-git remote add upstream git@github.com:fastapi/full-stack-fastapi-template.git
+git remote set-url origin git@github.com:Techletes/my-project.git
 ```
 
-- Push the code to your new repository:
+- Keep this template as an upstream remote to receive updates:
+
+```bash
+git remote add upstream https://github.com/Techletes/full-stack-template.git
+```
+
+- Push your initial code:
 
 ```bash
 git push -u origin master
 ```
 
-### Update From the Original Template
+### Keep Your Project Updated
 
-After cloning the repository, and after doing changes, you might want to get the latest changes from this original template.
-
-- Make sure you added the original repository as a remote, you can check it with:
+As the template evolves with new integrations and improvements, you can pull updates:
 
 ```bash
-git remote -v
-
-origin    git@github.com:octocat/my-full-stack.git (fetch)
-origin    git@github.com:octocat/my-full-stack.git (push)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (fetch)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (push)
-```
-
-- Pull the latest changes without merging:
-
-```bash
+# Pull latest changes from template (without auto-merging)
 git pull --no-commit upstream master
-```
 
-This will download the latest changes from this template without committing them, that way you can check everything is right before committing.
-
-- If there are conflicts, solve them in your editor.
-
-- Once you are done, commit the changes:
-
-```bash
+# Review changes, resolve conflicts if needed
+# Then commit when ready:
 git merge --continue
 ```
 

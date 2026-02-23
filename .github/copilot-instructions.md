@@ -1,16 +1,23 @@
 ---
-name: FastAPI Full-Stack Template Workspace
-description: Workspace instructions for the full-stack FastAPI template with React frontend
+name: Techletes Full-Stack Template — Workspace Instructions
+description: Internal company template for building full-stack applications with FastAPI, React, and PostgreSQL
 ---
 
-# FastAPI Full-Stack Template — Workspace Instructions
+# Techletes Full-Stack Template — Workspace Instructions
 
-## Project Overview
+## About This Template
 
-This is a production-ready full-stack template combining:
+This is **Techletes' internal company template** for building modern full-stack applications focused on data and AI solutions. It's designed to:
+
+- **Be cloned for each new project** — Rapidly spin up new applications with a solid foundation
+- **Remain maintainable** — Consistent patterns across all company projects for easy onboarding
+- **Be extensible** — Ready for integration with company-specific services (Microsoft Entra, Mistral AI, data connectors, etc.)
+- **Support collaboration** — All developers follow the same patterns and best practices
+
+### Core Stack
 - **Backend**: FastAPI + SQLModel ORM + PostgreSQL
 - **Frontend**: React + TypeScript + Vite + shadcn/ui
-- **Infrastructure**: Docker Compose, Traefik, CI/CD with GitHub Actions
+- **Infrastructure**: Docker Compose, Caddy, CI/CD with GitHub Actions
 
 **Monorepo Structure**: `uv` workspaces for Python + Node.js workspace (Bun/npm) for frontend.
 
@@ -71,7 +78,7 @@ npm run generate-client          # Regenerate API client from OpenAPI spec
 **Build**: Vite (fast HMR), TypeScript strict mode, Tailwind + shadcn/ui components, Dark mode support.
 
 ### Infrastructure
-- **Compose**: `compose.yml` — PostgreSQL, backend, frontend, Adminer, Traefik (reverse proxy)
+- **Compose**: `compose.yml` — PostgreSQL, backend, frontend, Adminer, Caddy (reverse proxy)
 - **Dockerfiles**: Optimized multi-stage builds for both backend & frontend
 - **CI/CD**: GitHub Actions workflows for testing, coverage, Docker builds
 - **Docs**: `docs/` — DEV_SETUP.md, deployment.md, release-notes.md
@@ -288,6 +295,31 @@ cd frontend && npm run lint      # Biome
 | `biome` | TypeScript linter | frontend/biome.json |
 | `docker compose` | Local dev env | compose.yml (all-in-one command) |
 | `openapi-ts` | Generate client from OpenAPI | frontend/openapi-ts.config.ts |
+
+---
+
+## Template Maintenance & Evolution
+
+This template is continuously improved with new capabilities for Techletes projects. When making changes:
+
+**For all projects using this template:**
+- ✅ Keep core layer structure intact (backend/app, frontend/src, docker compose)
+- ✅ Maintain backward compatibility where possible
+- ✅ Update project docs when adding new features
+- ✅ Add skills/instructions for new patterns (in `.github/` folder)
+
+**Planned integrations & enhancements:**
+- 🔐 **Microsoft Entra ID** — Single sign-on and enterprise authentication
+- 🤖 **Mistral AI** — Ready-to-use LLM integration patterns
+- 📊 **Data Connectors** — Common data source patterns (SQL, APIs, files)
+- 🔍 **Advanced Search** — Full-text and semantic search capabilities
+- 📈 **Analytics** — Built-in metrics, logging, and monitoring
+
+When these are added to the template, existing projects can pull updates via:
+```bash
+git pull --no-commit upstream master   # Pull from template
+# Review, resolve conflicts, merge when ready
+```
 
 ---
 
