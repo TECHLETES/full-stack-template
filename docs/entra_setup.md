@@ -25,17 +25,18 @@ This template supports Microsoft Entra (Azure AD) authentication with both singl
    ↓
 3. User authenticates with their Microsoft account
    ↓
-4. Microsoft returns access token to frontend
+4. Microsoft returns access token + ID token (with app roles) to frontend
    ↓
-5. Frontend sends token to backend /auth/entra/login
+5. Frontend extracts roles from ID token claims and sends to backend /auth/entra/login
    ↓
-6. Backend validates token via Microsoft Graph API
-   (uses CLIENT_SECRET for backend-to-backend calls)
+6. Backend validates access token via Microsoft Graph API to ensure it's valid
    ↓
-7. Backend creates/updates user in database, returns JWT
+7. Backend creates/updates user in database with app roles, returns JWT
    ↓
 8. Frontend stores JWT and uses for all subsequent API calls
 ```
+
+**Key Point:** App roles are assigned by your Azure tenant admin in the Azure Portal. When a user logs in, the roles are included in the ID token and sent to the backend. No extra Graph API permissions are needed.
 
 ---
 
@@ -96,41 +97,53 @@ AZURE_TENANT_ID=aaaabbbb-cccc-dddd-eeee-ffff00001111
 
 ### Step 5: Set API Permissions
 
-The app needs permission to read user profile and access Microsoft Graph.
+### Step 5: Configure App Roles
+
+App roles allow tenant admins to assign roles to users. When users log in, their assigned roles are automatically included in the ID token.
+
+**1. Create app roles through the UI:**
+
+1. In app registration, go to **App roles**
+2. Click **Create app role**
+3. Fill in the form:
+   - **Display name:** `Admin`
+   - **Allowed member types:** Check `Users/Groups`
+   - **Value:** `Admin` (this is what appears in the token's `roles` claim)
+   - **Description:** `Admin role with full access`
+   - **Do you want to enable this app role?:** Check this box
+4. Click **Apply**
+5. Repeat to create additional roles:
+   - **Display name:** `Editor`, **Value:** `Editor`, **Description:** `Editor role with content management access`
+   - **Display name:** `Viewer`, **Value:** `Viewer`, **Description:** `Viewer role with read-only access`
+
+**2. Assign roles to users:**
+
+1. Go to **Enterprise applications**
+2. Find and select your app
+3. Go to **Users and groups**
+4. Click **Add user/group**
+5. Select a user
+6. Select **Select a role** and choose the role(s) to assign
+7. Click **Assign**
+
+**Important:** Once you assign a user to a role, that role appears automatically in the ID token (`roles` claim) when they log in. No additional token configuration is needed.
+
+### Step 6: Set API Permissions
+
+The app needs minimum permissions to read user profile info.
 
 1. In app registration, go to **API permissions**
 2. Click **Add a permission**
-3. Select **Microsoft Graph**
-4. Choose **Delegated permissions**
-5. Search for and add:
+3. Select **Microsoft Graph** → **Delegated permissions**
+4. Search for and add:
    - `openid` (OIDC)
    - `profile` (User profile)
    - `email` (Email address)
    - `User.Read` (Read user profile)
-   - `Directory.Read.All` (Read directory data for roles - if using groups for roles)
 
-6. Click **Add permissions**
+5. Click **Add permissions**
 
-**If this is a multi-tenant app, the admin of each tenant will need to consent:**
-- Provide them with: `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code&scope=openid profile email`
-
-### Step 6: (Optional) Setup App Roles
-
-If you want to assign specific roles (Admin, Editor, Viewer) to users:
-
-1. Go to **App roles** in the app registration
-2. Click **Create app role**
-3. Add roles:
-   - **Admin** — Full access
-   - **Editor** — Can create/edit content
-   - **Viewer** — Read-only access
-
-**Assign roles to users:**
-1. Go to **Enterprise applications** → find your app
-2. Select **Users and groups**
-3. Add users and assign them roles
-
-These roles will appear in the user's JWT token claims.
+**Note:** If you used the old `Directory.Read.All` permission for roles, you can remove it now since roles come from token claims.
 
 ---
 

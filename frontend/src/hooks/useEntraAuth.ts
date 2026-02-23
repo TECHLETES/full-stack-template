@@ -7,6 +7,7 @@ import useCustomToast from "./useCustomToast"
 interface EntraLoginData {
   access_token: string
   tenant_id?: string
+  roles?: string[]
 }
 
 interface EntraLoginResponse {

@@ -27,6 +27,7 @@ router = APIRouter(prefix="/auth/entra", tags=["auth-entra"])
 class EntraLoginRequest(BaseModel):
     access_token: str
     tenant_id: str | None = None
+    roles: list[str] = []  # Roles from ID token claims (configured in Azure app)
 
 
 class EntraLoginUrlResponse(BaseModel):
@@ -54,7 +55,8 @@ def entra_login(
     try:
         # Get user info from Microsoft Graph using the access token
         user_info = entra_client.get_user_info(request.access_token)
-        user_roles = entra_client.get_user_roles(request.access_token)
+        # Use roles from ID token claims (sent by frontend)
+        user_roles = request.roles or []
     except Exception:
         raise HTTPException(
             status_code=400, detail="Failed to validate Microsoft token"
@@ -87,6 +89,9 @@ def entra_login(
     # Find or create user
     db_user = session.exec(select(User).where(User.email == email)).first()
 
+    # Check if user has superuser role (configurable via AZURE_SUPERUSER_ROLE)
+    is_admin = settings.AZURE_SUPERUSER_ROLE in user_roles
+
     if not db_user:
         db_user = User(
             email=email,
@@ -95,6 +100,7 @@ def entra_login(
             azure_tenant_id=azure_tenant_id,
             azure_roles=user_roles,
             is_active=True,
+            is_superuser=is_admin,
         )
         session.add(db_user)
     else:
@@ -103,6 +109,7 @@ def entra_login(
         db_user.azure_user_id = azure_user_id
         db_user.azure_tenant_id = azure_tenant_id
         db_user.azure_roles = user_roles
+        db_user.is_superuser = is_admin
         session.add(db_user)
 
     session.commit()

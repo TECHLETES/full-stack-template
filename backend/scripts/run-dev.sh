@@ -15,7 +15,7 @@ fi
 
 # Start Docker Compose services (PostgreSQL, etc.)
 echo "🐳 Starting Docker Compose services..."
-docker compose -f docker-compose.dev.yml up -d
+docker compose -f ../docker-compose.dev.yml up -d
 
 # Wait for PostgreSQL to be ready with health check
 echo "⏳ Waiting for database to be ready..."
@@ -38,7 +38,9 @@ if [ $ATTEMPT -gt $MAX_ATTEMPTS ]; then
     exit 1
 fi
 
-cd backend
+# Set PYTHONPATH to enable app module imports
+export PYTHONPATH="${PWD}:$PYTHONPATH"
+
 uv run python app/backend_pre_start.py
 
 # Run migrations and setup

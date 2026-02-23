@@ -57,26 +57,6 @@ class EntraAuthClient:
                 return resp.json()  # type: ignore[no-any-return]
             raise Exception(f"Failed to get user info: {resp.status_code}")
 
-    def get_user_roles(self, access_token: str) -> list[str]:
-        """Get app roles assigned to user via /me/memberOf."""
-        headers = {"Authorization": f"Bearer {access_token}"}
-
-        with httpx.Client() as client:
-            resp = client.get(
-                f"{self.graph_api}/me/memberOf",
-                headers=headers,
-                params={"$select": "displayName"},
-            )
-            if resp.status_code == 200:
-                data = resp.json()
-                roles: list[str] = []
-                for item in data.get("value", []):
-                    display_name = item.get("displayName")
-                    if display_name:
-                        roles.append(display_name)
-                return roles
-            return []
-
     def get_login_url(
         self,
         redirect_uri: str,

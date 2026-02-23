@@ -74,8 +74,8 @@ function Login() {
     loginMutation.mutate(data)
   }
 
-  const handleEntraLogin = (accessToken: string) => {
-    entraLoginMutation.mutate({ access_token: accessToken })
+  const handleEntraLogin = (accessToken: string, roles?: string[]) => {
+    entraLoginMutation.mutate({ access_token: accessToken, roles: roles || [] })
   }
 
   return (

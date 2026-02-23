@@ -5,7 +5,7 @@ import { isEntraEnabled, loginScopes } from "@/auth/entra"
 import { LoadingButton } from "@/components/ui/loading-button"
 
 interface EntraLoginButtonProps {
-  onSuccess: (accessToken: string) => void
+  onSuccess: (accessToken: string, roles?: string[]) => void
   onError?: (error: Error) => void
 }
 
@@ -28,7 +28,10 @@ export function EntraLoginButton({ onSuccess, onError }: EntraLoginButtonProps) 
           scopes: ["User.Read"],
           account: response.account,
         })
-        onSuccess(tokenResponse.accessToken)
+        
+        // Extract roles from ID token claims
+        const roles = response.idTokenClaims?.roles || []
+        onSuccess(tokenResponse.accessToken, roles as string[])
       }
     } catch (error) {
       onError?.(error as Error)

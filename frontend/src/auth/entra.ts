@@ -35,12 +35,12 @@ export const initEntra = async (): Promise<void> => {
     
     entraConfig = await response.json()
     
-    if (!entraConfig.client_id) return
+    if (!entraConfig?.client_id) return
     
     const msalConfig: Configuration = {
       auth: {
         clientId: entraConfig.client_id,
-        authority: entraConfig.authority,
+        authority: entraConfig.authority ?? undefined,
         redirectUri: window.location.origin,
         postLogoutRedirectUri: "/",
       },
