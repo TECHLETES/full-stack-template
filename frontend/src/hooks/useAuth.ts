@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router"
 
 import {
   type Body_login_login_access_token as AccessToken,
+  ApiError,
   LoginService,
   type UserPublic,
   type UserRegister,
@@ -20,11 +21,27 @@ const useAuth = () => {
   const queryClient = useQueryClient()
   const { showErrorToast } = useCustomToast()
 
-  const { data: user } = useQuery<UserPublic | null, Error>({
+  const { data: user, error } = useQuery<UserPublic | null, Error>({
     queryKey: ["currentUser"],
     queryFn: UsersService.readUserMe,
     enabled: isLoggedIn(),
+    retry: false,
   })
+
+  // Handle 404 on readUserMe: session is no longer valid
+  if (error instanceof ApiError && error.status === 404 && isLoggedIn()) {
+    // Clear all session data
+    localStorage.removeItem("access_token")
+    sessionStorage.clear()
+    // Clear all cookies
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
+    })
+    // Redirect to login
+    navigate({ to: "/login" })
+  }
 
   const signUpMutation = useMutation({
     mutationFn: (data: UserRegister) =>
