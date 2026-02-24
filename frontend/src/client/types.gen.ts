@@ -96,6 +96,15 @@ export type PermissionCreate = {
     resource: string;
 };
 
+/**
+ * Type definition for a permission.
+ */
+export type PermissionDefinition = {
+    name: string;
+    display: string;
+    resource: string;
+};
+
 export type PermissionPublic = {
     name: string;
     description?: (string | null);
@@ -411,9 +420,7 @@ export type RbacGetUserPermissionsEndpointData = {
 export type RbacGetUserPermissionsEndpointResponse = (PermissionsPublic);
 
 export type RbacGetPermissionsCatalogResponse = ({
-    [key: string]: Array<{
-        [key: string]: (string);
-    }>;
+    [key: string]: Array<PermissionDefinition>;
 });
 
 export type TenantsListTenantsData = {

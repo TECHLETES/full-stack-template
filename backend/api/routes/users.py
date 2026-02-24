@@ -24,7 +24,7 @@ from backend.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from backend.utils import generate_new_account_email, send_email
+from backend.utils.utils import generate_new_account_email, send_email
 
 router = APIRouter(prefix="/users", tags=["users"])
 

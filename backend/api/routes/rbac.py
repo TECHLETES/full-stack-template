@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from backend.api.deps import SessionDep
 from backend.api.deps_rbac import require_role
-from backend.core.rbac import DEFAULT_PERMISSIONS
+from backend.core.rbac import DEFAULT_PERMISSIONS, PermissionDefinition
 from backend.crud_rbac import (
     add_permission_to_role,
     assign_role_to_user,
@@ -284,7 +284,7 @@ def get_user_permissions_endpoint(
 
 
 @router.get("/permissions-catalog")
-def get_permissions_catalog() -> dict[str, list[dict[str, str]]]:
+def get_permissions_catalog() -> dict[str, list[PermissionDefinition]]:
     """
     Get the catalog of available permissions in the application.
 

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from sqlmodel import select
 
-from backend.backend_pre_start import init, logger
+from backend.utils.backend_pre_start import init, logger
 
 
 def test_init_successful_connection() -> None:
@@ -14,8 +14,8 @@ def test_init_successful_connection() -> None:
     select1 = select(1)
 
     with (
-        patch("backend.backend_pre_start.Session", return_value=session_mock),
-        patch("backend.backend_pre_start.select", return_value=select1),
+        patch("backend.utils.backend_pre_start.Session", return_value=session_mock),
+        patch("backend.utils.backend_pre_start.select", return_value=select1),
         patch.object(logger, "info"),
         patch.object(logger, "error"),
         patch.object(logger, "warn"),

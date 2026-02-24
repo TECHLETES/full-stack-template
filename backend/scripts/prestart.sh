@@ -4,10 +4,10 @@ set -e
 set -x
 
 # Let the DB start
-python backend_pre_start.py
+python utils/backend_pre_start.py
 
 # Run migrations
 alembic upgrade head
 
 # Create initial data in DB
-python initial_data.py
+python utils/initial_data.py

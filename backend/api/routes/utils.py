@@ -5,7 +5,7 @@ from pydantic.networks import EmailStr
 from backend.api.deps import get_current_active_superuser
 from backend.core.config import settings
 from backend.models import Message
-from backend.utils import generate_test_email, send_email
+from backend.utils.utils import generate_test_email, send_email
 
 
 class AppConfig(BaseModel):

@@ -457,6 +457,27 @@ export const PermissionCreateSchema = {
     title: 'PermissionCreate'
 } as const;
 
+export const PermissionDefinitionSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        display: {
+            type: 'string',
+            title: 'Display'
+        },
+        resource: {
+            type: 'string',
+            title: 'Resource'
+        }
+    },
+    type: 'object',
+    required: ['name', 'display', 'resource'],
+    title: 'PermissionDefinition',
+    description: 'Type definition for a permission.'
+} as const;
+
 export const PermissionPublicSchema = {
     properties: {
         name: {

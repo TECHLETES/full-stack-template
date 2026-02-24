@@ -655,7 +655,7 @@ export class RbacService {
      *
      * This endpoint returns the predefined permissions that can be assigned to roles.
      * Useful for UI to display what permissions are available.
-     * @returns string Successful Response
+     * @returns PermissionDefinition Successful Response
      * @throws ApiError
      */
     public static getPermissionsCatalog(): CancelablePromise<RbacGetPermissionsCatalogResponse> {

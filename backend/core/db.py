@@ -69,7 +69,7 @@ def _seed_rbac(session: Session) -> None:
                 session=session,
                 role_in=RoleCreate(
                     name=role_name,
-                    description=str(role_def["description"]),
+                    description=role_def["description"],
                     permission_ids=[],
                 ),
                 is_system=True,

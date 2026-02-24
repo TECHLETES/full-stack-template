@@ -10,7 +10,7 @@ from backend.api.deps import CurrentUser, SessionDep, get_current_active_superus
 from backend.core import security
 from backend.core.config import settings
 from backend.models import Message, NewPassword, Token, UserPublic, UserUpdate
-from backend.utils import (
+from backend.utils.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
     send_email,
