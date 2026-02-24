@@ -8,7 +8,6 @@ interface EntraConfig {
   enabled: boolean
   client_id: string | null
   tenant_id: string | null
-  is_multi_tenant: boolean
   authority: string | null
 }
 

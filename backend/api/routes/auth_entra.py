@@ -73,19 +73,6 @@ def entra_login(
         "tid", request.tenant_id or settings.AZURE_TENANT_ID
     )
 
-    # For multi-tenant: verify the tenant is allowed
-    if settings.AZURE_IS_MULTI_TENANT and azure_tenant_id:
-        allowed_tenant = session.exec(
-            select(MicrosoftTenant).where(
-                MicrosoftTenant.tenant_id == azure_tenant_id,
-                MicrosoftTenant.is_enabled == True,  # noqa: E712
-            )
-        ).first()
-        if not allowed_tenant:
-            raise HTTPException(
-                status_code=403, detail="Your organization is not authorized"
-            )
-
     # Find or create user
     db_user = session.exec(select(User).where(User.email == email)).first()
 
@@ -115,8 +102,8 @@ def entra_login(
     session.commit()
     session.refresh(db_user)
 
-    # Sync tenant roles if multi-tenant
-    if settings.AZURE_IS_MULTI_TENANT and azure_tenant_id:
+    # Sync tenant roles
+    if azure_tenant_id:
         ms_tenant = session.exec(
             select(MicrosoftTenant).where(
                 MicrosoftTenant.tenant_id == azure_tenant_id,
@@ -175,12 +162,7 @@ def get_entra_config() -> dict[str, Any]:
         "enabled": settings.azure_enabled,
         "client_id": settings.AZURE_CLIENT_ID if settings.azure_enabled else None,
         "tenant_id": settings.AZURE_TENANT_ID if settings.azure_enabled else None,
-        "is_multi_tenant": settings.AZURE_IS_MULTI_TENANT,
-        "authority": (
-            f"{settings.AZURE_AUTHORITY}/organizations"
-            if settings.AZURE_IS_MULTI_TENANT
-            else f"{settings.AZURE_AUTHORITY}/{settings.AZURE_TENANT_ID}"
-        )
+        "authority": f"{settings.AZURE_AUTHORITY}/organizations"
         if settings.azure_enabled
         else None,
     }

@@ -38,9 +38,9 @@ def test_create_user_new_email(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     with (
-        patch("app.utils.send_email", return_value=None),
-        patch("app.core.config.settings.SMTP_HOST", "smtp.example.com"),
-        patch("app.core.config.settings.SMTP_USER", "admin@example.com"),
+        patch("backend.utils.send_email", return_value=None),
+        patch("backend.core.config.settings.SMTP_HOST", "smtp.example.com"),
+        patch("backend.core.config.settings.SMTP_USER", "admin@example.com"),
     ):
         username = random_email()
         password = random_lower_string()
@@ -321,10 +321,12 @@ def test_register_user(client: TestClient, db: Session) -> None:
     password = random_lower_string()
     full_name = random_lower_string()
     data = {"email": username, "password": password, "full_name": full_name}
-    r = client.post(
-        f"{settings.API_V1_STR}/users/signup",
-        json=data,
-    )
+    with patch("backend.api.routes.users.settings") as mock_settings:
+        mock_settings.SIGNUP_ENABLED = True
+        r = client.post(
+            f"{settings.API_V1_STR}/users/signup",
+            json=data,
+        )
     assert r.status_code == 200
     created_user = r.json()
     assert created_user["email"] == username
@@ -347,10 +349,12 @@ def test_register_user_already_exists_error(client: TestClient) -> None:
         "password": password,
         "full_name": full_name,
     }
-    r = client.post(
-        f"{settings.API_V1_STR}/users/signup",
-        json=data,
-    )
+    with patch("backend.api.routes.users.settings") as mock_settings:
+        mock_settings.SIGNUP_ENABLED = True
+        r = client.post(
+            f"{settings.API_V1_STR}/users/signup",
+            json=data,
+        )
     assert r.status_code == 400
     assert r.json()["detail"] == "The user with this email already exists in the system"
 

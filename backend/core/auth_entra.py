@@ -21,9 +21,7 @@ class EntraAuthClient:
     def _get_tenant_id(self, tenant_id: str | None = None) -> str:
         if tenant_id:
             return tenant_id
-        if settings.AZURE_IS_MULTI_TENANT:
-            return "organizations"
-        return settings.AZURE_TENANT_ID
+        return "organizations"
 
     def get_token_by_auth_code(
         self,

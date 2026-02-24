@@ -99,7 +99,6 @@ class Settings(BaseSettings):
     AZURE_CLIENT_SECRET: str = ""
     AZURE_TENANT_ID: str = ""
     AZURE_AUTHORITY: str = "https://login.microsoftonline.com"
-    AZURE_IS_MULTI_TENANT: bool = False
     AZURE_GRAPH_SCOPE: str = "https://graph.microsoft.com/.default"
     AZURE_SUPERUSER_ROLE: str = "Admin"  # Azure role name that grants superuser access
 

@@ -5,26 +5,20 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from backend.crud import create_user
-from backend.main import app
 from backend.models import User, UserCreate
+from backend.tests.utils.utils import random_email
 
 
 @pytest.fixture
-def client() -> TestClient:
-    """Create a test client."""
-    return TestClient(app)
-
-
-@pytest.fixture
-def admin_user(session: Session) -> User:
+def admin_user(db: Session) -> User:
     """Create an admin user for testing."""
     user_in = UserCreate(
-        email="admin@example.com",
-        password="admin123",
+        email=random_email(),
+        password="adminpassword123",
         full_name="Admin User",
         is_superuser=True,
     )
-    return create_user(session=session, user_create=user_in)
+    return create_user(session=db, user_create=user_in)
 
 
 @pytest.fixture
@@ -32,7 +26,7 @@ def token(client: TestClient, admin_user: User) -> str:
     """Get auth token for admin user."""
     response = client.post(
         "/api/v1/login/access-token",
-        data={"username": admin_user.email, "password": "admin123"},
+        data={"username": admin_user.email, "password": "adminpassword123"},
     )
     return response.json()["access_token"]
 

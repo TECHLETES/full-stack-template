@@ -14,7 +14,6 @@ def test_get_entra_config_when_disabled(client: TestClient) -> None:
     data = r.json()
     assert "enabled" in data
     assert "client_id" in data
-    assert "is_multi_tenant" in data
 
 
 def test_entra_login_url_when_disabled(client: TestClient) -> None:
@@ -37,7 +36,7 @@ def test_entra_login_when_disabled(client: TestClient) -> None:
         assert r.status_code == 400
 
 
-@patch("app.api.routes.auth_entra.EntraAuthClient")
+@patch("backend.api.routes.auth_entra.EntraAuthClient")
 def test_entra_login_creates_user(
     mock_entra_client_class: MagicMock,
     client: TestClient,
@@ -52,7 +51,6 @@ def test_entra_login_creates_user(
         "displayName": "Entra Test User",
         "tid": "test-tenant-id",
     }
-    mock_client.get_user_roles.return_value = ["Admin", "Editor"]
 
     with (
         patch.object(settings, "AZURE_CLIENT_ID", "test-client-id"),
@@ -61,7 +59,7 @@ def test_entra_login_creates_user(
     ):
         r = client.post(
             f"{settings.API_V1_STR}/auth/entra/login",
-            json={"access_token": "valid-ms-token"},
+            json={"access_token": "valid-ms-token", "roles": ["Admin", "Editor"]},
         )
         assert r.status_code == 200
         data = r.json()
@@ -82,7 +80,7 @@ def test_entra_login_creates_user(
     db.commit()
 
 
-@patch("app.api.routes.auth_entra.EntraAuthClient")
+@patch("backend.api.routes.auth_entra.EntraAuthClient")
 def test_entra_login_updates_existing_user(
     mock_entra_client_class: MagicMock,
     client: TestClient,
@@ -108,7 +106,6 @@ def test_entra_login_updates_existing_user(
         "displayName": "Updated Name",
         "tid": "test-tenant-id",
     }
-    mock_client.get_user_roles.return_value = ["Viewer"]
 
     with (
         patch.object(settings, "AZURE_CLIENT_ID", "test-client-id"),
@@ -117,7 +114,7 @@ def test_entra_login_updates_existing_user(
     ):
         r = client.post(
             f"{settings.API_V1_STR}/auth/entra/login",
-            json={"access_token": "valid-ms-token"},
+            json={"access_token": "valid-ms-token", "roles": ["Viewer"]},
         )
         assert r.status_code == 200
 
@@ -132,7 +129,7 @@ def test_entra_login_updates_existing_user(
     db.commit()
 
 
-@patch("app.api.routes.auth_entra.EntraAuthClient")
+@patch("backend.api.routes.auth_entra.EntraAuthClient")
 def test_entra_login_invalid_token(
     mock_entra_client_class: MagicMock,
     client: TestClient,
@@ -151,37 +148,6 @@ def test_entra_login_invalid_token(
             json={"access_token": "invalid-token"},
         )
         assert r.status_code == 400
-
-
-@patch("app.api.routes.auth_entra.EntraAuthClient")
-def test_entra_login_multi_tenant_unauthorized(
-    mock_entra_client_class: MagicMock,
-    client: TestClient,
-) -> None:
-    """Test that multi-tenant login rejects unauthorized tenants."""
-    mock_client = MagicMock()
-    mock_entra_client_class.return_value = mock_client
-    mock_client.get_user_info.return_value = {
-        "id": "azure-user-id-789",
-        "userPrincipalName": "user@unauthorized.com",
-        "displayName": "Unauthorized User",
-        "tid": "unauthorized-tenant-id",
-    }
-    mock_client.get_user_roles.return_value = []
-
-    with (
-        patch.object(settings, "AZURE_CLIENT_ID", "test-client-id"),
-        patch.object(settings, "AZURE_CLIENT_SECRET", "test-secret"),
-        patch.object(settings, "AZURE_IS_MULTI_TENANT", True),
-    ):
-        r = client.post(
-            f"{settings.API_V1_STR}/auth/entra/login",
-            json={
-                "access_token": "valid-ms-token",
-                "tenant_id": "unauthorized-tenant-id",
-            },
-        )
-        assert r.status_code == 403
 
 
 def test_tenant_crud_requires_superuser(
@@ -297,7 +263,7 @@ def test_tenant_delete_not_found(
     assert r.status_code == 404
 
 
-@patch("app.api.routes.auth_entra.EntraAuthClient")
+@patch("backend.api.routes.auth_entra.EntraAuthClient")
 def test_entra_login_url_when_enabled(
     mock_entra_client_class: MagicMock,
     client: TestClient,

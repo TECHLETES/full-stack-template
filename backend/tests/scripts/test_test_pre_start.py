@@ -14,8 +14,8 @@ def test_init_successful_connection() -> None:
     select1 = select(1)
 
     with (
-        patch("app.tests_pre_start.Session", return_value=session_mock),
-        patch("app.tests_pre_start.select", return_value=select1),
+        patch("backend.tests_pre_start.Session", return_value=session_mock),
+        patch("backend.tests_pre_start.select", return_value=select1),
         patch.object(logger, "info"),
         patch.object(logger, "error"),
         patch.object(logger, "warn"),

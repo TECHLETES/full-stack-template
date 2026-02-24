@@ -1,6 +1,6 @@
 # Microsoft Entra Integration Setup Guide
 
-This template supports Microsoft Entra (Azure AD) authentication with both single-tenant and multi-tenant configurations. The feature is **opt-in** — leave `AZURE_CLIENT_ID` empty to disable.
+This template supports Microsoft Entra (Azure AD) authentication. The feature is **opt-in** — leave `AZURE_CLIENT_ID` empty to disable.
 
 ## Quick Start
 
@@ -10,7 +10,6 @@ This template supports Microsoft Entra (Azure AD) authentication with both singl
    AZURE_CLIENT_ID=<your-client-id>
    AZURE_CLIENT_SECRET=<your-client-secret>
    AZURE_TENANT_ID=<your-tenant-id>
-   AZURE_IS_MULTI_TENANT=False  # or True for multi-tenant
    ```
 3. Run migrations: `cd backend && alembic upgrade head`
 4. Restart: `docker compose up --build`
@@ -156,7 +155,6 @@ Set these environment variables in `.env`:
 AZURE_CLIENT_ID=00001111-2222-3333-4444-555566667777
 AZURE_CLIENT_SECRET=your_client_secret_here
 AZURE_TENANT_ID=aaaabbbb-cccc-dddd-eeee-ffff00001111
-AZURE_IS_MULTI_TENANT=False  # Set to True for multi-tenant
 ```
 
 The frontend automatically fetches the public configuration from the backend API (`/api/v1/auth/entra/config`) at startup—no additional frontend env vars needed.
@@ -231,8 +229,6 @@ Users from that tenant can now log in.
 - [ ] Rotate client secret (set expiry date)
 - [ ] Set `ENVIRONMENT=production` in backend `.env`
 - [ ] Use strong `SECRET_KEY` (not "changethis")
-- [ ] Store secrets in secure vault (not `.env` files)
-- [ ] For multi-tenant, set `AZURE_IS_MULTI_TENANT=True`
 - [ ] Test login flow end-to-end
 - [ ] Set up admin consent flow for customers
 - [ ] Monitor API usage in Azure portal
@@ -303,26 +299,24 @@ environment:
 
 ## Supported Scenarios
 
-### ✅ Single-Tenant (Default)
+### ✅ Single-Tenant (One Organization)
 
-One organization's Azure AD:
+One organization's Azure AD. Control access directly in your Azure app registration — only grant access to your tenant:
 ```env
 AZURE_TENANT_ID=your-tenant-id
-AZURE_IS_MULTI_TENANT=False
 ```
 - All users from your tenant can log in
-- Simple setup, no tenant management UI needed
+- Simple setup, no tenant management needed
 
 ### ✅ Multi-Tenant (SaaS Model)
 
-Multiple customer organizations:
+Multiple customer organizations. In your Azure app registration, allow **any Azure AD tenant**. Then use the tenant management API to track and organize tenants in your app:
 ```env
-AZURE_IS_MULTI_TENANT=True
+AZURE_TENANT_ID=your-primary-tenant-id
 ```
-- Admin adds allowed tenants via API
-- Users from allowed tenants can log in
+- Register additional tenants via the `/api/v1/tenants/` admin API
 - Each tenant can have different users & roles
-- Database stores tenant configurations
+- **Access control lives in Azure** — tenant management in the database is for app-level organization
 
 ### ✅ Fallback Authentication
 

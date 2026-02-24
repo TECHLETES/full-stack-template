@@ -259,10 +259,14 @@ def get_user_roles(*, session: Session, user_id: uuid.UUID) -> list[Role]:
 def get_user_permissions(*, session: Session, user_id: uuid.UUID) -> list[Permission]:
     """Get all permissions for a user (via their roles)."""
     roles = get_user_roles(session=session, user_id=user_id)
-    permissions: set[Permission] = set()
+    seen_ids: set[uuid.UUID] = set()
+    permissions: list[Permission] = []
     for role in roles:
-        permissions.update(role.permissions or [])
-    return list(permissions)
+        for perm in role.permissions or []:
+            if perm.id not in seen_ids:
+                seen_ids.add(perm.id)
+                permissions.append(perm)
+    return permissions
 
 
 def get_users_with_role(*, session: Session, role_id: uuid.UUID) -> list[User]:

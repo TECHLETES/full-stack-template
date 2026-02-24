@@ -337,7 +337,6 @@ This template includes enterprise-ready Microsoft Entra ID authentication with m
    AZURE_CLIENT_ID=<your-client-id>
    AZURE_CLIENT_SECRET=<your-client-secret>
    AZURE_TENANT_ID=<your-tenant-id>
-   AZURE_IS_MULTI_TENANT=False  # or True for multi-tenant
    ```
 3. **Run migrations:** `cd backend && alembic upgrade head`
 4. **Restart:** `docker compose up --build`
@@ -372,14 +371,10 @@ cd backend && ./scripts/test.sh
 
 ### Single-Tenant vs Multi-Tenant
 
-**Single-Tenant** (default):
-- Users can only log in with accounts from your registered tenant
-- Set `AZURE_IS_MULTI_TENANT=False`
+The backend always uses the `organizations` endpoint (multi-tenant capable). Access control is managed in your **Azure app registration** — restrict to one tenant or allow any there. The database tenant management (`/api/v1/tenants/`) is for application-level organization (roles, data isolation), not access gating.
 
-**Multi-Tenant**:
-- Users from any Azure AD tenant can register
-- Set `AZURE_IS_MULTI_TENANT=True`
-- Admin must approve tenant registrations via `/api/v1/tenants` routes
+- **Single-tenant app**: Register app in Azure scoped to your tenant, don't add other tenants in the DB
+- **Multi-tenant SaaS**: Allow any tenant in Azure, register customer tenants via `/api/v1/tenants/`
 
 ### Common Tasks
 
