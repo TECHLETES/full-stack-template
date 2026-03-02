@@ -80,6 +80,7 @@ class User(UserBase, table=True):
     azure_roles: list[str] = Field(default_factory=list, sa_column=Column(JSON))
 
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    files: list["File"] = Relationship(back_populates="owner", cascade_delete=True)
     tenant_roles: list["UserTenantRole"] = Relationship(
         back_populates="user", cascade_delete=True
     )
@@ -295,6 +296,39 @@ class ItemPublic(ItemBase):
 class ItemsPublic(SQLModel):
     data: list[ItemPublic]
     count: int
+
+
+# --- File Storage Models ---
+
+
+class FileBase(SQLModel):
+    filename: str = Field(min_length=1, max_length=255)
+    content_type: str = Field(max_length=127)
+    size: int = Field(ge=0)  # bytes
+
+
+class FilePublic(FileBase):
+    id: uuid.UUID
+    owner_id: uuid.UUID
+    created_at: datetime | None = None
+
+
+class FilesPublic(SQLModel):
+    data: list[FilePublic]
+    count: int
+
+
+class File(FileBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    storage_key: str = Field(max_length=1024)  # path or S3 object key
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    owner: User | None = Relationship(back_populates="files")
 
 
 # Generic message

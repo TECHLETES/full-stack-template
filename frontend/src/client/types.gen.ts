@@ -7,6 +7,10 @@ export type AppConfig = {
     signup_enabled: boolean;
 };
 
+export type Body_files_upload_file = {
+    file: string;
+};
+
 export type Body_login_login_access_token = {
     grant_type?: (string | null);
     username: string;
@@ -16,6 +20,18 @@ export type Body_login_login_access_token = {
     client_secret?: (string | null);
 };
 
+export type EnqueueRequest = {
+    task: 'send_email' | 'export_data' | 'process_file';
+    queue?: 'default' | 'high' | 'low';
+    kwargs?: {
+        [key: string]: unknown;
+    };
+};
+
+export type task = 'send_email' | 'export_data' | 'process_file';
+
+export type queue = 'default' | 'high' | 'low';
+
 export type EntraLoginRequest = {
     access_token: string;
     tenant_id?: (string | null);
@@ -24,6 +40,20 @@ export type EntraLoginRequest = {
 
 export type EntraLoginUrlResponse = {
     login_url: string;
+};
+
+export type FilePublic = {
+    filename: string;
+    content_type: string;
+    size: number;
+    id: string;
+    owner_id: string;
+    created_at?: (string | null);
+};
+
+export type FilesPublic = {
+    data: Array<FilePublic>;
+    count: number;
 };
 
 export type HTTPValidationError = {
@@ -51,6 +81,44 @@ export type ItemsPublic = {
 export type ItemUpdate = {
     title?: (string | null);
     description?: (string | null);
+};
+
+export type JobInfo = {
+    id: string;
+    func: string;
+    status: string;
+    queue: string;
+    created_at?: (string | null);
+    started_at?: (string | null);
+    ended_at?: (string | null);
+};
+
+export type JobsListResponse = {
+    jobs: Array<JobInfo>;
+    total: number;
+};
+
+export type JobsStatsResponse = {
+    status_counts: JobStatusCount;
+    queue_stats: Array<QueueStats>;
+    total_jobs: number;
+};
+
+export type JobStatusCount = {
+    queued?: number;
+    started?: number;
+    finished?: number;
+    failed?: number;
+    deferred?: number;
+    canceled?: number;
+    stopped?: number;
+};
+
+export type JobStatusResponse = {
+    job_id: string;
+    status: string;
+    result?: unknown;
+    error?: (string | null);
 };
 
 export type Message = {
@@ -152,6 +220,11 @@ export type PrivateUserCreate = {
     is_verified?: boolean;
 };
 
+export type QueueStats = {
+    name: string;
+    count: number;
+};
+
 export type RoleCreate = {
     name: string;
     description?: (string | null);
@@ -243,6 +316,16 @@ export type ValidationError = {
     };
 };
 
+export type AdminGetJobsStatsResponse = (JobsStatsResponse);
+
+export type AdminGetJobsListData = {
+    limit?: number;
+    queue?: string;
+    statusFilter?: (string | null);
+};
+
+export type AdminGetJobsListResponse = (JobsListResponse);
+
 export type AuthEntraEntraLoginData = {
     requestBody: EntraLoginRequest;
 };
@@ -259,6 +342,37 @@ export type AuthEntraGetEntraLoginUrlResponse = (EntraLoginUrlResponse);
 export type AuthEntraGetEntraConfigResponse = ({
     [key: string]: unknown;
 });
+
+export type FilesUploadFileData = {
+    formData: Body_files_upload_file;
+};
+
+export type FilesUploadFileResponse = (FilePublic);
+
+export type FilesListFilesData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type FilesListFilesResponse = (FilesPublic);
+
+export type FilesGetFileData = {
+    id: string;
+};
+
+export type FilesGetFileResponse = (FilePublic);
+
+export type FilesDeleteFileData = {
+    id: string;
+};
+
+export type FilesDeleteFileResponse = (Message);
+
+export type FilesDownloadFileData = {
+    id: string;
+};
+
+export type FilesDownloadFileResponse = (unknown);
 
 export type ItemsReadItemsData = {
     limit?: number;
@@ -456,6 +570,26 @@ export type RbacGetUserPermissionsEndpointResponse = (PermissionsPublic);
 
 export type RbacGetPermissionsCatalogResponse = ({
     [key: string]: Array<PermissionDefinition>;
+});
+
+export type TasksEnqueueTaskData = {
+    requestBody: EnqueueRequest;
+};
+
+export type TasksEnqueueTaskResponse = (JobStatusResponse);
+
+export type TasksGetJobStatusData = {
+    jobId: string;
+};
+
+export type TasksGetJobStatusResponse = (JobStatusResponse);
+
+export type TasksCancelJobData = {
+    jobId: string;
+};
+
+export type TasksCancelJobResponse = ({
+    [key: string]: (string);
 });
 
 export type TenantsListTenantsData = {

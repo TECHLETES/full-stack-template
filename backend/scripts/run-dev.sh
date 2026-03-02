@@ -73,6 +73,25 @@ uv run alembic upgrade head
 echo "🌱 Initializing database with sample data..."
 uv run python utils/initial_data.py
 
+# Start RQ worker in background (for background task processing)
+echo "🔄 Starting RQ worker for background tasks..."
+bash scripts/start-worker.sh &
+WORKER_PID=$!
+echo "   Worker PID: $WORKER_PID"
+
+# Set up cleanup trap for background processes
+cleanup() {
+    echo ""
+    echo "🛑 Shutting down..."
+    if kill -0 $WORKER_PID 2>/dev/null; then
+        echo "   Stopping worker (PID $WORKER_PID)..."
+        kill $WORKER_PID 2>/dev/null || true
+        wait $WORKER_PID 2>/dev/null || true
+    fi
+    echo "✅ Cleanup complete"
+}
+trap cleanup EXIT INT TERM
+
 # Start FastAPI dev server with auto-reload in current terminal
 echo "✨ Starting FastAPI development server..."
 uv run fastapi dev main.py

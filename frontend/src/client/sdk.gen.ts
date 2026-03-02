@@ -3,7 +3,52 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotificationsSendNotificationData, NotificationsSendNotificationResponse, NotificationsSendNotificationToSelfData, NotificationsSendNotificationToSelfResponse, NotificationsSendTestNotificationToAllResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+import type { AdminGetJobsStatsResponse, AdminGetJobsListData, AdminGetJobsListResponse, AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, FilesUploadFileData, FilesUploadFileResponse, FilesListFilesData, FilesListFilesResponse, FilesGetFileData, FilesGetFileResponse, FilesDeleteFileData, FilesDeleteFileResponse, FilesDownloadFileData, FilesDownloadFileResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotificationsSendNotificationData, NotificationsSendNotificationResponse, NotificationsSendNotificationToSelfData, NotificationsSendNotificationToSelfResponse, NotificationsSendTestNotificationToAllResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TasksEnqueueTaskData, TasksEnqueueTaskResponse, TasksGetJobStatusData, TasksGetJobStatusResponse, TasksCancelJobData, TasksCancelJobResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+
+export class AdminService {
+    /**
+     * Get Jobs Stats
+     * Get statistics about all background jobs (superuser only).
+     * @returns JobsStatsResponse Successful Response
+     * @throws ApiError
+     */
+    public static getJobsStats(): CancelablePromise<AdminGetJobsStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/admin/jobs/stats'
+        });
+    }
+    
+    /**
+     * Get Jobs List
+     * List jobs from a specific queue (superuser only).
+     *
+     * Query parameters:
+     * - queue: "high", "default", or "low"
+     * - status_filter: Filter by status (queued, started, finished, failed, etc)
+     * - limit: Max results to return (default 50)
+     * @param data The data for the request.
+     * @param data.queue
+     * @param data.statusFilter
+     * @param data.limit
+     * @returns JobsListResponse Successful Response
+     * @throws ApiError
+     */
+    public static getJobsList(data: AdminGetJobsListData = {}): CancelablePromise<AdminGetJobsListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/admin/jobs/list',
+            query: {
+                queue: data.queue,
+                status_filter: data.statusFilter,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class AuthEntraService {
     /**
@@ -62,6 +107,114 @@ export class AuthEntraService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/auth/entra/config'
+        });
+    }
+}
+
+export class FilesService {
+    /**
+     * Upload File
+     * Upload a file. Returns file metadata.
+     * @param data The data for the request.
+     * @param data.formData
+     * @returns FilePublic Successful Response
+     * @throws ApiError
+     */
+    public static uploadFile(data: FilesUploadFileData): CancelablePromise<FilesUploadFileResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/files/',
+            formData: data.formData,
+            mediaType: 'multipart/form-data',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * List Files
+     * List files owned by the current user (superusers see all).
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns FilesPublic Successful Response
+     * @throws ApiError
+     */
+    public static listFiles(data: FilesListFilesData = {}): CancelablePromise<FilesListFilesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/files/',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get File
+     * Return file metadata.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns FilePublic Successful Response
+     * @throws ApiError
+     */
+    public static getFile(data: FilesGetFileData): CancelablePromise<FilesGetFileResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/files/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete File
+     * Delete a file and its stored data.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteFile(data: FilesDeleteFileData): CancelablePromise<FilesDeleteFileResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/files/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Download File
+     * Stream file bytes to the client.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static downloadFile(data: FilesDownloadFileData): CancelablePromise<FilesDownloadFileResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/files/{id}/download',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
         });
     }
 }
@@ -725,6 +878,70 @@ export class RbacService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/rbac/permissions-catalog'
+        });
+    }
+}
+
+export class TasksService {
+    /**
+     * Enqueue Task
+     * Enqueue a background task. Returns the job ID immediately.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns JobStatusResponse Successful Response
+     * @throws ApiError
+     */
+    public static enqueueTask(data: TasksEnqueueTaskData): CancelablePromise<TasksEnqueueTaskResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/tasks/enqueue',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Job Status
+     * Check the status of an enqueued job.
+     * @param data The data for the request.
+     * @param data.jobId
+     * @returns JobStatusResponse Successful Response
+     * @throws ApiError
+     */
+    public static getJobStatus(data: TasksGetJobStatusData): CancelablePromise<TasksGetJobStatusResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/tasks/{job_id}',
+            path: {
+                job_id: data.jobId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Cancel Job
+     * Cancel a queued job (superuser only).
+     * @param data The data for the request.
+     * @param data.jobId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static cancelJob(data: TasksCancelJobData): CancelablePromise<TasksCancelJobResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/tasks/{job_id}',
+            path: {
+                job_id: data.jobId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
         });
     }
 }

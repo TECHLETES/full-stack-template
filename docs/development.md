@@ -61,6 +61,92 @@ This is useful for:
 
 The backend is automatically configured to use Mailcatcher when running with Docker Compose locally (SMTP on port 1025). All captured emails can be viewed at <http://localhost:1080>.
 
+## Background Tasks with RQ
+
+The template includes **RQ (Redis Queue)** for background task processing. This allows you to offload long-running operations from the HTTP request cycle.
+
+### What You Can Do
+
+- **Upload Files**: Process file uploads asynchronously (e.g., generate thumbnails, extract metadata)
+- **Send Emails**: Queue transactional emails to send in the background
+- **Export Data**: Generate and export large datasets without blocking the API
+- **Run Scheduled Tasks**: Use RQ's job scheduler for recurring tasks
+
+### Architecture
+
+- **Redis**: Broker for job queue
+- **RQ Worker**: Background process that picks up jobs and executes them
+- **API Endpoints**: Queue jobs via `/api/v1/tasks/enqueue`, check status via `/api/v1/tasks/{job_id}`
+
+### Starting the Worker in Development
+
+When you run `./backend/scripts/run-dev.sh`, the RQ worker starts automatically in the background alongside FastAPI.
+
+To start the worker manually:
+
+```bash
+cd backend
+uv run bash scripts/start-worker.sh
+```
+
+Or directly:
+
+```bash
+cd backend
+uv run python worker.py
+```
+
+The worker monitors three queues (in priority order): `high`, `default`, `low`.
+
+**Note**: In Docker Compose, code changes to tasks will automatically restart the worker container. For local development without Docker, restart the worker manually to pick up task changes.
+
+### Creating Background Tasks
+
+Tasks are simple Python functions in `backend/tasks/example.py`. Example:
+
+```python
+def send_email_task(to: str, subject: str, body: str) -> dict[str, str]:
+    """Send email in the background."""
+    # Your email logic here
+    return {"status": "sent"}
+```
+
+### Enqueueing Jobs
+
+From your API endpoint or FastAPI route:
+
+```python
+from backend.core.queue import get_queue
+from backend.tasks.example import send_email_task
+
+queue = get_queue("default")
+job = queue.enqueue(send_email_task, to="user@example.com", subject="Hello")
+```
+
+Or via the HTTP API:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/tasks/enqueue \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "task": "send_email",
+    "queue": "default",
+    "kwargs": {"to": "user@example.com", "subject": "Hello", "body": "Hi!"}
+  }'
+```
+
+### Checking Job Status
+
+```bash
+curl http://localhost:8000/api/v1/tasks/{job_id} \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Docker Compose
+
+In Docker Compose, a separate `worker` service runs the RQ worker alongside the main `backend` service. Both share the same `uploads-data` volume for file storage.
+
 ## Local Development
 
 The Docker Compose files are configured to have the services available on different ports in `localhost`.

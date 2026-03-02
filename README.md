@@ -35,6 +35,8 @@ Perfect for rapid development of custom solutions in data, AI, and business appl
 - 🔑 JWT (JSON Web Token) authentication.
 - 📫 Email based password recovery.
 - 📬 [Mailcatcher](https://mailcatcher.me) for local email testing during development.
+- ⏳ [RQ (Redis Queue)](https://python-rq.org/) for background job processing and file uploads.
+- 💾 File storage with support for local filesystem or S3-compatible object storage.
 - ✅ Tests with [Pytest](https://pytest.org).
 - 📞 [Caddy](https://caddyserver.com/) as a reverse proxy / load balancer.
 - 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Caddy proxy to handle automatic HTTPS certificates.
@@ -91,10 +93,11 @@ docker compose up --build
 3. **Customize models** in `backend/models.py` for your domain
 4. **Add API routes** in `backend/api/routes/`
 5. **Build frontend pages** in `frontend/src/routes/` and `frontend/src/components/`
-6. **Integrate company services** (Microsoft Entra, Mistral AI, data connectors, etc.)
-7. **Deploy** using Docker Compose or your preferred platform
+6. **Create background tasks** in `backend/tasks/` for long-running operations (emails, exports, file processing)
+7. **Integrate company services** (Microsoft Entra, Mistral AI, data connectors, etc.)
+8. **Deploy** using Docker Compose or your preferred platform
 
-See [development.md](./development.md) for detailed guidance.
+See [development.md](./development.md) for detailed guidance on file uploads, background tasks, and local development.
 
 ### Set Up Your Project Repository
 

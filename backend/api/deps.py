@@ -57,6 +57,9 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
     return current_user
 
 
+SuperUserDep = Annotated[User, Depends(get_current_active_superuser)]
+
+
 def require_role(*required_roles: str):  # type: ignore[no-untyped-def]
     """Dependency to check if user has any of the required Azure roles."""
 

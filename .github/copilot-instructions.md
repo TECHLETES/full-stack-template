@@ -237,8 +237,7 @@ Load from `.env` via Pydantic Settings:
 4. Add tests in `backend/tests/api/routes/test_newfeature.py`
 5. **⚠️ CRITICAL: Frontend MUST regenerate OpenAPI client** — Never add an endpoint directly without regenerating:
    ```bash
-   cd frontend
-   npm run generate-client  # Regenerates src/client/schemas.gen.ts, sdk.gen.ts
+   ./scripts/generate-client.sh  # Regenerates src/client/schemas.gen.ts, sdk.gen.ts
    ```
    This ensures type safety and keeps frontend types in sync with backend API.
 6. Use new client in `src/components/` or route with auto-generated types

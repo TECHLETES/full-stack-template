@@ -1,12 +1,15 @@
 from fastapi import APIRouter
 
 from backend.api.routes import (
+    admin,
     auth_entra,
+    files,
     items,
     login,
     notifications,
     private,
     rbac,
+    tasks,
     users,
     utils,
 )
@@ -21,6 +24,9 @@ api_router.include_router(rbac.router)
 api_router.include_router(auth_entra.router)
 api_router.include_router(auth_entra.tenant_router)
 api_router.include_router(notifications.router)
+api_router.include_router(files.router)
+api_router.include_router(tasks.router)
+api_router.include_router(admin.router)
 
 
 if settings.ENVIRONMENT == "local":

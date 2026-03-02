@@ -5,11 +5,6 @@ This document collects suggested features, grouped and briefly described, to imp
 ## Overview
 - Purpose: give maintainers and contributors a prioritized checklist of value-add features to scaffold or implement.
 
-## Developer Experience (DX)
-- Dev task runner: unified `dev` command (Makefile / `uv`) to start backend, frontend, and db with one command.
-- Improved local setup: an opinionated `bootstrap` script that configures `.env`, runs migrations, and seeds dev data.
-- Live reload & debugger recipes: curated VS Code launch configs and instructions for debugging backend and frontend.
-
 ## API & Client
 - CI client generation: regenerate TypeScript client (`openapi.json`) in CI and fail builds if out-of-date.
 - GraphQL option: optional GraphQL endpoint (Strawberry) with unified schema generation from existing models.

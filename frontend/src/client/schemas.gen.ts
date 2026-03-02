@@ -13,6 +13,19 @@ export const AppConfigSchema = {
     description: 'Public application configuration'
 } as const;
 
+export const Body_files_upload_fileSchema = {
+    properties: {
+        file: {
+            type: 'string',
+            contentMediaType: 'application/octet-stream',
+            title: 'File'
+        }
+    },
+    type: 'object',
+    required: ['file'],
+    title: 'Body_files-upload_file'
+} as const;
+
 export const Body_login_login_access_tokenSchema = {
     properties: {
         grant_type: {
@@ -70,6 +83,31 @@ export const Body_login_login_access_tokenSchema = {
     title: 'Body_login-login_access_token'
 } as const;
 
+export const EnqueueRequestSchema = {
+    properties: {
+        task: {
+            type: 'string',
+            enum: ['send_email', 'export_data', 'process_file'],
+            title: 'Task'
+        },
+        queue: {
+            type: 'string',
+            enum: ['default', 'high', 'low'],
+            title: 'Queue',
+            default: 'default'
+        },
+        kwargs: {
+            additionalProperties: true,
+            type: 'object',
+            title: 'Kwargs',
+            default: {}
+        }
+    },
+    type: 'object',
+    required: ['task'],
+    title: 'EnqueueRequest'
+} as const;
+
 export const EntraLoginRequestSchema = {
     properties: {
         access_token: {
@@ -111,6 +149,71 @@ export const EntraLoginUrlResponseSchema = {
     type: 'object',
     required: ['login_url'],
     title: 'EntraLoginUrlResponse'
+} as const;
+
+export const FilePublicSchema = {
+    properties: {
+        filename: {
+            type: 'string',
+            maxLength: 255,
+            minLength: 1,
+            title: 'Filename'
+        },
+        content_type: {
+            type: 'string',
+            maxLength: 127,
+            title: 'Content Type'
+        },
+        size: {
+            type: 'integer',
+            minimum: 0,
+            title: 'Size'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        owner_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Owner Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        }
+    },
+    type: 'object',
+    required: ['filename', 'content_type', 'size', 'id', 'owner_id'],
+    title: 'FilePublic'
+} as const;
+
+export const FilesPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/FilePublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'FilesPublic'
 } as const;
 
 export const HTTPValidationErrorSchema = {
@@ -250,6 +353,176 @@ export const ItemsPublicSchema = {
     type: 'object',
     required: ['data', 'count'],
     title: 'ItemsPublic'
+} as const;
+
+export const JobInfoSchema = {
+    properties: {
+        id: {
+            type: 'string',
+            title: 'Id'
+        },
+        func: {
+            type: 'string',
+            title: 'Func'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        queue: {
+            type: 'string',
+            title: 'Queue'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        started_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Started At'
+        },
+        ended_at: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Ended At'
+        }
+    },
+    type: 'object',
+    required: ['id', 'func', 'status', 'queue'],
+    title: 'JobInfo'
+} as const;
+
+export const JobStatusCountSchema = {
+    properties: {
+        queued: {
+            type: 'integer',
+            title: 'Queued',
+            default: 0
+        },
+        started: {
+            type: 'integer',
+            title: 'Started',
+            default: 0
+        },
+        finished: {
+            type: 'integer',
+            title: 'Finished',
+            default: 0
+        },
+        failed: {
+            type: 'integer',
+            title: 'Failed',
+            default: 0
+        },
+        deferred: {
+            type: 'integer',
+            title: 'Deferred',
+            default: 0
+        },
+        canceled: {
+            type: 'integer',
+            title: 'Canceled',
+            default: 0
+        },
+        stopped: {
+            type: 'integer',
+            title: 'Stopped',
+            default: 0
+        }
+    },
+    type: 'object',
+    title: 'JobStatusCount'
+} as const;
+
+export const JobStatusResponseSchema = {
+    properties: {
+        job_id: {
+            type: 'string',
+            title: 'Job Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        result: {
+            title: 'Result'
+        },
+        error: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Error'
+        }
+    },
+    type: 'object',
+    required: ['job_id', 'status'],
+    title: 'JobStatusResponse'
+} as const;
+
+export const JobsListResponseSchema = {
+    properties: {
+        jobs: {
+            items: {
+                '$ref': '#/components/schemas/JobInfo'
+            },
+            type: 'array',
+            title: 'Jobs'
+        },
+        total: {
+            type: 'integer',
+            title: 'Total'
+        }
+    },
+    type: 'object',
+    required: ['jobs', 'total'],
+    title: 'JobsListResponse'
+} as const;
+
+export const JobsStatsResponseSchema = {
+    properties: {
+        status_counts: {
+            '$ref': '#/components/schemas/JobStatusCount'
+        },
+        queue_stats: {
+            items: {
+                '$ref': '#/components/schemas/QueueStats'
+            },
+            type: 'array',
+            title: 'Queue Stats'
+        },
+        total_jobs: {
+            type: 'integer',
+            title: 'Total Jobs'
+        }
+    },
+    type: 'object',
+    required: ['status_counts', 'queue_stats', 'total_jobs'],
+    title: 'JobsStatsResponse'
 } as const;
 
 export const MessageSchema = {
@@ -669,6 +942,22 @@ export const PrivateUserCreateSchema = {
     type: 'object',
     required: ['email', 'password', 'full_name'],
     title: 'PrivateUserCreate'
+} as const;
+
+export const QueueStatsSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            title: 'Name'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['name', 'count'],
+    title: 'QueueStats'
 } as const;
 
 export const RoleCreateSchema = {

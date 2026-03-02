@@ -97,6 +97,16 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
 
+    # File Storage
+    # STORAGE_BACKEND: "local" stores files on disk; "s3" uses an S3-compatible service
+    STORAGE_BACKEND: Literal["local", "s3"] = "local"
+    LOCAL_STORAGE_PATH: str = "/app/uploads"
+    S3_BUCKET_NAME: str = ""
+    S3_ENDPOINT_URL: str = ""  # Override for MinIO / non-AWS S3
+    S3_REGION: str = "us-east-1"
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+
     # Microsoft Entra (Azure AD) Configuration
     AZURE_CLIENT_ID: str = ""
     AZURE_CLIENT_SECRET: str = ""
