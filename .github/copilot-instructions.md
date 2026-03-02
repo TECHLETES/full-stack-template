@@ -26,17 +26,16 @@ This is **Techletes' internal company template** for building modern full-stack 
 
 ## Quick Development Commands
 
-### Full Stack (Recommended)
-```bash
-docker compose up --build
-# Single unified service: Frontend + Backend API (8000/docs) | DB (5432) | DB Admin (8080)
-```
+### ⚠️ Docker Policy
+**DO NOT run `docker compose up` or `docker compose build` unless explicitly instructed.**
+- Use `docker-compose.dev.yml` ONLY when base services (PostgreSQL, Redis, etc.) are needed for testing and are not already running.
+- Default workflow: Run backend and frontend locally without Docker.
 
-### Backend Only
+### Backend Only (Recommended for Development)
 ```bash
 cd backend
 uv sync                          # Install dependencies
-uv run fastapi dev main.py   # Start API server (auto-reload)
+uv run fastapi dev main.py       # Start API server (auto-reload)
 ./scripts/test.sh                # Run tests
 ./scripts/lint.sh                # Lint + format
 ```
@@ -48,6 +47,14 @@ npm install                      # Install dependencies
 npm run dev                      # Start dev server (hot reload)
 npm run test                     # Run Playwright tests
 npm run generate-client          # Regenerate API client from OpenAPI spec
+```
+
+### Start Base Services Only (When Needed for Testing)
+```bash
+# Only use this if PostgreSQL and/or Redis are required and not running locally
+docker compose -f docker-compose.dev.yml up
+# This starts: PostgreSQL (5432), Redis, Adminer (8080)
+# Backend and Frontend should still run locally (not in Docker)
 ```
 
 ---
@@ -272,6 +279,28 @@ cd backend && ./scripts/lint.sh  # Ruff + Mypy
 # Frontend
 cd frontend && npm run lint      # Biome
 ```
+
+---
+
+## Docker Usage Rules
+
+**MUST READ: These rules are strictly enforced.**
+
+1. **Never run `docker compose up` or `docker compose build` for development** unless explicitly instructed by the user.
+2. **Do not use the unified Docker image locally** — It's designed for production deployment, not local development.
+3. **Use `docker-compose.dev.yml` ONLY for base services** (PostgreSQL, Redis) when:
+   - They are required for testing/development
+   - They are not already running on your local machine
+   - You explicitly need database persistence across restarts
+4. **Default workflow**: Always run backend (`uv run fastapi dev main.py`) and frontend (`npm run dev`) locally on your machine.
+5. **When to use `docker-compose.dev.yml`**:
+   ```bash
+   # Only if PostgreSQL/Redis are needed AND not running locally
+   docker compose -f docker-compose.dev.yml up
+   ```
+6. **Backend and Frontend should always run locally**, even if base services are in Docker.
+
+**Why?** Local development is faster (auto-reload, HMR), easier to debug, and doesn't require Docker context switching.
 
 ---
 
