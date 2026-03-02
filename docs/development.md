@@ -10,17 +10,15 @@ docker compose watch
 
 * Now you can open your browser and interact with these URLs:
 
-Frontend, built with Docker, with routes handled based on the path: <http://localhost:5173>
+Frontend and Backend, both served from the same unified Docker image: <http://localhost:8000>
 
-Backend, JSON based web API based on OpenAPI: <http://localhost:8000>
+The frontend is automatically bundled with the backend and served as static files.
 
 Automatic interactive documentation with Swagger UI (from the OpenAPI backend): <http://localhost:8000/docs>
 
 Adminer, database web administration: <http://localhost:8080>
 
-Caddy UI, to see how the routes are being handled by the proxy: <http://localhost:2019>
-
-**Note**: The first time you start your stack, it might take a minute for it to be ready. While the backend waits for the database to be ready and configures everything. You can check the logs to monitor it.
+**Note**: The first time you start your stack, it might take a few minutes for it to be ready. While the backend waits for the database to be ready, configures everything, and the Docker image builds both the frontend and backend components. You can check the logs to monitor it.
 
 To check the logs, run (in another terminal):
 
@@ -33,6 +31,23 @@ To check the logs of a specific service, add the name of the service, e.g.:
 ```bash
 docker compose logs backend
 ```
+
+## Unified Docker Image
+
+The application is now built as a **single Docker image** that includes:
+
+- **Frontend**: Built with Bun and compiled with Vite
+- **Backend**: FastAPI Python application
+- **Static Files**: Frontend assets served by FastAPI
+
+The unified `Dockerfile` at the root of the project:
+1. Builds the frontend using Bun
+2. Compiles the frontend with Vite
+3. Builds the backend Python environment
+4. Mounts the compiled frontend as static files in the backend
+5. Serves both through a single FastAPI application
+
+This means there's only one Docker image and container to manage, simplifying deployment and reducing resource usage.
 
 ## Mailcatcher
 
@@ -48,16 +63,27 @@ The backend is automatically configured to use Mailcatcher when running with Doc
 
 ## Local Development
 
-The Docker Compose files are configured so that each of the services is available in a different port in `localhost`.
+The Docker Compose files are configured to have the services available on different ports in `localhost`.
 
-For the backend and frontend, they use the same port that would be used by their local development server, so, the backend is at `http://localhost:8000` and the frontend at `http://localhost:5173`.
+The backend (which includes the frontend) is available at `http://localhost:8000`.
 
-This way, you could turn off a Docker Compose service and start its local development service, and everything would keep working, because it all uses the same ports.
-
-For example, you can stop that `frontend` service in the Docker Compose, in another terminal, run:
+For frontend-only development, you can run the frontend locally in a separate terminal (outside of Docker) while keeping the backend running in Docker:
 
 ```bash
-docker compose stop frontend
+cd frontend
+npm run dev
+```
+
+This will start the frontend development server at `http://localhost:5173` with hot reload enabled, connecting to the backend API running at `http://localhost:8000`.
+
+For backend-only development, you can run the backend directly:
+
+```bash
+cd backend
+uv run fastapi dev main.py
+```
+
+This will start the backend development server at `http://localhost:8000` with auto-reload enabled.
 ```
 
 And then start the local frontend development server:

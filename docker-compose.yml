@@ -39,7 +39,9 @@ services:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=https://${DOMAIN?Variable not set}
     depends_on:
       db:
         condition: service_healthy
@@ -110,7 +112,9 @@ services:
 
     build:
       context: .
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=https://${DOMAIN?Variable not set}
 
   caddy:
     image: ghcr.io/techletes/caddy-ratelimit:latest
@@ -127,17 +131,6 @@ services:
       - DOMAIN=${DOMAIN?Variable not set}
     depends_on:
       - backend
-      - frontend
-
-  frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
-    restart: always
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        - VITE_API_URL=https://${DOMAIN?Variable not set}
-        - NODE_ENV=production
 
 volumes:
   postgres-data:

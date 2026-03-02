@@ -17,9 +17,10 @@ This is **Techletes' internal company template** for building modern full-stack 
 ### Core Stack
 - **Backend**: FastAPI + SQLModel ORM + PostgreSQL
 - **Frontend**: React + TypeScript + Vite + shadcn/ui
-- **Infrastructure**: Docker Compose, Caddy, CI/CD with GitHub Actions
+- **Infrastructure**: Single unified Docker image, Docker Compose, Caddy, CI/CD with GitHub Actions
+- **Dependency Management**: `uv` for Python packages
 
-**Monorepo Structure**: `uv` workspaces for Python + Node.js workspace (Bun/npm) for frontend.
+**Deployment**: Single Docker image that includes both frontend and backend, served together as one application.
 
 ---
 
@@ -28,7 +29,7 @@ This is **Techletes' internal company template** for building modern full-stack 
 ### Full Stack (Recommended)
 ```bash
 docker compose up --build
-# Services: Frontend (3000) | API (8000) | API Docs (8000/docs) | DB Admin (8080)
+# Single unified service: Frontend + Backend API (8000/docs) | DB (5432) | DB Admin (8080)
 ```
 
 ### Backend Only
@@ -78,14 +79,24 @@ npm run generate-client          # Regenerate API client from OpenAPI spec
 **Build**: Vite (fast HMR), TypeScript strict mode, Tailwind + shadcn/ui components, Dark mode support.
 
 ### Infrastructure
-- **Compose**: `compose.yml` — PostgreSQL, backend, frontend, Adminer, Caddy (reverse proxy)
-- **Dockerfiles**: Optimized multi-stage builds for both backend & frontend
+- **Dockerfile**: Single unified multi-stage build
+  - Stage 1: Builds frontend with Bun
+  - Stage 2: Builds backend with Python, mounts frontend static files
+- **Docker Compose**: `docker-compose.yml` — PostgreSQL, unified app (backend+frontend), Adminer, Caddy (reverse proxy)
+- **Static Files**: Frontend built files served from `/backend/static` by FastAPI
 - **CI/CD**: GitHub Actions workflows for testing, coverage, Docker builds
-- **Docs**: `docs/` — DEV_SETUP.md, deployment.md, release-notes.md
+- **Docs**: `docs/` — development.md, deployment.md, release-notes.md
 
 ---
 
 ## Development Workflow
+
+### Docker Setup
+
+The application uses a **single unified Docker image** where:
+- Frontend is built with Bun and compiled with Vite
+- Frontend build output is served as static files from FastAPI backend
+- Both frontend and backend run in the same container on port 8000
 
 ### 1. Backend Changes
 ```bash

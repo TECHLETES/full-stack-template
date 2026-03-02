@@ -33,7 +33,7 @@ export function EntraLoginButton({
         })
 
         // Extract roles from ID token claims
-        const roles = response.idTokenClaims?.roles || []
+        const roles = (response.idTokenClaims as any)?.roles || []
         onSuccess(tokenResponse.accessToken, roles as string[])
       }
     } catch (error) {

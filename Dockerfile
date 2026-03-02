@@ -1,3 +1,24 @@
+# Stage 1: Build frontend with Bun
+FROM oven/bun:1 AS frontend-builder
+
+WORKDIR /app
+
+COPY package.json bun.lock /app/
+
+COPY frontend/package.json /app/frontend/
+
+WORKDIR /app/frontend
+
+RUN bun install
+
+COPY ./frontend /app/frontend
+
+ARG VITE_API_URL
+
+RUN bun run build
+
+
+# Stage 2: Build and run backend with frontend static files
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
@@ -20,25 +41,26 @@ WORKDIR /app/
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Install dependencies
+# Install backend dependencies (without the project itself for layer caching)
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-workspace --package app
-
-COPY ./backend/scripts /app/backend/scripts
-
-COPY ./backend/pyproject.toml ./backend/alembic.ini /app/backend/
+    uv sync --frozen --no-install-workspace
 
 COPY ./backend /app/backend
 
-# Sync the project
+COPY ./pyproject.toml /app/
+
+# Sync the project (install the backend package itself)
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --package app
+    uv sync --frozen
+
+# Copy built frontend to backend static directory
+COPY --from=frontend-builder /app/frontend/dist /app/backend/static
 
 WORKDIR /app/backend/
 

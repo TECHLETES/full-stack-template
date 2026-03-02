@@ -73,7 +73,7 @@ Future versions will include built-in support for:
 
 This template is designed to be **cloned and customized** for each new Techletes project.
 
-### Option 1: Simple Clone (Recommended)
+### Clone & Setup
 
 For a quick start, simply clone this repository:
 
@@ -83,17 +83,6 @@ cd my-project
 # Update .env files and customize as needed
 docker compose up --build
 ```
-
-### Option 2: Clone with Copier (Automated Setup)
-
-Use [Copier](https://copier.readthedocs.io) to automatically configure project details:
-
-```bash
-pipx install copier
-copier copy https://github.com/Techletes/full-stack-template.git my-project
-```
-
-This will ask for project name, stack name, credentials, and other configuration.
 
 ### Customization Workflow
 
@@ -176,65 +165,84 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 
 Copy the content and use that as password / secret key. And run that again to generate another secure key.
 
-## How To Use It - Alternative With Copier
+## Dependency Management
 
-This repository also supports generating a new project using [Copier](https://copier.readthedocs.io).
+This project uses [**uv**](https://docs.astral.sh/uv/) — a fast, modern Python package manager — for managing dependencies.
 
-It will copy all the files, ask you configuration questions, and update the `.env` files with your answers.
+### Install uv
 
-### Install Copier
-
-You can install Copier with:
+If you're on **Linux** and don't have uv installed yet:
 
 ```bash
-pip install copier
+# Using curl (recommended)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or using apt (if available in your distro)
+sudo apt install uv
+
+# Or using pip
+pip install uv
 ```
 
-Or better, if you have [`pipx`](https://pipx.pypa.io/), you can run it with:
+After installation, verify it works:
 
 ```bash
-pipx install copier
+uv --version
 ```
 
-**Note**: If you have `pipx`, installing copier is optional, you could run it directly.
+### Managing Dependencies
 
-### Generate a Project With Copier
+Dependencies for the backend are defined in [backend/pyproject.toml](./backend/pyproject.toml). Frontend dependencies are in [frontend/package.json](./frontend/package.json).
 
-Decide a name for your new project's directory, you will use it below. For example, `my-awesome-project`.
+#### Common uv Commands
 
-Go to the directory that will be the parent of your project, and run the command with your project's name:
+Run these commands from the project root or respective `backend/` and `frontend/` directories:
 
+**Sync all dependencies** to your virtual environment:
 ```bash
-copier copy https://github.com/fastapi/full-stack-fastapi-template my-awesome-project --trust
+cd backend
+uv sync              # Install/update all dependencies from lock file
 ```
 
-If you have `pipx` and you didn't install `copier`, you can run it directly:
-
+**Update lock file** after modifying `pyproject.toml`:
 ```bash
-pipx run copier copy https://github.com/fastapi/full-stack-fastapi-template my-awesome-project --trust
+cd backend
+uv lock              # Generate/update uv.lock based on pyproject.toml
 ```
 
-**Note** the `--trust` option is necessary to be able to execute a [post-creation script](https://github.com/fastapi/full-stack-fastapi-template/blob/master/.copier/update_dotenv.py) that updates your `.env` files.
+**Upgrade all dependencies** to their latest versions:
+```bash
+cd backend
+uv lock --upgrade    # Update uv.lock to latest compatible versions
+```
 
-### Input Variables
+**Add a new dependency**:
+```bash
+cd backend
+uv add package-name  # Add and sync automatically
+```
 
-Copier will ask you for some data, you might want to have at hand before generating the project.
+**Remove a dependency**:
+```bash
+cd backend
+uv remove package-name  # Remove and sync automatically
+```
 
-But don't worry, you can just update any of that in the `.env` files afterwards.
+**Run a script** with dependencies installed:
+```bash
+cd backend
+uv run fastapi dev main.py  # Run command in the managed environment
+```
 
-The input variables, with their default values (some auto generated) are:
+### Workflow
 
-- `project_name`: (default: `"FastAPI Project"`) The name of the project, shown to API users (in .env).
-- `stack_name`: (default: `"fastapi-project"`) The name of the stack used for Docker Compose labels and project name (no spaces, no periods) (in .env).
-- `secret_key`: (default: `"changethis"`) The secret key for the project, used for security, stored in .env, you can generate one with the method above.
-- `first_superuser`: (default: `"admin@example.com"`) The email of the first superuser (in .env).
-- `first_superuser_password`: (default: `"changethis"`) The password of the first superuser (in .env).
-- `smtp_host`: (default: "") The SMTP server host to send emails, you can set it later in .env.
-- `smtp_user`: (default: "") The SMTP server user to send emails, you can set it later in .env.
-- `smtp_password`: (default: "") The SMTP server password to send emails, you can set it later in .env.
-- `emails_from_email`: (default: `"info@example.com"`) The email account to send emails from, you can set it later in .env.
-- `postgres_password`: (default: `"changethis"`) The password for the PostgreSQL database, stored in .env, you can generate one with the method above.
-- `sentry_dsn`: (default: "") The DSN for Sentry, if you are using it, you can set it later in .env.
+1. **Initial setup**: `uv sync` installs all dependencies from the lock file
+2. **Edit requirements**: Modify `backend/pyproject.toml` to add/remove/change versions
+3. **Update lock file**: Run `uv lock` to resolve and lock the new versions
+4. **Sync locally**: Run `uv sync` to install the updated dependencies
+5. **Commit changes**: Commit both `pyproject.toml` and `uv.lock` to version control
+
+For more details, see the [uv documentation](https://docs.astral.sh/uv/).
 
 ## Backend Development
 

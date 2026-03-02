@@ -15,6 +15,23 @@ But you have to configure a couple things first. 🤓
 * Configure a wildcard subdomain for your domain, so that you can have multiple subdomains for different services, e.g. `*.fastapi-project.example.com`. This will be useful for accessing different components, like `dashboard.fastapi-project.example.com`, `api.fastapi-project.example.com`, `caddy.fastapi-project.example.com`, `adminer.fastapi-project.example.com`, etc. And also for `staging`, like `dashboard.staging.fastapi-project.example.com`, `adminer.staging.fastapi-project.example.com`, etc.
 * Install and configure [Docker](https://docs.docker.com/engine/install/) on the remote server (Docker Engine, not Docker Desktop).
 
+## Unified Docker Image
+
+This project uses a **single unified Docker image** for both the frontend and backend:
+
+- **Frontend**: Built with Bun and compiled with Vite
+- **Backend**: FastAPI Python application with static file serving
+- **Single container**: Both frontend and backend run in a single Docker container on port 8000
+
+The unified `Dockerfile` at the root of the project handles:
+1. Building the frontend with Bun
+2. Compiling the frontend assets with Vite
+3. Installing backend Python dependencies with uv
+4. Mounting the compiled frontend as static files
+5. Starting the FastAPI server to serve both frontend and backend
+
+This simplifies deployment and reduces resource usage compared to managing separate containers.
+
 ## Public Caddy
 
 We need a Caddy proxy to handle incoming connections and HTTPS certificates.
