@@ -1,13 +1,15 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 
-import { type UserPublic, UsersService } from "@/client"
+import { NotificationsService, type UserPublic, UsersService } from "@/client"
 import AddUser from "@/components/Admin/AddUser"
 import { columns, type UserTableData } from "@/components/Admin/columns"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingUsers from "@/components/Pending/PendingUsers"
+import { Button } from "@/components/ui/button"
 import useAuth from "@/hooks/useAuth"
+import useCustomToast from "@/hooks/useCustomToast"
 
 function getUsersQueryOptions() {
   return {
@@ -55,6 +57,37 @@ function UsersTable() {
   )
 }
 
+function TestNotificationButton() {
+  const [isLoading, setIsLoading] = useState(false)
+  const { showSuccessToast, showErrorToast } = useCustomToast()
+
+  const handleSendTestNotification = async () => {
+    setIsLoading(true)
+    try {
+      const response = await NotificationsService.sendTestNotificationToAll()
+      showSuccessToast(response.message)
+    } catch (error) {
+      showErrorToast(
+        error instanceof Error
+          ? error.message
+          : "Failed to send test notification",
+      )
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <Button
+      onClick={handleSendTestNotification}
+      disabled={isLoading}
+      variant="outline"
+    >
+      {isLoading ? "Sending..." : "Send Test Notification"}
+    </Button>
+  )
+}
+
 function Admin() {
   return (
     <div className="flex flex-col gap-6">
@@ -65,7 +98,10 @@ function Admin() {
             Manage user accounts and permissions
           </p>
         </div>
-        <AddUser />
+        <div className="flex gap-2 my-4">
+          <TestNotificationButton />
+          <AddUser />
+        </div>
       </div>
       <UsersTable />
     </div>

@@ -94,6 +94,9 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     SIGNUP_ENABLED: bool = True
 
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379"
+
     # Microsoft Entra (Azure AD) Configuration
     AZURE_CLIENT_ID: str = ""
     AZURE_CLIENT_SECRET: str = ""

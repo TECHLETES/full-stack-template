@@ -427,6 +427,65 @@ export const NewPasswordSchema = {
     title: 'NewPassword'
 } as const;
 
+export const NotificationCreateSchema = {
+    properties: {
+        type: {
+            type: 'string',
+            enum: ['info', 'success', 'warning', 'error'],
+            title: 'Type',
+            default: 'info'
+        },
+        title: {
+            type: 'string',
+            maxLength: 255,
+            minLength: 1,
+            title: 'Title'
+        },
+        message: {
+            type: 'string',
+            maxLength: 1024,
+            minLength: 1,
+            title: 'Message'
+        }
+    },
+    type: 'object',
+    required: ['title', 'message'],
+    title: 'NotificationCreate',
+    description: 'Payload for sending a notification to the authenticated user.'
+} as const;
+
+export const NotificationSendSchema = {
+    properties: {
+        type: {
+            type: 'string',
+            enum: ['info', 'success', 'warning', 'error'],
+            title: 'Type',
+            default: 'info'
+        },
+        title: {
+            type: 'string',
+            maxLength: 255,
+            minLength: 1,
+            title: 'Title'
+        },
+        message: {
+            type: 'string',
+            maxLength: 1024,
+            minLength: 1,
+            title: 'Message'
+        },
+        user_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'User Id'
+        }
+    },
+    type: 'object',
+    required: ['title', 'message', 'user_id'],
+    title: 'NotificationSend',
+    description: 'Payload for superusers to push a notification to any user.'
+} as const;
+
 export const PermissionCreateSchema = {
     properties: {
         name: {

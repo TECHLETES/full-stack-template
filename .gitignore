@@ -6,3 +6,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 .env
+
+.venv/
+venv/
+htmlcov/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/

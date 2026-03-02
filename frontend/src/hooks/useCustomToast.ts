@@ -13,7 +13,23 @@ const useCustomToast = () => {
     })
   }
 
-  return { showSuccessToast, showErrorToast }
+  const showToast = (
+    title: string,
+    description: string,
+    type: "success" | "error",
+  ) => {
+    if (type === "success") {
+      toast.success(title, {
+        description,
+      })
+    } else if (type === "error") {
+      toast.error(title, {
+        description,
+      })
+    }
+  }
+
+  return { showSuccessToast, showErrorToast, showToast }
 }
 
 export default useCustomToast

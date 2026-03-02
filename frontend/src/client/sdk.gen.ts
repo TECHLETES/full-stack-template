@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+import type { AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotificationsSendNotificationData, NotificationsSendNotificationResponse, NotificationsSendNotificationToSelfData, NotificationsSendNotificationToSelfResponse, NotificationsSendTestNotificationToAllResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
 
 export class AuthEntraService {
     /**
@@ -270,6 +270,69 @@ export class LoginService {
             errors: {
                 422: 'Validation Error'
             }
+        });
+    }
+}
+
+export class NotificationsService {
+    /**
+     * Send Notification
+     * Send a notification to a specific user by ``user_id``.
+     *
+     * **Superusers only.**  The target user must be connected via WebSocket to
+     * receive the message in real time.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static sendNotification(data: NotificationsSendNotificationData): CancelablePromise<NotificationsSendNotificationResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/notifications/send',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Send Notification To Self
+     * Send a notification to yourself.
+     *
+     * Useful for testing that your WebSocket connection is live without needing
+     * superuser privileges.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static sendNotificationToSelf(data: NotificationsSendNotificationToSelfData): CancelablePromise<NotificationsSendNotificationToSelfResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/notifications/send/me',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Send Test Notification To All
+     * Send a test notification to all active users.
+     *
+     * **Superusers only.** Useful for testing WebSocket connections.
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static sendTestNotificationToAll(): CancelablePromise<NotificationsSendTestNotificationToAllResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/notifications/send/test-all'
         });
     }
 }

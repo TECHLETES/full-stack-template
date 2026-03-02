@@ -7,7 +7,7 @@ from testcontainers.postgres import PostgresContainer
 
 from backend.api.deps import get_db
 from backend.core.config import settings
-from backend.core.db import init_db
+from backend.core.db import init_db, get_engine
 from backend.main import app
 from backend.tests.utils.user import authentication_token_from_email
 from backend.tests.utils.utils import get_superuser_token_headers

@@ -34,10 +34,13 @@ const useAuth = () => {
     localStorage.removeItem("access_token")
     sessionStorage.clear()
     // Clear all cookies
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
+    const cookies = document.cookie.split(";")
+    cookies.forEach((c) => {
+      const name = c.split("=")[0].trim()
+      if (name) {
+        // biome-ignore lint/suspicious/noDocumentCookie: Cookie clearing is necessary for logout
+        document.cookie = `${name}=;expires=${new Date().toUTCString()};path=/`
+      }
     })
     // Redirect to login
     navigate({ to: "/login" })
@@ -65,6 +68,7 @@ const useAuth = () => {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
       navigate({ to: "/" })
     },
     onError: handleError.bind(showErrorToast),

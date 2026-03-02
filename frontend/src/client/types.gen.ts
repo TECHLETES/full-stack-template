@@ -90,6 +90,27 @@ export type NewPassword = {
     new_password: string;
 };
 
+/**
+ * Payload for sending a notification to the authenticated user.
+ */
+export type NotificationCreate = {
+    type?: 'info' | 'success' | 'warning' | 'error';
+    title: string;
+    message: string;
+};
+
+export type type = 'info' | 'success' | 'warning' | 'error';
+
+/**
+ * Payload for superusers to push a notification to any user.
+ */
+export type NotificationSend = {
+    type?: 'info' | 'success' | 'warning' | 'error';
+    title: string;
+    message: string;
+    user_id: string;
+};
+
 export type PermissionCreate = {
     name: string;
     description?: (string | null);
@@ -296,6 +317,20 @@ export type LoginRecoverPasswordHtmlContentData = {
 };
 
 export type LoginRecoverPasswordHtmlContentResponse = (string);
+
+export type NotificationsSendNotificationData = {
+    requestBody: NotificationSend;
+};
+
+export type NotificationsSendNotificationResponse = (Message);
+
+export type NotificationsSendNotificationToSelfData = {
+    requestBody: NotificationCreate;
+};
+
+export type NotificationsSendNotificationToSelfResponse = (Message);
+
+export type NotificationsSendTestNotificationToAllResponse = (Message);
 
 export type PrivateCreateUserData = {
     requestBody: PrivateUserCreate;

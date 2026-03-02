@@ -224,8 +224,13 @@ Load from `.env` via Pydantic Settings:
 2. Add route in `backend/api/routes/newfeature.py` with proper dependencies
 3. Register route in `backend/api/main.py` via `APIRouter`
 4. Add tests in `backend/tests/api/routes/test_newfeature.py`
-5. Frontend: run `npm run generate-client` to regenerate types
-6. Use new client in `src/components/` or route
+5. **⚠️ CRITICAL: Frontend MUST regenerate OpenAPI client** — Never add an endpoint directly without regenerating:
+   ```bash
+   cd frontend
+   npm run generate-client  # Regenerates src/client/schemas.gen.ts, sdk.gen.ts
+   ```
+   This ensures type safety and keeps frontend types in sync with backend API.
+6. Use new client in `src/components/` or route with auto-generated types
 
 ### Add a New Frontend Page
 1. Create route file in `src/routes/` (e.g., `src/routes/mypage.tsx`)

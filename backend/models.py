@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, datetime
+from typing import Literal
 
 from pydantic import EmailStr
 from sqlalchemy import Column, DateTime
@@ -315,3 +316,32 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str = Field(min_length=8, max_length=128)
+
+
+# ---------------------------------------------------------------------------
+# Notification models (ephemeral — not stored in DB, delivered via WebSocket)
+# ---------------------------------------------------------------------------
+
+
+class NotificationOut(SQLModel):
+    """A notification message pushed to the client over WebSocket."""
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type: Literal["info", "success", "warning", "error"] = "info"
+    title: str = Field(min_length=1, max_length=255)
+    message: str = Field(min_length=1, max_length=1024)
+    created_at: datetime = Field(default_factory=get_datetime_utc)
+
+
+class NotificationCreate(SQLModel):
+    """Payload for sending a notification to the authenticated user."""
+
+    type: Literal["info", "success", "warning", "error"] = "info"
+    title: str = Field(min_length=1, max_length=255)
+    message: str = Field(min_length=1, max_length=1024)
+
+
+class NotificationSend(NotificationCreate):
+    """Payload for superusers to push a notification to any user."""
+
+    user_id: uuid.UUID
