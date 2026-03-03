@@ -1,35 +1,42 @@
 """Background task enqueueing and status endpoints."""
 
-from typing import Any, Literal
+import importlib
+import uuid
+from typing import Any
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, status
+from rq import Callback
 from rq.exceptions import NoSuchJobError
 from rq.job import Job
 
-from backend.api.deps import CurrentUser, SuperUserDep
-from backend.core.queue import get_queue
+from backend import crud
+from backend.api.deps import CurrentUser, SessionDep, SuperUserDep
+from backend.core.queue import get_queue, get_redis_conn
+from backend.core.task_callbacks import (
+    on_task_failure,
+    on_task_started,
+    on_task_success,
+)
+from backend.models import TaskCreate, TaskPublic, TasksPublic
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
-
 # ---------------------------------------------------------------------------
-# Request / Response schemas
+# Task registry
 # ---------------------------------------------------------------------------
 
+TASK_MAP: dict[str, str] = {
+    "send_email": "backend.tasks.example.send_email_task",
+    "export_data": "backend.tasks.example.export_data_task",
+    "process_file": "backend.tasks.example.process_file_task",
+}
 
-class EnqueueRequest(BaseModel):
-    task: Literal["send_email", "export_data", "process_file"]
-    queue: Literal["default", "high", "low"] = "default"
-    # Task-specific keyword arguments
-    kwargs: dict[str, Any] = {}
 
-
-class JobStatusResponse(BaseModel):
-    job_id: str
-    status: str
-    result: Any = None
-    error: str | None = None
+def _load_task_func(task_type: str) -> Any:
+    func_path = TASK_MAP[task_type]
+    module_path, func_name = func_path.rsplit(".", 1)
+    module = importlib.import_module(module_path)
+    return getattr(module, func_name)
 
 
 # ---------------------------------------------------------------------------
@@ -37,70 +44,182 @@ class JobStatusResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-@router.post("/enqueue", response_model=JobStatusResponse)
+@router.post("/enqueue", response_model=TaskPublic)
 def enqueue_task(
     *,
-    body: EnqueueRequest,
-    _current_user: CurrentUser,
+    body: TaskCreate,
+    session: SessionDep,
+    current_user: CurrentUser,
 ) -> Any:
-    """Enqueue a background task. Returns the job ID immediately."""
-    task_map = {
-        "send_email": "backend.tasks.example.send_email_task",
-        "export_data": "backend.tasks.example.export_data_task",
-        "process_file": "backend.tasks.example.process_file_task",
-    }
+    """Create a DB task record and enqueue it for background processing."""
+    db_task = crud.create_task(session=session, task_in=body, owner_id=current_user.id)
 
-    func_path = task_map[body.task]
-    module_path, func_name = func_path.rsplit(".", 1)
-
-    import importlib
-
-    module = importlib.import_module(module_path)
-    func = getattr(module, func_name)
-
+    func = _load_task_func(body.task_type)
     q = get_queue(body.queue)
-    job = q.enqueue(func, **body.kwargs)
 
-    return JobStatusResponse(job_id=job.id, status="queued")
+    # Pass task_id via meta and as kwarg so the function and callbacks can update DB
+    kwargs = dict(body.kwargs)
+    kwargs["task_id"] = str(db_task.id)
+
+    job = q.enqueue(
+        func,
+        kwargs=kwargs,
+        meta={"task_id": str(db_task.id)},
+        on_started=Callback(on_task_started),
+        on_success=Callback(on_task_success),
+        on_failure=Callback(on_task_failure),
+    )
+
+    # Store the RQ job ID in the DB record
+    db_task = crud.update_task_status(
+        session=session,
+        db_task=db_task,
+        status="queued",
+        rq_job_id=job.id,
+    )
+    return db_task
 
 
-@router.get("/{job_id}", response_model=JobStatusResponse)
-def get_job_status(
-    job_id: str,
-    _current_user: CurrentUser,
+@router.get("/", response_model=TasksPublic)
+def list_tasks(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    status: str | None = None,
+    task_type: str | None = None,
+    queue: str | None = None,
+    skip: int = 0,
+    limit: int = 100,
 ) -> Any:
-    """Check the status of an enqueued job."""
-    from backend.core.queue import get_redis_conn
-
-    try:
-        job = Job.fetch(job_id, connection=get_redis_conn())
-    except NoSuchJobError:
-        raise HTTPException(status_code=404, detail="Job not found") from None
-
-    status = job.get_status()
-    result = job.result if status and status.value == "finished" else None
-    error = job.exc_info if status and status.value == "failed" else None
-
-    return JobStatusResponse(
-        job_id=job_id,
-        status=str(status.value) if status else "unknown",
-        result=result,
-        error=str(error) if error else None,
+    """List the current user's tasks."""
+    return crud.list_tasks(
+        session=session,
+        owner_id=current_user.id,
+        status=status,
+        task_type=task_type,
+        queue=queue,
+        skip=skip,
+        limit=limit,
     )
 
 
-@router.delete("/{job_id}")
-def cancel_job(
+@router.get("/{task_id}", response_model=TaskPublic)
+def get_task(
+    task_id: uuid.UUID,
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> Any:
+    """Get a task by its database ID."""
+    db_task = crud.get_task(session=session, task_id=task_id)
+    if not db_task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+    if db_task.owner_id != current_user.id and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
+        )
+    return db_task
+
+
+@router.delete("/{task_id}", response_model=TaskPublic)
+def cancel_task(
+    task_id: uuid.UUID,
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> Any:
+    """Cancel a queued or running task."""
+    db_task = crud.get_task(session=session, task_id=task_id)
+    if not db_task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+    if db_task.owner_id != current_user.id and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
+        )
+
+    if db_task.status not in ("queued", "running"):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot cancel task with status '{db_task.status}'",
+        )
+
+    # Attempt to cancel the RQ job (best-effort)
+    if db_task.rq_job_id:
+        try:
+            job = Job.fetch(db_task.rq_job_id, connection=get_redis_conn())
+            job.cancel()
+        except (NoSuchJobError, Exception):
+            pass  # Job may have already finished; still update DB
+
+    db_task = crud.update_task_status(
+        session=session,
+        db_task=db_task,
+        status="cancelled",
+    )
+    return db_task
+
+
+# ---------------------------------------------------------------------------
+# Superuser: list all tasks across all users
+# ---------------------------------------------------------------------------
+
+
+@router.get("/admin/all", response_model=TasksPublic)
+def list_all_tasks(
+    *,
+    session: SessionDep,
+    _superuser: SuperUserDep,
+    status: str | None = None,
+    task_type: str | None = None,
+    queue: str | None = None,
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """List all tasks across all users (superuser only)."""
+    return crud.list_tasks(
+        session=session,
+        owner_id=None,
+        status=status,
+        task_type=task_type,
+        queue=queue,
+        skip=skip,
+        limit=limit,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Legacy compatibility: job_id-based lookup
+# ---------------------------------------------------------------------------
+
+
+class LegacyJobStatusResponse(TaskPublic):
+    """Backwards-compatible response that includes job_id alias."""
+
+    job_id: str | None = None
+
+    @classmethod
+    def from_task(cls, task: Any) -> "LegacyJobStatusResponse":
+        data = TaskPublic.model_validate(task).model_dump()
+        data["job_id"] = task.rq_job_id
+        return cls(**data)
+
+
+@router.get("/by-job/{job_id}", response_model=LegacyJobStatusResponse)
+def get_task_by_job_id(
     job_id: str,
-    _: SuperUserDep,
-) -> dict[str, str]:
-    """Cancel a queued job (superuser only)."""
-    from backend.core.queue import get_redis_conn
-
-    try:
-        job = Job.fetch(job_id, connection=get_redis_conn())
-    except NoSuchJobError:
-        raise HTTPException(status_code=404, detail="Job not found") from None
-
-    job.cancel()
-    return {"message": f"Job {job_id} cancelled"}
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> Any:
+    """Look up a task by its RQ job ID (legacy support)."""
+    db_task = crud.get_task_by_rq_job_id(session=session, rq_job_id=job_id)
+    if not db_task:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+    if db_task.owner_id != current_user.id and not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions"
+        )
+    return LegacyJobStatusResponse.from_task(db_task)

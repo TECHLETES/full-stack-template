@@ -20,18 +20,6 @@ export type Body_login_login_access_token = {
     client_secret?: (string | null);
 };
 
-export type EnqueueRequest = {
-    task: 'send_email' | 'export_data' | 'process_file';
-    queue?: 'default' | 'high' | 'low';
-    kwargs?: {
-        [key: string]: unknown;
-    };
-};
-
-export type task = 'send_email' | 'export_data' | 'process_file';
-
-export type queue = 'default' | 'high' | 'low';
-
 export type EntraLoginRequest = {
     access_token: string;
     tenant_id?: (string | null);
@@ -88,6 +76,7 @@ export type JobInfo = {
     func: string;
     status: string;
     queue: string;
+    owner_id?: (string | null);
     created_at?: (string | null);
     started_at?: (string | null);
     ended_at?: (string | null);
@@ -106,19 +95,33 @@ export type JobsStatsResponse = {
 
 export type JobStatusCount = {
     queued?: number;
-    started?: number;
-    finished?: number;
+    running?: number;
+    completed?: number;
     failed?: number;
-    deferred?: number;
-    canceled?: number;
-    stopped?: number;
+    cancelled?: number;
 };
 
-export type JobStatusResponse = {
-    job_id: string;
+/**
+ * Backwards-compatible response that includes job_id alias.
+ */
+export type LegacyJobStatusResponse = {
+    task_type: string;
+    queue?: string;
+    id: string;
+    rq_job_id?: (string | null);
     status: string;
-    result?: unknown;
+    kwargs?: {
+        [key: string]: unknown;
+    };
+    result?: ({
+    [key: string]: unknown;
+} | null);
     error?: (string | null);
+    owner_id: string;
+    created_at?: (string | null);
+    started_at?: (string | null);
+    completed_at?: (string | null);
+    job_id?: (string | null);
 };
 
 export type Message = {
@@ -252,6 +255,42 @@ export type RoleUpdate = {
     permission_ids?: (Array<(string)> | null);
 };
 
+export type TaskCreate = {
+    task_type: 'send_email' | 'export_data' | 'process_file';
+    queue?: 'default' | 'high' | 'low';
+    kwargs?: {
+        [key: string]: unknown;
+    };
+};
+
+export type task_type = 'send_email' | 'export_data' | 'process_file';
+
+export type queue = 'default' | 'high' | 'low';
+
+export type TaskPublic = {
+    task_type: string;
+    queue?: string;
+    id: string;
+    rq_job_id?: (string | null);
+    status: string;
+    kwargs?: {
+        [key: string]: unknown;
+    };
+    result?: ({
+    [key: string]: unknown;
+} | null);
+    error?: (string | null);
+    owner_id: string;
+    created_at?: (string | null);
+    started_at?: (string | null);
+    completed_at?: (string | null);
+};
+
+export type TasksPublic = {
+    data: Array<TaskPublic>;
+    count: number;
+};
+
 export type Token = {
     access_token: string;
     token_type?: string;
@@ -320,7 +359,7 @@ export type AdminGetJobsStatsResponse = (JobsStatsResponse);
 
 export type AdminGetJobsListData = {
     limit?: number;
-    queue?: string;
+    queue?: (string | null);
     statusFilter?: (string | null);
 };
 
@@ -573,24 +612,48 @@ export type RbacGetPermissionsCatalogResponse = ({
 });
 
 export type TasksEnqueueTaskData = {
-    requestBody: EnqueueRequest;
+    requestBody: TaskCreate;
 };
 
-export type TasksEnqueueTaskResponse = (JobStatusResponse);
+export type TasksEnqueueTaskResponse = (TaskPublic);
 
-export type TasksGetJobStatusData = {
+export type TasksListTasksData = {
+    limit?: number;
+    queue?: (string | null);
+    skip?: number;
+    status?: (string | null);
+    taskType?: (string | null);
+};
+
+export type TasksListTasksResponse = (TasksPublic);
+
+export type TasksGetTaskData = {
+    taskId: string;
+};
+
+export type TasksGetTaskResponse = (TaskPublic);
+
+export type TasksCancelTaskData = {
+    taskId: string;
+};
+
+export type TasksCancelTaskResponse = (TaskPublic);
+
+export type TasksListAllTasksData = {
+    limit?: number;
+    queue?: (string | null);
+    skip?: number;
+    status?: (string | null);
+    taskType?: (string | null);
+};
+
+export type TasksListAllTasksResponse = (TasksPublic);
+
+export type TasksGetTaskByJobIdData = {
     jobId: string;
 };
 
-export type TasksGetJobStatusResponse = (JobStatusResponse);
-
-export type TasksCancelJobData = {
-    jobId: string;
-};
-
-export type TasksCancelJobResponse = ({
-    [key: string]: (string);
-});
+export type TasksGetTaskByJobIdResponse = (LegacyJobStatusResponse);
 
 export type TenantsListTenantsData = {
     limit?: number;

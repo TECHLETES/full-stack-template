@@ -2,12 +2,14 @@
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from rq import Queue
+from sqlmodel import func, select
 
-from backend.api.deps import SuperUserDep
+from backend.api.deps import SessionDep, SuperUserDep
 from backend.core.queue import get_redis_conn
+from backend.models import Task
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -19,12 +21,10 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 class JobStatusCount(BaseModel):
     queued: int = 0
-    started: int = 0
-    finished: int = 0
+    running: int = 0
+    completed: int = 0
     failed: int = 0
-    deferred: int = 0
-    canceled: int = 0
-    stopped: int = 0
+    cancelled: int = 0
 
 
 class QueueStats(BaseModel):
@@ -37,6 +37,7 @@ class JobInfo(BaseModel):
     func: str
     status: str
     queue: str
+    owner_id: str | None = None
     created_at: str | None = None
     started_at: str | None = None
     ended_at: str | None = None
@@ -61,39 +62,32 @@ class JobsListResponse(BaseModel):
 @router.get("/jobs/stats", response_model=JobsStatsResponse)
 def get_jobs_stats(
     _superuser: SuperUserDep,
+    session: SessionDep,
 ) -> Any:
-    """Get statistics about all background jobs (superuser only)."""
+    """Get statistics about all background jobs (superuser only).
+
+    Status counts come from the DB (persistent history).
+    Queue stats reflect the live RQ pending depth.
+    """
+    # DB-based status counts
+    rows = session.exec(select(Task.status, func.count()).group_by(Task.status)).all()
+    status_map: dict[str, int] = {row[0]: row[1] for row in rows}
+
+    status_counts = JobStatusCount(
+        queued=status_map.get("queued", 0),
+        running=status_map.get("running", 0),
+        completed=status_map.get("completed", 0),
+        failed=status_map.get("failed", 0),
+        cancelled=status_map.get("cancelled", 0),
+    )
+    total = sum(status_map.values())
+
+    # Live queue depths from RQ
     conn = get_redis_conn()
-
-    # Count jobs by status across all queues
-    status_counts = JobStatusCount()
-
-    for queue_name in ["high", "default", "low"]:
-        queue = Queue(queue_name, connection=conn)
-
-        # Get jobs by status
-        status_counts.queued += len(queue.get_job_ids())
-        status_counts.finished += len(queue.finished_job_registry.get_job_ids())
-        status_counts.failed += len(queue.failed_job_registry.get_job_ids())
-        status_counts.started += len(queue.started_job_registry.get_job_ids())
-        status_counts.deferred += len(queue.deferred_job_registry.get_job_ids())
-        status_counts.canceled += len(queue.canceled_job_registry.get_job_ids())
-
-    # Get queue stats
     queue_stats = []
     for queue_name in ["high", "default", "low"]:
-        queue = Queue(queue_name, connection=conn)
-        count = len(queue.get_job_ids())
-        queue_stats.append(QueueStats(name=queue_name, count=count))
-
-    total = (
-        status_counts.queued
-        + status_counts.started
-        + status_counts.finished
-        + status_counts.failed
-        + status_counts.deferred
-        + status_counts.canceled
-    )
+        q = Queue(queue_name, connection=conn)
+        queue_stats.append(QueueStats(name=queue_name, count=len(q.get_job_ids())))
 
     return JobsStatsResponse(
         status_counts=status_counts,
@@ -105,67 +99,47 @@ def get_jobs_stats(
 @router.get("/jobs/list", response_model=JobsListResponse)
 def get_jobs_list(
     _superuser: SuperUserDep,
-    queue: str = "default",
+    session: SessionDep,
+    queue: str | None = None,
     status_filter: str | None = None,
     limit: int = 50,
 ) -> Any:
-    """List jobs from a specific queue (superuser only).
+    """List tasks from the DB (superuser only).
 
     Query parameters:
-    - queue: "high", "default", or "low"
-    - status_filter: Filter by status (queued, started, finished, failed, etc)
-    - limit: Max results to return (default 50)
+    - queue: filter by queue name ("high", "default", "low")
+    - status_filter: filter by status (queued, running, completed, failed, cancelled)
+    - limit: max results to return (default 50)
     """
-    if queue not in ["high", "default", "low"]:
-        raise HTTPException(
-            status_code=400, detail="Queue must be high, default, or low"
+    from sqlmodel import col
+
+    stmt = select(Task).order_by(col(Task.created_at).desc()).limit(limit)
+    if queue:
+        stmt = stmt.where(Task.queue == queue)
+    if status_filter:
+        stmt = stmt.where(Task.status == status_filter)
+
+    tasks = session.exec(stmt).all()
+
+    count_stmt = select(func.count()).select_from(Task)
+    if queue:
+        count_stmt = count_stmt.where(Task.queue == queue)
+    if status_filter:
+        count_stmt = count_stmt.where(Task.status == status_filter)
+    total = session.exec(count_stmt).one()
+
+    jobs_info = [
+        JobInfo(
+            id=str(t.id),
+            func=t.task_type,
+            status=t.status,
+            queue=t.queue,
+            owner_id=str(t.owner_id),
+            created_at=t.created_at.isoformat() if t.created_at else None,
+            started_at=t.started_at.isoformat() if t.started_at else None,
+            ended_at=t.completed_at.isoformat() if t.completed_at else None,
         )
+        for t in tasks
+    ]
 
-    conn = get_redis_conn()
-    q = Queue(queue, connection=conn)
-
-    jobs_info = []
-
-    # Get jobs from appropriate registry based on status_filter
-    if status_filter == "queued":
-        job_ids = q.get_job_ids()
-    elif status_filter == "started":
-        job_ids = q.started_job_registry.get_job_ids()
-    elif status_filter == "finished":
-        job_ids = q.finished_job_registry.get_job_ids()
-    elif status_filter == "failed":
-        job_ids = q.failed_job_registry.get_job_ids()
-    elif status_filter == "deferred":
-        job_ids = q.deferred_job_registry.get_job_ids()
-    else:
-        # Get all jobs across all registries
-        job_ids = (
-            q.get_job_ids()
-            + q.started_job_registry.get_job_ids()
-            + q.finished_job_registry.get_job_ids()
-            + q.failed_job_registry.get_job_ids()
-            + q.deferred_job_registry.get_job_ids()
-        )
-
-    # Limit and fetch job details
-    for job_id in job_ids[:limit]:
-        try:
-            from rq.job import Job
-
-            job = Job.fetch(job_id, connection=conn)
-            jobs_info.append(
-                JobInfo(
-                    id=job.id,
-                    func=job.func_name or "unknown",
-                    status=str(job.get_status()) if job.get_status() else "unknown",
-                    queue=queue,
-                    created_at=job.created_at.isoformat() if job.created_at else None,
-                    started_at=job.started_at.isoformat() if job.started_at else None,
-                    ended_at=job.ended_at.isoformat() if job.ended_at else None,
-                )
-            )
-        except Exception:
-            # Skip jobs that can't be fetched
-            pass
-
-    return JobsListResponse(jobs=jobs_info, total=len(job_ids))
+    return JobsListResponse(jobs=jobs_info, total=total)

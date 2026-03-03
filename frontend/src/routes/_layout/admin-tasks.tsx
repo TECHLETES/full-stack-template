@@ -4,6 +4,7 @@ import {
   JobsList,
   JobsStatsSummary,
   QueueDistributionChart,
+  SampleTaskButtons,
 } from "@/components/AdminDashboard"
 
 export const Route = createFileRoute("/_layout/admin-tasks")({
@@ -17,6 +18,9 @@ function AdminTasksDashboard() {
         <h1 className="text-3xl font-bold tracking-tight">Task Dashboard</h1>
         <p className="text-gray-600 mt-2">Monitor and manage background jobs</p>
       </div>
+
+      {/* Sample task launcher */}
+      <SampleTaskButtons />
 
       {/* Statistics Summary */}
       <JobsStatsSummary />

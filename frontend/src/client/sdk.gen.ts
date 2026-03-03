@@ -3,12 +3,15 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { AdminGetJobsStatsResponse, AdminGetJobsListData, AdminGetJobsListResponse, AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, FilesUploadFileData, FilesUploadFileResponse, FilesListFilesData, FilesListFilesResponse, FilesGetFileData, FilesGetFileResponse, FilesDeleteFileData, FilesDeleteFileResponse, FilesDownloadFileData, FilesDownloadFileResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotificationsSendNotificationData, NotificationsSendNotificationResponse, NotificationsSendNotificationToSelfData, NotificationsSendNotificationToSelfResponse, NotificationsSendTestNotificationToAllResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TasksEnqueueTaskData, TasksEnqueueTaskResponse, TasksGetJobStatusData, TasksGetJobStatusResponse, TasksCancelJobData, TasksCancelJobResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
+import type { AdminGetJobsStatsResponse, AdminGetJobsListData, AdminGetJobsListResponse, AuthEntraEntraLoginData, AuthEntraEntraLoginResponse, AuthEntraGetEntraLoginUrlData, AuthEntraGetEntraLoginUrlResponse, AuthEntraGetEntraConfigResponse, FilesUploadFileData, FilesUploadFileResponse, FilesListFilesData, FilesListFilesResponse, FilesGetFileData, FilesGetFileResponse, FilesDeleteFileData, FilesDeleteFileResponse, FilesDownloadFileData, FilesDownloadFileResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, NotificationsSendNotificationData, NotificationsSendNotificationResponse, NotificationsSendNotificationToSelfData, NotificationsSendNotificationToSelfResponse, NotificationsSendTestNotificationToAllResponse, PrivateCreateUserData, PrivateCreateUserResponse, RbacListPermissionsData, RbacListPermissionsResponse, RbacCreatePermissionEndpointData, RbacCreatePermissionEndpointResponse, RbacGetPermissionEndpointData, RbacGetPermissionEndpointResponse, RbacUpdatePermissionEndpointData, RbacUpdatePermissionEndpointResponse, RbacDeletePermissionEndpointData, RbacDeletePermissionEndpointResponse, RbacListRolesData, RbacListRolesResponse, RbacCreateRoleEndpointData, RbacCreateRoleEndpointResponse, RbacGetRoleEndpointData, RbacGetRoleEndpointResponse, RbacUpdateRoleEndpointData, RbacUpdateRoleEndpointResponse, RbacDeleteRoleEndpointData, RbacDeleteRoleEndpointResponse, RbacAddPermissionToRoleEndpointData, RbacAddPermissionToRoleEndpointResponse, RbacRemovePermissionFromRoleEndpointData, RbacRemovePermissionFromRoleEndpointResponse, RbacAssignRoleToUserEndpointData, RbacAssignRoleToUserEndpointResponse, RbacRemoveRoleFromUserEndpointData, RbacRemoveRoleFromUserEndpointResponse, RbacGetUserRolesEndpointData, RbacGetUserRolesEndpointResponse, RbacGetUserPermissionsEndpointData, RbacGetUserPermissionsEndpointResponse, RbacGetPermissionsCatalogResponse, TasksEnqueueTaskData, TasksEnqueueTaskResponse, TasksListTasksData, TasksListTasksResponse, TasksGetTaskData, TasksGetTaskResponse, TasksCancelTaskData, TasksCancelTaskResponse, TasksListAllTasksData, TasksListAllTasksResponse, TasksGetTaskByJobIdData, TasksGetTaskByJobIdResponse, TenantsListTenantsData, TenantsListTenantsResponse, TenantsCreateTenantData, TenantsCreateTenantResponse, TenantsUpdateTenantData, TenantsUpdateTenantResponse, TenantsDeleteTenantData, TenantsDeleteTenantResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, UtilsGetAppConfigResponse } from './types.gen';
 
 export class AdminService {
     /**
      * Get Jobs Stats
      * Get statistics about all background jobs (superuser only).
+     *
+     * Status counts come from the DB (persistent history).
+     * Queue stats reflect the live RQ pending depth.
      * @returns JobsStatsResponse Successful Response
      * @throws ApiError
      */
@@ -21,12 +24,12 @@ export class AdminService {
     
     /**
      * Get Jobs List
-     * List jobs from a specific queue (superuser only).
+     * List tasks from the DB (superuser only).
      *
      * Query parameters:
-     * - queue: "high", "default", or "low"
-     * - status_filter: Filter by status (queued, started, finished, failed, etc)
-     * - limit: Max results to return (default 50)
+     * - queue: filter by queue name ("high", "default", "low")
+     * - status_filter: filter by status (queued, running, completed, failed, cancelled)
+     * - limit: max results to return (default 50)
      * @param data The data for the request.
      * @param data.queue
      * @param data.statusFilter
@@ -885,10 +888,10 @@ export class RbacService {
 export class TasksService {
     /**
      * Enqueue Task
-     * Enqueue a background task. Returns the job ID immediately.
+     * Create a DB task record and enqueue it for background processing.
      * @param data The data for the request.
      * @param data.requestBody
-     * @returns JobStatusResponse Successful Response
+     * @returns TaskPublic Successful Response
      * @throws ApiError
      */
     public static enqueueTask(data: TasksEnqueueTaskData): CancelablePromise<TasksEnqueueTaskResponse> {
@@ -904,19 +907,27 @@ export class TasksService {
     }
     
     /**
-     * Get Job Status
-     * Check the status of an enqueued job.
+     * List Tasks
+     * List the current user's tasks.
      * @param data The data for the request.
-     * @param data.jobId
-     * @returns JobStatusResponse Successful Response
+     * @param data.status
+     * @param data.taskType
+     * @param data.queue
+     * @param data.skip
+     * @param data.limit
+     * @returns TasksPublic Successful Response
      * @throws ApiError
      */
-    public static getJobStatus(data: TasksGetJobStatusData): CancelablePromise<TasksGetJobStatusResponse> {
+    public static listTasks(data: TasksListTasksData = {}): CancelablePromise<TasksListTasksResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/tasks/{job_id}',
-            path: {
-                job_id: data.jobId
+            url: '/api/v1/tasks/',
+            query: {
+                status: data.status,
+                task_type: data.taskType,
+                queue: data.queue,
+                skip: data.skip,
+                limit: data.limit
             },
             errors: {
                 422: 'Validation Error'
@@ -925,17 +936,88 @@ export class TasksService {
     }
     
     /**
-     * Cancel Job
-     * Cancel a queued job (superuser only).
+     * Get Task
+     * Get a task by its database ID.
      * @param data The data for the request.
-     * @param data.jobId
-     * @returns string Successful Response
+     * @param data.taskId
+     * @returns TaskPublic Successful Response
      * @throws ApiError
      */
-    public static cancelJob(data: TasksCancelJobData): CancelablePromise<TasksCancelJobResponse> {
+    public static getTask(data: TasksGetTaskData): CancelablePromise<TasksGetTaskResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/tasks/{task_id}',
+            path: {
+                task_id: data.taskId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Cancel Task
+     * Cancel a queued or running task.
+     * @param data The data for the request.
+     * @param data.taskId
+     * @returns TaskPublic Successful Response
+     * @throws ApiError
+     */
+    public static cancelTask(data: TasksCancelTaskData): CancelablePromise<TasksCancelTaskResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/v1/tasks/{job_id}',
+            url: '/api/v1/tasks/{task_id}',
+            path: {
+                task_id: data.taskId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * List All Tasks
+     * List all tasks across all users (superuser only).
+     * @param data The data for the request.
+     * @param data.status
+     * @param data.taskType
+     * @param data.queue
+     * @param data.skip
+     * @param data.limit
+     * @returns TasksPublic Successful Response
+     * @throws ApiError
+     */
+    public static listAllTasks(data: TasksListAllTasksData = {}): CancelablePromise<TasksListAllTasksResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/tasks/admin/all',
+            query: {
+                status: data.status,
+                task_type: data.taskType,
+                queue: data.queue,
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Task By Job Id
+     * Look up a task by its RQ job ID (legacy support).
+     * @param data The data for the request.
+     * @param data.jobId
+     * @returns LegacyJobStatusResponse Successful Response
+     * @throws ApiError
+     */
+    public static getTaskByJobId(data: TasksGetTaskByJobIdData): CancelablePromise<TasksGetTaskByJobIdResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/tasks/by-job/{job_id}',
             path: {
                 job_id: data.jobId
             },

@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import { AdminService } from "@/client"
 import {
   Card,
   CardContent,
@@ -28,24 +29,10 @@ const COLORS = [
   "#ec4899",
 ]
 
-// Fetch stats directly from API
-const fetchJobsStats = async () => {
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1"}/admin/jobs/stats`,
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
-      },
-    },
-  )
-  if (!response.ok) throw new Error("Failed to fetch job stats")
-  return response.json()
-}
-
 export const JobStatusChart = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "jobs", "stats"],
-    queryFn: fetchJobsStats,
+    queryFn: () => AdminService.getJobsStats(),
     refetchInterval: 5000, // Refresh every 5 seconds
   })
 
@@ -54,12 +41,11 @@ export const JobStatusChart = () => {
 
   const chartData = [
     { name: "Queued", value: data.status_counts.queued },
-    { name: "Started", value: data.status_counts.started },
-    { name: "Finished", value: data.status_counts.finished },
+    { name: "Running", value: data.status_counts.running },
+    { name: "Completed", value: data.status_counts.completed },
     { name: "Failed", value: data.status_counts.failed },
-    { name: "Deferred", value: data.status_counts.deferred },
-    { name: "Stopped", value: data.status_counts.stopped },
-  ].filter((item) => item.value > 0)
+    { name: "Cancelled", value: data.status_counts.cancelled },
+  ].filter((item) => (item.value ?? 0) > 0)
 
   return (
     <Card>
@@ -104,7 +90,7 @@ export const JobStatusChart = () => {
 export const QueueDistributionChart = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "jobs", "stats"],
-    queryFn: fetchJobsStats,
+    queryFn: () => AdminService.getJobsStats(),
     refetchInterval: 5000,
   })
 
@@ -141,7 +127,7 @@ export const QueueDistributionChart = () => {
 export const JobsStatsSummary = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "jobs", "stats"],
-    queryFn: fetchJobsStats,
+    queryFn: () => AdminService.getJobsStats(),
     refetchInterval: 5000,
   })
 
@@ -163,12 +149,12 @@ export const JobsStatsSummary = () => {
     },
     {
       label: "Running",
-      value: status_counts.started,
+      value: status_counts.running,
       color: "bg-purple-100 text-purple-800",
     },
     {
-      label: "Finished",
-      value: status_counts.finished,
+      label: "Completed",
+      value: status_counts.completed,
       color: "bg-green-100 text-green-800",
     },
     {

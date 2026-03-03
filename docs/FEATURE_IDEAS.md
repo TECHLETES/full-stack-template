@@ -16,10 +16,6 @@ This document collects suggested features, grouped and briefly described, to imp
 - RBAC + ABAC: role-based access control helpers and attribute-based policy examples.
 - Multi-tenant hooks: tenant scoping patterns, tenant admin APIs, and sample migrations.
 
-## Real-time & Background
-- WebSockets & Pub/Sub: example notifications channel (Redis-backed) and client usage patterns.
-- Background jobs: worker and queue (Celery/RQ/Prefect) with example job and scheduler entry.
-
 ## Data & Storage
 - File storage: S3-compatible upload flow, signed URL generation, and local dev fallback.
 - Search: Postgres full-text examples plus optional Meili/Elastic integration and indexing job.

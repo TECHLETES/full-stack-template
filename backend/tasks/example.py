@@ -15,7 +15,9 @@ import time
 logger = logging.getLogger(__name__)
 
 
-def send_email_task(to: str, subject: str, _body: str) -> dict[str, str]:
+def send_email_task(
+    to: str, subject: str, _body: str, _task_id: str | None = None
+) -> dict[str, str]:
     """Simulate sending a transactional email in the background.
 
     In production, replace the body with actual email-sending logic using
@@ -28,7 +30,9 @@ def send_email_task(to: str, subject: str, _body: str) -> dict[str, str]:
     return {"status": "sent", "to": to, "subject": subject}
 
 
-def export_data_task(user_id: str, format: str = "csv") -> dict[str, str]:
+def export_data_task(
+    user_id: str, format: str = "csv", _task_id: str | None = None
+) -> dict[str, str]:
     """Simulate a long-running data export.
 
     Replace with real DB queries and file generation; write the result to
@@ -43,7 +47,7 @@ def export_data_task(user_id: str, format: str = "csv") -> dict[str, str]:
     return {"status": "complete", "filename": filename}
 
 
-def process_file_task(file_id: str) -> dict[str, str]:
+def process_file_task(file_id: str, _task_id: str | None = None) -> dict[str, str]:
     """Simulate post-upload file processing (e.g. thumbnail generation, OCR).
 
     Replace with real processing logic; load the file via

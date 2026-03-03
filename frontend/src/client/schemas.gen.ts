@@ -83,31 +83,6 @@ export const Body_login_login_access_tokenSchema = {
     title: 'Body_login-login_access_token'
 } as const;
 
-export const EnqueueRequestSchema = {
-    properties: {
-        task: {
-            type: 'string',
-            enum: ['send_email', 'export_data', 'process_file'],
-            title: 'Task'
-        },
-        queue: {
-            type: 'string',
-            enum: ['default', 'high', 'low'],
-            title: 'Queue',
-            default: 'default'
-        },
-        kwargs: {
-            additionalProperties: true,
-            type: 'object',
-            title: 'Kwargs',
-            default: {}
-        }
-    },
-    type: 'object',
-    required: ['task'],
-    title: 'EnqueueRequest'
-} as const;
-
 export const EntraLoginRequestSchema = {
     properties: {
         access_token: {
@@ -373,6 +348,17 @@ export const JobInfoSchema = {
             type: 'string',
             title: 'Queue'
         },
+        owner_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Owner Id'
+        },
         created_at: {
             anyOf: [
                 {
@@ -419,14 +405,14 @@ export const JobStatusCountSchema = {
             title: 'Queued',
             default: 0
         },
-        started: {
+        running: {
             type: 'integer',
-            title: 'Started',
+            title: 'Running',
             default: 0
         },
-        finished: {
+        completed: {
             type: 'integer',
-            title: 'Finished',
+            title: 'Completed',
             default: 0
         },
         failed: {
@@ -434,54 +420,14 @@ export const JobStatusCountSchema = {
             title: 'Failed',
             default: 0
         },
-        deferred: {
+        cancelled: {
             type: 'integer',
-            title: 'Deferred',
-            default: 0
-        },
-        canceled: {
-            type: 'integer',
-            title: 'Canceled',
-            default: 0
-        },
-        stopped: {
-            type: 'integer',
-            title: 'Stopped',
+            title: 'Cancelled',
             default: 0
         }
     },
     type: 'object',
     title: 'JobStatusCount'
-} as const;
-
-export const JobStatusResponseSchema = {
-    properties: {
-        job_id: {
-            type: 'string',
-            title: 'Job Id'
-        },
-        status: {
-            type: 'string',
-            title: 'Status'
-        },
-        result: {
-            title: 'Result'
-        },
-        error: {
-            anyOf: [
-                {
-                    type: 'string'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Error'
-        }
-    },
-    type: 'object',
-    required: ['job_id', 'status'],
-    title: 'JobStatusResponse'
 } as const;
 
 export const JobsListResponseSchema = {
@@ -523,6 +469,127 @@ export const JobsStatsResponseSchema = {
     type: 'object',
     required: ['status_counts', 'queue_stats', 'total_jobs'],
     title: 'JobsStatsResponse'
+} as const;
+
+export const LegacyJobStatusResponseSchema = {
+    properties: {
+        task_type: {
+            type: 'string',
+            maxLength: 100,
+            title: 'Task Type'
+        },
+        queue: {
+            type: 'string',
+            maxLength: 50,
+            title: 'Queue',
+            default: 'default'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        rq_job_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Rq Job Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        kwargs: {
+            additionalProperties: true,
+            type: 'object',
+            title: 'Kwargs',
+            default: {}
+        },
+        result: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Result'
+        },
+        error: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Error'
+        },
+        owner_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Owner Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        started_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Started At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        },
+        job_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Job Id'
+        }
+    },
+    type: 'object',
+    required: ['task_type', 'id', 'status', 'owner_id'],
+    title: 'LegacyJobStatusResponse',
+    description: 'Backwards-compatible response that includes job_id alias.'
 } as const;
 
 export const MessageSchema = {
@@ -1115,6 +1182,158 @@ export const RolesPublicSchema = {
     type: 'object',
     required: ['data', 'count'],
     title: 'RolesPublic'
+} as const;
+
+export const TaskCreateSchema = {
+    properties: {
+        task_type: {
+            type: 'string',
+            enum: ['send_email', 'export_data', 'process_file'],
+            title: 'Task Type'
+        },
+        queue: {
+            type: 'string',
+            enum: ['default', 'high', 'low'],
+            title: 'Queue',
+            default: 'default'
+        },
+        kwargs: {
+            additionalProperties: true,
+            type: 'object',
+            title: 'Kwargs'
+        }
+    },
+    type: 'object',
+    required: ['task_type'],
+    title: 'TaskCreate'
+} as const;
+
+export const TaskPublicSchema = {
+    properties: {
+        task_type: {
+            type: 'string',
+            maxLength: 100,
+            title: 'Task Type'
+        },
+        queue: {
+            type: 'string',
+            maxLength: 50,
+            title: 'Queue',
+            default: 'default'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        rq_job_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Rq Job Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        kwargs: {
+            additionalProperties: true,
+            type: 'object',
+            title: 'Kwargs',
+            default: {}
+        },
+        result: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Result'
+        },
+        error: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Error'
+        },
+        owner_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Owner Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        started_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Started At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        }
+    },
+    type: 'object',
+    required: ['task_type', 'id', 'status', 'owner_id'],
+    title: 'TaskPublic'
+} as const;
+
+export const TasksPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/TaskPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'TasksPublic'
 } as const;
 
 export const TokenSchema = {

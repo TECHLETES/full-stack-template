@@ -1,6 +1,6 @@
 import uuid
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import EmailStr
 from sqlalchemy import Column, DateTime
@@ -81,6 +81,7 @@ class User(UserBase, table=True):
 
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
     files: list["File"] = Relationship(back_populates="owner", cascade_delete=True)
+    tasks: list["Task"] = Relationship(back_populates="owner", cascade_delete=True)
     tenant_roles: list["UserTenantRole"] = Relationship(
         back_populates="user", cascade_delete=True
     )
@@ -329,6 +330,71 @@ class File(FileBase, table=True):
         foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     owner: User | None = Relationship(back_populates="files")
+
+
+# ---------------------------------------------------------------------------
+# Background Task Models
+# ---------------------------------------------------------------------------
+
+TASK_STATUS_QUEUED = "queued"
+TASK_STATUS_RUNNING = "running"
+TASK_STATUS_COMPLETED = "completed"
+TASK_STATUS_FAILED = "failed"
+TASK_STATUS_CANCELLED = "cancelled"
+
+
+class TaskBase(SQLModel):
+    task_type: str = Field(max_length=100)
+    queue: str = Field(default="default", max_length=50)
+
+
+class TaskCreate(TaskBase):
+    task_type: Literal["send_email", "export_data", "process_file"]
+    queue: Literal["default", "high", "low"] = "default"
+    kwargs: dict[str, Any] = Field(default_factory=dict)
+
+
+class Task(TaskBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    rq_job_id: str | None = Field(default=None, index=True, max_length=255)
+    status: str = Field(default=TASK_STATUS_QUEUED)
+    kwargs: dict[str, Any] = Field(default_factory=dict, sa_column=Column(JSON))
+    result: dict[str, Any] | None = Field(default=None, sa_column=Column(JSON))
+    error: str | None = Field(default=None)
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
+    )
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    started_at: datetime | None = Field(
+        default=None,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    completed_at: datetime | None = Field(
+        default=None,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    owner: User | None = Relationship(back_populates="tasks")
+
+
+class TaskPublic(TaskBase):
+    id: uuid.UUID
+    rq_job_id: str | None = None
+    status: str
+    kwargs: dict[str, Any] = {}
+    result: dict[str, Any] | None = None
+    error: str | None = None
+    owner_id: uuid.UUID
+    created_at: datetime | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+
+
+class TasksPublic(SQLModel):
+    data: list[TaskPublic]
+    count: int
 
 
 # Generic message
