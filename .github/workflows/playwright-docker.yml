@@ -122,24 +122,12 @@ jobs:
 
       - name: Create .env file for backend
         run: |
-          cat > .env << EOF
-          ENVIRONMENT=testing
-          SECRET_KEY=test-secret-key-for-testing-only-not-secure
-          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/app
-          POSTGRES_USER=postgres
-          POSTGRES_PASSWORD=postgres
-          POSTGRES_DB=app
-          POSTGRES_SERVER=localhost
-          POSTGRES_PORT=5432
-          FIRST_SUPERUSER=admin@example.com
-          FIRST_SUPERUSER_PASSWORD=password123
-          BACKEND_CORS_ORIGINS=["http://localhost:5173","http://localhost:8000"]
-          FRONTEND_HOST=http://localhost:5173
-          REDIS_URL=redis://localhost:6379
-          SMTP_HOST=mailcatcher
-          SMTP_PORT=1025
-          EMAILS_ENABLED=false
-          EOF
+          cp .env.template .env
+          # Override for CI (host networking - postgres/redis exposed on localhost)
+          sed -i 's/^SECRET_KEY=.*/SECRET_KEY=test-secret-key-for-testing-only-not-secure/' .env
+          sed -i 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=postgres/' .env
+          sed -i 's/^FIRST_SUPERUSER=.*/FIRST_SUPERUSER=admin@example.com/' .env
+          sed -i 's/^FIRST_SUPERUSER_PASSWORD=.*/FIRST_SUPERUSER_PASSWORD=password123/' .env
 
       - name: Start backend from Docker image
         run: |
