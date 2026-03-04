@@ -1,5 +1,19 @@
 # FastAPI Project - Development
 
+## Design System
+
+All UI/UX development is guided by the **[design-brief.json](../frontend/design-brief.json)** specification. This document defines:
+
+- **Layout System**: Navigation sidebar, top utility bar, content grid, responsive behavior
+- **Design Tokens**: Spacing, radius values, borders, shadows, typography scales
+- **Color System**: Brand orange accent, neutral grays for light/dark modes, accent colors (success, danger, warning, info)
+- **Component Patterns**: Cards, metric tiles, tables, buttons, input fields, badges, charts
+- **Interaction States**: Hover, active, disabled, focus states
+- **Accessibility**: Contrast requirements, keyboard navigation, color independence
+- **Dark Mode**: Adaptations for reduced shadow reliance and increased border visibility
+
+When building new UI components or pages, refer to the design brief for consistent spacing, colors, typography, and behavior.
+
 ## Docker Compose
 
 * Start the local stack with Docker Compose:

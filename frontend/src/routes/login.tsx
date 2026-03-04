@@ -48,7 +48,7 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       {
-        title: "Log In - Techletes Fullstack Template",
+        title: "Log In - Techletes",
       },
     ],
   }),
@@ -84,8 +84,13 @@ function Login() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Login to your account</h1>
+          <div className="flex flex-col items-center gap-2 text-center mb-6">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Login to your account
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Enter your credentials to continue
+            </p>
           </div>
 
           {isEntraEnabled() && (

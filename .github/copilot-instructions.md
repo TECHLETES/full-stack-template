@@ -469,6 +469,20 @@ src/routes/
 
 ---
 
+## Design System Reference
+
+**All UI/UX development uses [frontend/design-brief.json](../../frontend/design-brief.json)** as the authoritative design reference.
+
+This includes:
+- Layout system, spacing tokens, and responsive breakpoints
+- Component patterns (cards, buttons, forms, tables, badges, etc.)
+- Color system with brand orange and neutral grays
+- Typography scale and font weights
+- Dark mode specifications
+- Interaction states and accessibility requirements
+
+When suggesting UI changes or reviewing component design, align recommendations with the design brief.
+
 ## When to Ask Me (Agent) Questions
 
 - **Architecture decisions**: Suggest where to add new features (backend route + DB model vs frontend component)
@@ -477,6 +491,7 @@ src/routes/
 - **Type safety**: Help with TypeScript schema validation
 - **Performance**: Suggest optimizations for queries, caching, pagination
 - **Testing**: Recommend test coverage, fixtures, mocking strategies
+- **Design alignment**: Verify component designs match the design brief specifications
 
 ---
 

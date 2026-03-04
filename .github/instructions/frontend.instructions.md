@@ -6,6 +6,27 @@ applyTo: frontend/src/**/*.tsx, frontend/src/**/*.ts, frontend/tests/**/*.ts
 
 # Frontend Development Instructions
 
+## Design Reference
+
+**All UI/UX decisions must align with [frontend/design-brief.json](../../../frontend/design-brief.json).**
+
+This design brief is the authoritative reference for:
+- Layout system and responsive breakpoints
+- Component design patterns (cards, buttons, forms, tables, charts)
+- Color system (brand orange, neutral grays, accent colors)
+- Typography and spacing tokens
+- Dark mode adaptations
+- Interaction patterns and states
+- Accessibility requirements
+
+When creating new components or modifying existing ones, consult the design brief for:
+- Spacing and padding values
+- Radius values for cards and buttons
+- Color usage and contrast requirements
+- Font sizes and weights
+- Responsive behavior
+- Interactive states (hover, active, disabled)
+
 ## Project Setup & Configuration
 
 ### TypeScript Configuration

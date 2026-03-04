@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
   TableBody,
@@ -18,13 +19,20 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  QUEUE_FILTER_OPTIONS,
+  STATUS_BADGE_MAP,
+  STATUS_FILTER_OPTIONS,
+} from "./data"
 
-const statusColors: Record<string, string> = {
-  queued: "bg-yellow-100 text-yellow-800",
-  running: "bg-blue-100 text-blue-800",
-  completed: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
-  cancelled: "bg-purple-100 text-purple-800",
+function TableSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Skeleton key={i} className="h-10 w-full rounded-xl" />
+      ))}
+    </div>
+  )
 }
 
 export const JobsList = () => {
@@ -46,15 +54,13 @@ export const JobsList = () => {
     refetchInterval: 5000,
   })
 
-  if (isLoading) return <div>Loading jobs...</div>
-
   const jobs = data?.jobs || []
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recent Jobs</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-sm font-semibold">Recent Jobs</CardTitle>
+        <CardDescription className="text-xs">
           View detailed information about background tasks
         </CardDescription>
       </CardHeader>
@@ -65,15 +71,19 @@ export const JobsList = () => {
             value={selectedQueue ?? "all"}
             onValueChange={(val) =>
               setSelectedQueue(
-                val === "all" ? undefined : (val as "high" | "default" | "low"),
+                val === "all"
+                  ? undefined
+                  : (val as (typeof QUEUE_FILTER_OPTIONS)[number]),
               )
             }
           >
             <TabsList>
               <TabsTrigger value="all">All Queues</TabsTrigger>
-              <TabsTrigger value="high">High Priority</TabsTrigger>
-              <TabsTrigger value="default">Default Priority</TabsTrigger>
-              <TabsTrigger value="low">Low Priority</TabsTrigger>
+              {QUEUE_FILTER_OPTIONS.map((q) => (
+                <TabsTrigger key={q} value={q} className="capitalize">
+                  {q} Priority
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
 
@@ -86,69 +96,69 @@ export const JobsList = () => {
             >
               All Statuses
             </Badge>
-            {["queued", "running", "completed", "failed", "cancelled"].map(
-              (status) => (
-                <Badge
-                  key={status}
-                  variant={selectedStatus === status ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => setSelectedStatus(status)}
-                >
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </Badge>
-              ),
-            )}
+            {STATUS_FILTER_OPTIONS.map((status) => (
+              <Badge
+                key={status}
+                variant={selectedStatus === status ? "default" : "outline"}
+                className="cursor-pointer capitalize"
+                onClick={() => setSelectedStatus(status)}
+              >
+                {status}
+              </Badge>
+            ))}
           </div>
 
           {/* Jobs Table */}
-          {jobs.length > 0 ? (
+          {isLoading ? (
+            <TableSkeleton />
+          ) : jobs.length > 0 ? (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[200px]">Job ID</TableHead>
-                    <TableHead className="w-[150px]">Task Type</TableHead>
-                    <TableHead className="w-[100px]">Status</TableHead>
-                    <TableHead className="w-[100px]">Queue</TableHead>
-                    <TableHead className="w-[150px]">Created</TableHead>
-                    <TableHead className="w-[150px]">Started</TableHead>
-                    <TableHead className="w-[150px]">Ended</TableHead>
+                    <TableHead>Job ID</TableHead>
+                    <TableHead>Task Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Queue</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Started</TableHead>
+                    <TableHead>Ended</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {jobs.map((job) => (
                     <TableRow key={job.id}>
                       <TableCell className="font-mono text-xs">
-                        {job.id.slice(0, 12)}...
+                        {job.id.slice(0, 12)}…
                       </TableCell>
-                      <TableCell className="font-mono text-sm">
+                      <TableCell className="font-mono text-xs">
                         {job.func}
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={
-                            statusColors[job.status] ||
-                            "bg-gray-100 text-gray-800"
-                          }
+                          variant={STATUS_BADGE_MAP[job.status] ?? "neutral"}
+                          className="capitalize"
                         >
                           {job.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-sm">{job.queue}</TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm capitalize">
+                        {job.queue}
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground tabular-nums">
                         {job.created_at
                           ? new Date(job.created_at).toLocaleTimeString()
-                          : "-"}
+                          : "–"}
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs text-muted-foreground tabular-nums">
                         {job.started_at
                           ? new Date(job.started_at).toLocaleTimeString()
-                          : "-"}
+                          : "–"}
                       </TableCell>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-xs text-muted-foreground tabular-nums">
                         {job.ended_at
                           ? new Date(job.ended_at).toLocaleTimeString()
-                          : "-"}
+                          : "–"}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -156,7 +166,9 @@ export const JobsList = () => {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">No jobs found</div>
+            <div className="flex h-32 items-center justify-center text-sm text-muted-foreground">
+              No jobs found
+            </div>
           )}
         </div>
       </CardContent>

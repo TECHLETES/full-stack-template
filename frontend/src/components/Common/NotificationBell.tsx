@@ -11,10 +11,10 @@ import { Separator } from "@/components/ui/separator"
 import { type Notification, useNotifications } from "@/hooks/useNotifications"
 
 const TYPE_COLOUR: Record<Notification["type"], string> = {
-  info: "text-blue-500",
-  success: "text-green-500",
-  warning: "text-yellow-500",
-  error: "text-red-500",
+  info: "text-info",
+  success: "text-success",
+  warning: "text-warning",
+  error: "text-destructive",
 }
 
 function formatTime(iso: string): string {
