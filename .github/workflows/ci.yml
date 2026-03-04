@@ -49,6 +49,26 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Cache frontend dependencies
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install frontend dependencies
+        run: bun ci
+        working-directory: frontend
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('frontend/package.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
       - name: Cache pre-commit hooks
         uses: actions/cache@v4
         with:
@@ -59,6 +79,12 @@ jobs:
 
       - name: Run pre-commit hooks
         run: uv run pre-commit run --all-files
+        env:
+          PROJECT_NAME: "Full Stack Template"
+          POSTGRES_SERVER: "localhost"
+          POSTGRES_USER: "postgres"
+          FIRST_SUPERUSER: "admin@example.com"
+          FIRST_SUPERUSER_PASSWORD: "testpassword"
 
       - name: Run tests
         run: uv run bash scripts/test.sh "Coverage for ${{ github.sha }}"
