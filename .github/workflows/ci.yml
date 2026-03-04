@@ -95,6 +95,7 @@ jobs:
           POSTGRES_USER: "postgres"
           FIRST_SUPERUSER: "admin@example.com"
           FIRST_SUPERUSER_PASSWORD: "testpassword"
+          EMAILS_FROM_EMAIL: "test@example.com"
       - name: Store coverage files
         uses: actions/upload-artifact@v6
         with:
