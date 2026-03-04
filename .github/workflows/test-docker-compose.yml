@@ -29,6 +29,21 @@ jobs:
 
   test-docker-compose:
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: "test-secret-key-for-ci"
+      DOCKER_IMAGE_BACKEND: "backend"
+      TAG: "latest"
+      POSTGRES_PASSWORD: "testdb"
+      POSTGRES_USER: "testuser"
+      POSTGRES_DB: "testdb"
+      POSTGRES_PORT: "5432"
+      FRONTEND_HOST: "http://localhost"
+      DOMAIN: "localhost"
+      ENVIRONMENT: "local"
+      FIRST_SUPERUSER: "admin@example.com"
+      FIRST_SUPERUSER_PASSWORD: "testpassword"
+      EMAILS_FROM_EMAIL: "test@example.com"
+      BACKEND_CORS_ORIGINS: "http://localhost"
     steps:
       - name: Checkout
         uses: actions/checkout@v6
