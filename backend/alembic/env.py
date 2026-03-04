@@ -19,11 +19,10 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from backend.models import SQLModel  # noqa
-from backend.core.config import settings # noqa
-
 # Import models to ensure they're registered with metadata
 import backend.models as models  # noqa
+from backend.core.config import settings  # noqa
+from backend.models import SQLModel  # noqa
 
 target_metadata = SQLModel.metadata
 
@@ -33,7 +32,7 @@ target_metadata = SQLModel.metadata
 # ... etc.
 
 
-def get_url():
+def get_url() -> str:
     return str(settings.SQLALCHEMY_DATABASE_URI)
 
 

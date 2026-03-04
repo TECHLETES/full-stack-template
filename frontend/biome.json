@@ -1,6 +1,17 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.4/schema.json",
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
   "files": {
     "includes": [
       "**",
@@ -13,22 +24,6 @@
       "!**/playwright.config.ts"
     ]
   },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noArrayIndexKey": "off"
-      },
-      "style": {
-        "noNonNullAssertion": "off",
-        "noParameterAssign": "error",
-        "useSelfClosingElements": "error",
-        "noUselessElse": "error"
-      }
-    }
-  },
   "formatter": {
     "indentStyle": "space"
   },
@@ -38,9 +33,20 @@
       "semicolons": "asNeeded"
     }
   },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noNonNullAssertion": "off",
+        "noParameterAssign": "error",
+        "noUselessElse": "error",
+        "useSelfClosingElements": "error"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off",
+        "noExplicitAny": "off"
+      }
     }
   }
 }

@@ -1,19 +1,20 @@
 from collections.abc import Generator
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
 from testcontainers.postgres import PostgresContainer
 
+# Import all models so SQLModel.metadata knows about every table
+import backend.models  # noqa: F401
 from backend.api.deps import get_db
 from backend.core.config import settings
-from backend.core.db import init_db, get_engine
+from backend.core.db import get_engine, init_db
 from backend.main import app
 from backend.tests.utils.user import authentication_token_from_email
 from backend.tests.utils.utils import get_superuser_token_headers
-
-# Import all models so SQLModel.metadata knows about every table
-import backend.models  # noqa: F401
 
 
 @pytest.fixture(scope="session")
@@ -23,7 +24,7 @@ def _postgres_container() -> Generator[PostgresContainer, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _engine(_postgres_container: PostgresContainer):
+def _engine(_postgres_container: PostgresContainer) -> Engine:
     url = _postgres_container.get_connection_url()
     engine = create_engine(url)
     SQLModel.metadata.create_all(engine)
@@ -34,13 +35,13 @@ def _engine(_postgres_container: PostgresContainer):
 
 
 @pytest.fixture(autouse=True)
-def db(_engine) -> Generator[Session, None, None]:
+def db(_engine: Any) -> Generator[Session, None, None]:
     with Session(_engine) as session:
         yield session
 
 
 @pytest.fixture(scope="module")
-def client(_engine) -> Generator[TestClient, None, None]:
+def client(_engine: Any) -> Generator[TestClient, None, None]:
     def _get_test_db() -> Generator[Session, None, None]:
         with Session(_engine) as session:
             yield session
@@ -57,7 +58,7 @@ def superuser_token_headers(client: TestClient) -> dict[str, str]:
 
 
 @pytest.fixture(scope="module")
-def normal_user_token_headers(client: TestClient, _engine) -> dict[str, str]:
+def normal_user_token_headers(client: TestClient, _engine: Any) -> dict[str, str]:
     with Session(_engine) as session:
         return authentication_token_from_email(
             client=client, email=settings.EMAIL_TEST_USER, db=session

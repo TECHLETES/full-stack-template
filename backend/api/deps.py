@@ -1,5 +1,5 @@
-from collections.abc import Generator
-from typing import Annotated
+from collections.abc import Callable, Generator
+from typing import Annotated, cast
 
 import jwt
 from fastapi import Depends, HTTPException, status
@@ -27,7 +27,7 @@ SessionDep = Annotated[Session, Depends(get_db)]
 TokenDep = Annotated[str, Depends(reusable_oauth2)]
 
 
-def get_current_user(session: SessionDep, token: TokenDep) -> User:
+def get_current_user(session: SessionDep, token: TokenDep) -> User | None:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -43,7 +43,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    return user
+    return cast(User, user)
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
@@ -60,7 +60,7 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
 SuperUserDep = Annotated[User, Depends(get_current_active_superuser)]
 
 
-def require_role(*required_roles: str):  # type: ignore[no-untyped-def]
+def require_role(*required_roles: str) -> Callable[[CurrentUser], User]:
     """Dependency to check if user has any of the required Azure roles."""
 
     def check_role(current_user: CurrentUser) -> User:

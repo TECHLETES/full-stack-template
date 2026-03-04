@@ -1,7 +1,302 @@
 {
+  "accessibility": {
+    "colorUsage": [
+      "Do not rely solely on color for meaning",
+      "Use arrows or icons for metric changes"
+    ],
+    "contrast": "All text meets WCAG AA contrast",
+    "keyboardNavigation": [
+      "Full keyboard access for navigation",
+      "Logical tab order",
+      "Search field shortcut supported"
+    ]
+  },
+  "colorSystem": {
+    "accentColors": {
+      "danger": "#EF4444",
+      "info": "#38BDF8",
+      "success": "#22C55E",
+      "warning": "#F59E0B"
+    },
+    "brandColor": "#ffa500",
+    "complexMedia": {
+      "gradientStyle": "Subtle gradients based on orange tones with abstract shapes or line patterns",
+      "gradientUsage": [
+        "Hero cards",
+        "Highlighted dashboards",
+        "Decorative card surfaces"
+      ]
+    },
+    "neutralGrays": {
+      "darkMode": {
+        "appBackground": "#0B1220",
+        "border": "#1F2A3A",
+        "cardSurface": "#0F172A",
+        "sidebarBackground": "#0F1B2D",
+        "textMuted": "#94A3B8",
+        "textPrimary": "#E5E7EB"
+      },
+      "lightMode": {
+        "appBackground": "#EEF2F6",
+        "border": "#E6EBF0",
+        "cardSurface": "#FFFFFF",
+        "sidebarBackground": "#F7F9FB",
+        "textMuted": "#6B7280",
+        "textPrimary": "#0F172A"
+      }
+    },
+    "palettes": {
+      "primary": {
+        "approx": {
+          "100": "#fff1cc",
+          "200": "#ffdc99",
+          "300": "#ffc966",
+          "400": "#ffb733",
+          "500": "#ffa500",
+          "600": "#e69500",
+          "700": "#cc8400",
+          "800": "#a66d00",
+          "900": "#7a5200"
+        },
+        "intent": "Main brand accent for CTAs, highlights, focus states, and important UI emphasis",
+        "name": "Techletes Orange"
+      },
+      "secondary": {
+        "approx": {
+          "100": "#fef3c7",
+          "200": "#fde68a",
+          "300": "#fcd34d",
+          "400": "#fbbf24",
+          "500": "#f59e0b",
+          "600": "#d48806",
+          "700": "#b57300",
+          "800": "#8f5a00",
+          "900": "#6b4200"
+        },
+        "intent": "Complementary accent surfaces and hover states derived from the brand orange",
+        "name": "Amber Gold"
+      }
+    }
+  },
+  "coreComponents": {
+    "badges": {
+      "shape": "pill",
+      "types": ["success", "warning", "danger", "neutral"]
+    },
+    "buttons": {
+      "primary": {
+        "background": "primary orange",
+        "hover": "slightly darker orange",
+        "text": "white"
+      },
+      "secondary": {
+        "background": "neutral surface",
+        "border": "neutral border"
+      },
+      "types": ["primary", "secondary", "ghost", "icon"]
+    },
+    "cards": {
+      "purpose": "Primary container for almost all application UI",
+      "structure": ["optional header", "content area", "optional footer"],
+      "styles": {
+        "background": "neutral surface",
+        "border": "subtle neutral border",
+        "padding": "20 to 24px",
+        "radius": "16px",
+        "shadow": "very light elevation"
+      }
+    },
+    "charts": {
+      "colorUsage": [
+        "primary orange for positive values",
+        "success green for positive metrics",
+        "danger red for negative metrics"
+      ],
+      "style": ["minimal gridlines", "clean axes", "limited color palette"]
+    },
+    "inputs": {
+      "structure": [
+        "icon optional left",
+        "text input",
+        "meta element optional right"
+      ],
+      "types": ["text inputs", "search fields", "dropdowns", "date selectors"]
+    },
+    "metricCards": {
+      "purpose": "Display key metrics or KPIs",
+      "structure": [
+        "icon or label",
+        "large value",
+        "change indicator",
+        "context label"
+      ]
+    },
+    "tables": {
+      "purpose": "Structured data display",
+      "rowBehavior": {
+        "clickableRows": "optional navigation to detail view",
+        "hover": "subtle background highlight"
+      },
+      "structure": [
+        "table header",
+        "data rows",
+        "status badges",
+        "optional secondary metadata lines"
+      ]
+    }
+  },
+  "darkMode": {
+    "adaptations": {
+      "buttons": "brand orange preserved but slightly darker",
+      "cards": "deep slate surfaces",
+      "charts": "muted gridlines and brighter accent colors",
+      "text": "light neutral text"
+    },
+    "principles": [
+      "Layout identical to light mode",
+      "Reduce reliance on shadows",
+      "Increase border visibility",
+      "Maintain brand orange accent for contrast"
+    ]
+  },
+  "designTokens": {
+    "borders": {
+      "dark": "1px slate border",
+      "focusRing": "2px ring using primary brand color",
+      "light": "1px subtle neutral border"
+    },
+    "radii": {
+      "appShell": "24px to 32px",
+      "button": "12px",
+      "card": "16px",
+      "input": "12px",
+      "pill": "9999px"
+    },
+    "shadows": {
+      "cardDark": "minimal shadow relying more on borders",
+      "cardLight": "very soft elevation shadow",
+      "overlay": "stronger shadow for dropdowns and drawers"
+    },
+    "spacing": {
+      "cardPadding": "20px to 24px",
+      "controlGap": "8px to 12px",
+      "pagePadding": {
+        "base": "16px",
+        "lg": "28px",
+        "md": "24px"
+      },
+      "sectionGap": "24px"
+    },
+    "typography": {
+      "fontFamily": "Modern sans serif similar to Inter",
+      "fontWeights": {
+        "medium": 500,
+        "regular": 400,
+        "semibold": 600
+      },
+      "numberFormatting": {
+        "tabular": true
+      },
+      "sizes": {
+        "body": "14px to 15px",
+        "cardTitle": "14px to 16px semibold",
+        "display": "28px to 32px",
+        "displayLarge": "36px to 44px",
+        "small": "12px to 13px"
+      }
+    }
+  },
+  "interactionStates": {
+    "buttons": {
+      "active": "pressed state reducing elevation",
+      "disabled": "reduced opacity",
+      "hover": "slightly darker background or subtle tint"
+    },
+    "inputs": {
+      "focus": "visible ring using primary brand color"
+    },
+    "navigation": {
+      "active": "pill highlight",
+      "hover": "light background highlight"
+    },
+    "tableRows": {
+      "hover": "subtle background tint"
+    }
+  },
+  "layoutSystem": {
+    "appShell": {
+      "container": {
+        "horizontalPadding": {
+          "base": "16px",
+          "lg": "28px",
+          "md": "24px"
+        },
+        "maxWidth": "wide fluid layout"
+      },
+      "pageBackground": {
+        "dark": "deep slate surface behind the application shell",
+        "light": "soft neutral gray surface behind the application shell"
+      },
+      "structure": [
+        "Left navigation sidebar",
+        "Top utility bar",
+        "Scrollable main content region"
+      ]
+    },
+    "contentGrid": {
+      "cardComposition": [
+        "hero cards",
+        "analytics cards",
+        "metric tiles",
+        "tables",
+        "detail panels"
+      ],
+      "columns": {
+        "lgUp": "12 column grid",
+        "md": "6 column grid",
+        "sm": "single column stacking"
+      },
+      "gap": "24px between cards",
+      "structure": "responsive card grid"
+    },
+    "navigationSidebar": {
+      "navigationPattern": {
+        "activeState": "highlight pill background",
+        "expandableItems": "chevron indicator on the right",
+        "groupLabels": "small uppercase muted label above group",
+        "itemStructure": "icon left + text label"
+      },
+      "purpose": "Global navigation across all application modules",
+      "sections": [
+        "Brand header",
+        "Primary navigation group",
+        "Secondary navigation group",
+        "Utility actions",
+        "User profile area"
+      ],
+      "width": {
+        "base": "off canvas drawer",
+        "mdUp": "280px to 304px fixed"
+      }
+    },
+    "topUtilityBar": {
+      "height": "single row with consistent control height",
+      "layout": {
+        "left": ["Global search input"],
+        "right": [
+          "Context filters",
+          "Date range selectors",
+          "Export actions",
+          "Module specific controls"
+        ]
+      },
+      "purpose": "Global search, filters, and contextual actions",
+      "responsive": "wrap into multiple rows on small screens"
+    }
+  },
   "meta": {
-    "productName": "Techletes SaaS application template",
     "designIntent": "A reusable design system and layout model for all Techletes SaaS applications",
+    "productName": "Techletes SaaS application template",
     "uiStyle": {
       "overall": "Modern SaaS product interface combining fintech style dashboards with enterprise application clarity",
       "principles": [
@@ -21,91 +316,7 @@
       ]
     }
   },
-
-  "layoutSystem": {
-    "appShell": {
-      "structure": [
-        "Left navigation sidebar",
-        "Top utility bar",
-        "Scrollable main content region"
-      ],
-      "container": {
-        "maxWidth": "wide fluid layout",
-        "horizontalPadding": {
-          "base": "16px",
-          "md": "24px",
-          "lg": "28px"
-        }
-      },
-      "pageBackground": {
-        "light": "soft neutral gray surface behind the application shell",
-        "dark": "deep slate surface behind the application shell"
-      }
-    },
-
-    "navigationSidebar": {
-      "purpose": "Global navigation across all application modules",
-      "width": {
-        "base": "off canvas drawer",
-        "mdUp": "280px to 304px fixed"
-      },
-      "sections": [
-        "Brand header",
-        "Primary navigation group",
-        "Secondary navigation group",
-        "Utility actions",
-        "User profile area"
-      ],
-      "navigationPattern": {
-        "itemStructure": "icon left + text label",
-        "activeState": "highlight pill background",
-        "groupLabels": "small uppercase muted label above group",
-        "expandableItems": "chevron indicator on the right"
-      }
-    },
-
-    "topUtilityBar": {
-      "purpose": "Global search, filters, and contextual actions",
-      "layout": {
-        "left": ["Global search input"],
-        "right": [
-          "Context filters",
-          "Date range selectors",
-          "Export actions",
-          "Module specific controls"
-        ]
-      },
-      "height": "single row with consistent control height",
-      "responsive": "wrap into multiple rows on small screens"
-    },
-
-    "contentGrid": {
-      "structure": "responsive card grid",
-      "columns": {
-        "lgUp": "12 column grid",
-        "md": "6 column grid",
-        "sm": "single column stacking"
-      },
-      "gap": "24px between cards",
-      "cardComposition": [
-        "hero cards",
-        "analytics cards",
-        "metric tiles",
-        "tables",
-        "detail panels"
-      ]
-    }
-  },
-
   "responsiveBreakpoints": {
-    "tailwindDefaults": {
-      "sm": "640px",
-      "md": "768px",
-      "lg": "1024px",
-      "xl": "1280px",
-      "2xl": "1536px"
-    },
-
     "behavior": {
       "base_lt_sm": [
         "Sidebar becomes off canvas drawer",
@@ -114,270 +325,27 @@
         "Tables become horizontally scrollable",
         "Topbar controls wrap"
       ],
-      "sm": [
-        "Increase padding around cards",
-        "Two column card layout where possible"
-      ],
+      "lg": ["Full card grid enabled", "Two column detail panels possible"],
       "md": [
         "Sidebar becomes fixed",
         "Metric cards form rows of three or two",
         "Tables display more columns"
       ],
-      "lg": ["Full card grid enabled", "Two column detail panels possible"],
+      "sm": [
+        "Increase padding around cards",
+        "Two column card layout where possible"
+      ],
       "xl_2xl": [
         "Whitespace increases",
         "Content remains centered within large viewports"
       ]
+    },
+    "tailwindDefaults": {
+      "2xl": "1536px",
+      "lg": "1024px",
+      "md": "768px",
+      "sm": "640px",
+      "xl": "1280px"
     }
-  },
-
-  "designTokens": {
-    "spacing": {
-      "pagePadding": {
-        "base": "16px",
-        "md": "24px",
-        "lg": "28px"
-      },
-      "cardPadding": "20px to 24px",
-      "sectionGap": "24px",
-      "controlGap": "8px to 12px"
-    },
-
-    "radii": {
-      "appShell": "24px to 32px",
-      "card": "16px",
-      "button": "12px",
-      "input": "12px",
-      "pill": "9999px"
-    },
-
-    "borders": {
-      "light": "1px subtle neutral border",
-      "dark": "1px slate border",
-      "focusRing": "2px ring using primary brand color"
-    },
-
-    "shadows": {
-      "cardLight": "very soft elevation shadow",
-      "cardDark": "minimal shadow relying more on borders",
-      "overlay": "stronger shadow for dropdowns and drawers"
-    },
-
-    "typography": {
-      "fontFamily": "Modern sans serif similar to Inter",
-      "sizes": {
-        "displayLarge": "36px to 44px",
-        "display": "28px to 32px",
-        "cardTitle": "14px to 16px semibold",
-        "body": "14px to 15px",
-        "small": "12px to 13px"
-      },
-      "fontWeights": {
-        "regular": 400,
-        "medium": 500,
-        "semibold": 600
-      },
-      "numberFormatting": {
-        "tabular": true
-      }
-    }
-  },
-
-  "colorSystem": {
-    "brandColor": "#ffa500",
-
-    "palettes": {
-      "primary": {
-        "name": "Techletes Orange",
-        "intent": "Main brand accent for CTAs, highlights, focus states, and important UI emphasis",
-        "approx": {
-          "900": "#7a5200",
-          "800": "#a66d00",
-          "700": "#cc8400",
-          "600": "#e69500",
-          "500": "#ffa500",
-          "400": "#ffb733",
-          "300": "#ffc966",
-          "200": "#ffdc99",
-          "100": "#fff1cc"
-        }
-      },
-
-      "secondary": {
-        "name": "Amber Gold",
-        "intent": "Complementary accent surfaces and hover states derived from the brand orange",
-        "approx": {
-          "900": "#6b4200",
-          "800": "#8f5a00",
-          "700": "#b57300",
-          "600": "#d48806",
-          "500": "#f59e0b",
-          "400": "#fbbf24",
-          "300": "#fcd34d",
-          "200": "#fde68a",
-          "100": "#fef3c7"
-        }
-      }
-    },
-
-    "neutralGrays": {
-      "lightMode": {
-        "appBackground": "#EEF2F6",
-        "sidebarBackground": "#F7F9FB",
-        "cardSurface": "#FFFFFF",
-        "border": "#E6EBF0",
-        "textPrimary": "#0F172A",
-        "textMuted": "#6B7280"
-      },
-
-      "darkMode": {
-        "appBackground": "#0B1220",
-        "sidebarBackground": "#0F1B2D",
-        "cardSurface": "#0F172A",
-        "border": "#1F2A3A",
-        "textPrimary": "#E5E7EB",
-        "textMuted": "#94A3B8"
-      }
-    },
-
-    "accentColors": {
-      "success": "#22C55E",
-      "danger": "#EF4444",
-      "info": "#38BDF8",
-      "warning": "#F59E0B"
-    },
-
-    "complexMedia": {
-      "gradientUsage": [
-        "Hero cards",
-        "Highlighted dashboards",
-        "Decorative card surfaces"
-      ],
-      "gradientStyle": "Subtle gradients based on orange tones with abstract shapes or line patterns"
-    }
-  },
-
-  "coreComponents": {
-    "cards": {
-      "purpose": "Primary container for almost all application UI",
-      "structure": ["optional header", "content area", "optional footer"],
-      "styles": {
-        "background": "neutral surface",
-        "radius": "16px",
-        "padding": "20 to 24px",
-        "border": "subtle neutral border",
-        "shadow": "very light elevation"
-      }
-    },
-
-    "metricCards": {
-      "purpose": "Display key metrics or KPIs",
-      "structure": [
-        "icon or label",
-        "large value",
-        "change indicator",
-        "context label"
-      ]
-    },
-
-    "tables": {
-      "purpose": "Structured data display",
-      "structure": [
-        "table header",
-        "data rows",
-        "status badges",
-        "optional secondary metadata lines"
-      ],
-      "rowBehavior": {
-        "hover": "subtle background highlight",
-        "clickableRows": "optional navigation to detail view"
-      }
-    },
-
-    "buttons": {
-      "types": ["primary", "secondary", "ghost", "icon"],
-      "primary": {
-        "background": "primary orange",
-        "text": "white",
-        "hover": "slightly darker orange"
-      },
-      "secondary": {
-        "background": "neutral surface",
-        "border": "neutral border"
-      }
-    },
-
-    "inputs": {
-      "types": ["text inputs", "search fields", "dropdowns", "date selectors"],
-      "structure": [
-        "icon optional left",
-        "text input",
-        "meta element optional right"
-      ]
-    },
-
-    "badges": {
-      "shape": "pill",
-      "types": ["success", "warning", "danger", "neutral"]
-    },
-
-    "charts": {
-      "style": ["minimal gridlines", "clean axes", "limited color palette"],
-      "colorUsage": [
-        "primary orange for positive values",
-        "success green for positive metrics",
-        "danger red for negative metrics"
-      ]
-    }
-  },
-
-  "interactionStates": {
-    "buttons": {
-      "hover": "slightly darker background or subtle tint",
-      "active": "pressed state reducing elevation",
-      "disabled": "reduced opacity"
-    },
-
-    "inputs": {
-      "focus": "visible ring using primary brand color"
-    },
-
-    "navigation": {
-      "hover": "light background highlight",
-      "active": "pill highlight"
-    },
-
-    "tableRows": {
-      "hover": "subtle background tint"
-    }
-  },
-
-  "darkMode": {
-    "principles": [
-      "Layout identical to light mode",
-      "Reduce reliance on shadows",
-      "Increase border visibility",
-      "Maintain brand orange accent for contrast"
-    ],
-
-    "adaptations": {
-      "cards": "deep slate surfaces",
-      "text": "light neutral text",
-      "charts": "muted gridlines and brighter accent colors",
-      "buttons": "brand orange preserved but slightly darker"
-    }
-  },
-
-  "accessibility": {
-    "contrast": "All text meets WCAG AA contrast",
-    "colorUsage": [
-      "Do not rely solely on color for meaning",
-      "Use arrows or icons for metric changes"
-    ],
-    "keyboardNavigation": [
-      "Full keyboard access for navigation",
-      "Logical tab order",
-      "Search field shortcut supported"
-    ]
   }
 }

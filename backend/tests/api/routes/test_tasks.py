@@ -148,16 +148,23 @@ def test_list_tasks_status_filter(
         client.post(
             _enqueue_url(),
             headers=superuser_token_headers,
-            json={"task_type": "send_email", "kwargs": {"to": "x@y.com", "subject": "s", "_body": "b"}},
+            json={
+                "task_type": "send_email",
+                "kwargs": {"to": "x@y.com", "subject": "s", "_body": "b"},
+            },
         )
 
-    response = client.get(_tasks_url() + "?status=queued", headers=superuser_token_headers)
+    response = client.get(
+        _tasks_url() + "?status=queued", headers=superuser_token_headers
+    )
     assert response.status_code == 200
     data = response.json()
     for task in data["data"]:
         assert task["status"] == "queued"
 
-    response = client.get(_tasks_url() + "?status=completed", headers=superuser_token_headers)
+    response = client.get(
+        _tasks_url() + "?status=completed", headers=superuser_token_headers
+    )
     assert response.status_code == 200
     for task in response.json()["data"]:
         assert task["status"] == "completed"

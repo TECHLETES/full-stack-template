@@ -81,7 +81,7 @@ class S3Storage(StorageBackend):
 
     def __init__(self) -> None:
         try:
-            import boto3  # type: ignore[import-untyped]
+            import boto3
         except ImportError as exc:
             raise ImportError(
                 "boto3 is required for S3 storage. Install it with: pip install boto3"

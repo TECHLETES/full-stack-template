@@ -62,6 +62,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Copy built frontend to backend static directory
 COPY --from=frontend-builder /app/frontend/dist /app/backend/static
 
+# Copy entrypoint script
+COPY ./backend/scripts/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 WORKDIR /app/backend/
 
-CMD ["fastapi", "run", "--workers", "4", "main.py"]
+ENTRYPOINT ["/app/entrypoint.sh"]

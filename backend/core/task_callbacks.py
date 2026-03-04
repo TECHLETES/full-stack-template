@@ -9,7 +9,7 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, cast
 
 from redis import Redis
 from rq.job import Job
@@ -32,10 +32,10 @@ def _get_engine() -> Any:
 
 def _get_task(session: Session, task_id: str) -> Task | None:
     try:
-        return session.get(Task, uuid.UUID(task_id))
+        return cast(Task | None, session.get(Task, uuid.UUID(task_id)))
     except Exception:
         statement = select(Task).where(Task.rq_job_id == task_id)
-        return session.exec(statement).first()
+        return cast(Task | None, session.exec(statement).first())
 
 
 def on_task_started(job: Job, _connection: Redis, *_args: Any, **_kwargs: Any) -> None:

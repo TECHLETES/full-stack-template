@@ -215,9 +215,7 @@ class TestRolePermissions:
         perm_name = f"items:create_{random_lower_string()}"
         perm = create_permission_fixture(name=perm_name, resource="items")
 
-        add_permission_to_role(
-            session=db, role_id=admin_role.id, permission_id=perm.id
-        )
+        add_permission_to_role(session=db, role_id=admin_role.id, permission_id=perm.id)
 
         success = remove_permission_from_role(
             session=db, role_id=admin_role.id, permission_id=perm.id
@@ -254,9 +252,7 @@ class TestUserRoles:
 
     def test_remove_role_from_user(self, db: Session, test_user, admin_role):
         """Test removing role from user."""
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=admin_role.id
-        )
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=admin_role.id)
 
         success = remove_role_from_user(
             session=db, user_id=test_user.id, role_id=admin_role.id
@@ -268,9 +264,7 @@ class TestUserRoles:
 
     def test_user_has_role(self, db: Session, test_user, admin_role):
         """Test checking if user has role."""
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=admin_role.id
-        )
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=admin_role.id)
 
         has_admin = user_has_role(
             session=db, user_id=test_user.id, role_name=admin_role.name
@@ -278,7 +272,9 @@ class TestUserRoles:
         assert has_admin is True
 
         has_editor = user_has_role(
-            session=db, user_id=test_user.id, role_name=f"NonExistent_{random_lower_string()}"
+            session=db,
+            user_id=test_user.id,
+            role_name=f"NonExistent_{random_lower_string()}",
         )
         assert has_editor is False
 
@@ -302,9 +298,7 @@ class TestUserPermissions:
         add_permission_to_role(
             session=db, role_id=admin_role.id, permission_id=perm2.id
         )
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=admin_role.id
-        )
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=admin_role.id)
 
         permissions = get_user_permissions(session=db, user_id=test_user.id)
         perm_names = [p.name for p in permissions]
@@ -318,12 +312,8 @@ class TestUserPermissions:
         perm_name = f"users:manage_{random_lower_string()}"
         perm = create_permission_fixture(name=perm_name, resource="users")
 
-        add_permission_to_role(
-            session=db, role_id=admin_role.id, permission_id=perm.id
-        )
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=admin_role.id
-        )
+        add_permission_to_role(session=db, role_id=admin_role.id, permission_id=perm.id)
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=admin_role.id)
 
         has_perm = user_has_permission(
             session=db, user_id=test_user.id, permission_name=perm_name
@@ -331,7 +321,9 @@ class TestUserPermissions:
         assert has_perm is True
 
         no_perm = user_has_permission(
-            session=db, user_id=test_user.id, permission_name=f"nonexistent_{random_lower_string()}"
+            session=db,
+            user_id=test_user.id,
+            permission_name=f"nonexistent_{random_lower_string()}",
         )
         assert no_perm is False
 
@@ -348,7 +340,9 @@ class TestUserPermissions:
         admin_perm_name = f"admin:manage_{suffix}"
         editor_perm_name = f"editor:edit_{suffix}"
         admin_perm = create_permission_fixture(name=admin_perm_name, resource="admin")
-        editor_perm = create_permission_fixture(name=editor_perm_name, resource="editor")
+        editor_perm = create_permission_fixture(
+            name=editor_perm_name, resource="editor"
+        )
 
         add_permission_to_role(
             session=db, role_id=admin_role.id, permission_id=admin_perm.id
@@ -359,14 +353,152 @@ class TestUserPermissions:
             permission_id=editor_perm.id,
         )
 
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=admin_role.id
-        )
-        assign_role_to_user(
-            session=db, user_id=test_user.id, role_id=editor_role.id
-        )
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=admin_role.id)
+        assign_role_to_user(session=db, user_id=test_user.id, role_id=editor_role.id)
 
         permissions = get_user_permissions(session=db, user_id=test_user.id)
         perm_names = [p.name for p in permissions]
         assert admin_perm_name in perm_names
         assert editor_perm_name in perm_names
+
+
+"""Final tests to boost RBAC coverage."""
+
+import pytest
+from sqlmodel import Session
+
+from backend.crud_rbac import (
+    assign_role_to_user,
+    create_permission,
+    create_role,
+    get_all_permissions,
+    get_all_roles,
+    update_permission,
+    update_role,
+    user_has_permission,
+    user_has_role,
+)
+from backend.models import PermissionCreate, PermissionUpdate, RoleCreate, RoleUpdate
+from backend.tests.utils.user import create_random_user
+
+
+def test_get_all_permissions_with_pagination(db: Session) -> None:
+    """Test getting all permissions with pagination."""
+    perms, count = get_all_permissions(session=db, skip=0, limit=100)
+    assert isinstance(perms, list)
+    assert isinstance(count, int)
+
+
+def test_get_all_roles_with_pagination(db: Session) -> None:
+    """Test getting all roles with pagination."""
+    roles, count = get_all_roles(session=db, skip=0, limit=100)
+    assert isinstance(roles, list)
+    assert isinstance(count, int)
+
+
+def test_update_permission(db: Session) -> None:
+    """Test updating a permission."""
+    perm = create_permission(
+        session=db,
+        permission_in=PermissionCreate(
+            name="update:test",
+            description="Original",
+            resource="test",
+        ),
+    )
+
+    update_data = PermissionUpdate(description="Updated description")
+    updated = update_permission(
+        session=db,
+        db_permission=perm,
+        permission_in=update_data,
+    )
+
+    assert updated.description == "Updated description"
+
+
+def test_update_role(db: Session) -> None:
+    """Test updating a role."""
+    role = create_role(
+        session=db,
+        role_in=RoleCreate(
+            name="update_role_test",
+            description="Original",
+            permission_ids=[],
+        ),
+    )
+
+    update_data = RoleUpdate(description="Updated role description")
+    updated = update_role(
+        session=db,
+        db_role=role,
+        role_in=update_data,
+    )
+
+    assert updated.description == "Updated role description"
+
+
+def test_user_has_role_true(db: Session) -> None:
+    """Test user_has_role when user has role."""
+    user = create_random_user(db)
+    role = create_role(
+        session=db,
+        role_in=RoleCreate(
+            name="has_role_test",
+            description="Test role",
+            permission_ids=[],
+        ),
+    )
+    assign_role_to_user(session=db, user_id=user.id, role_id=role.id)
+
+    result = user_has_role(session=db, user_id=user.id, role_name="has_role_test")
+    assert result is True
+
+
+def test_user_has_role_false(db: Session) -> None:
+    """Test user_has_role when user doesn't have role."""
+    user = create_random_user(db)
+
+    result = user_has_role(session=db, user_id=user.id, role_name="nonexistent_role")
+    assert result is False
+
+
+def test_user_has_permission_true(db: Session) -> None:
+    """Test user_has_permission when user has permission."""
+    user = create_random_user(db)
+    perm = create_permission(
+        session=db,
+        permission_in=PermissionCreate(
+            name="has_perm:test",
+            description="Test permission",
+            resource="test",
+        ),
+    )
+    role = create_role(
+        session=db,
+        role_in=RoleCreate(
+            name="perm_test_role",
+            description="Role with permission",
+            permission_ids=[perm.id],
+        ),
+    )
+    assign_role_to_user(session=db, user_id=user.id, role_id=role.id)
+
+    result = user_has_permission(
+        session=db,
+        user_id=user.id,
+        permission_name="has_perm:test",
+    )
+    assert result is True
+
+
+def test_user_has_permission_false(db: Session) -> None:
+    """Test user_has_permission when user doesn't have permission."""
+    user = create_random_user(db)
+
+    result = user_has_permission(
+        session=db,
+        user_id=user.id,
+        permission_name="nonexistent:permission",
+    )
+    assert result is False

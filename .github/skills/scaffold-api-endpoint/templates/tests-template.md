@@ -238,10 +238,10 @@ Create `backend/tests/utils/project.py`:
 import uuid
 
 from sqlmodel import Session
+from tests.utils.user import create_random_user
 
 from backend import crud
 from backend.models import Project, ProjectCreate
-from tests.utils.user import create_random_user
 
 
 def create_random_project(db: Session) -> Project:

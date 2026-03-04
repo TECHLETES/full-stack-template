@@ -3,6 +3,7 @@
 # Copy this template and adapt it for your feature.
 
 import uuid
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
@@ -20,9 +21,10 @@ def test_create_resource(db: Session) -> None:
     2. Create target resource
     3. Assert success and properties
     """
+    from tests.utils.resource import create_random_user
+
     from backend import crud
     from backend.models import ResourceCreate
-    from tests.utils.resource import create_random_user
 
     user = create_random_user(db)
     resource_in = ResourceCreate(
@@ -44,8 +46,9 @@ def test_create_resource(db: Session) -> None:
 
 def test_read_resource_by_id(db: Session) -> None:
     """Test reading a specific resource."""
-    from backend import crud
     from tests.utils.resource import create_random_resource
+
+    from backend import crud
 
     resource = create_random_resource(db)
 
@@ -62,8 +65,9 @@ def test_read_resource_by_id(db: Session) -> None:
 
 def test_read_resource_returns_none_if_not_found(db: Session) -> None:
     """Test reading non-existent resource returns None."""
-    from backend import crud
     from tests.utils.resource import create_random_user
+
+    from backend import crud
 
     user = create_random_user(db)
 
@@ -78,8 +82,9 @@ def test_read_resource_returns_none_if_not_found(db: Session) -> None:
 
 def test_read_resources_list(db: Session) -> None:
     """Test listing all resources for a user with pagination."""
-    from backend import crud
     from tests.utils.resource import create_random_resource
+
+    from backend import crud
 
     # Create multiple resources
     for _ in range(5):
@@ -100,9 +105,10 @@ def test_read_resources_list(db: Session) -> None:
 
 def test_update_resource_full(db: Session) -> None:
     """Test full update of a resource."""
+    from tests.utils.resource import create_random_resource
+
     from backend import crud
     from backend.models import ResourceUpdate
-    from tests.utils.resource import create_random_resource
 
     resource = create_random_resource(db)
     update_data = ResourceUpdate(
@@ -128,9 +134,10 @@ def test_update_resource_partial(db: Session) -> None:
     2. Update only one field
     3. Assert updated field and unchanged field
     """
+    from tests.utils.resource import create_random_resource
+
     from backend import crud
     from backend.models import ResourceUpdate
-    from tests.utils.resource import create_random_resource
 
     resource = create_random_resource(db)
     original_description = resource.description
@@ -156,8 +163,9 @@ def test_delete_resource(db: Session) -> None:
     2. Delete it
     3. Verify it no longer exists
     """
-    from backend import crud
     from tests.utils.resource import create_random_resource
+
+    from backend import crud
 
     resource = create_random_resource(db)
     resource_id = resource.id
@@ -174,12 +182,15 @@ def test_delete_resource(db: Session) -> None:
     assert result is None
 
 
-@pytest.mark.parametrize("title,valid", [
-    ("Valid Title", True),
-    ("Another Valid", True),
-    ("", False),  # Empty title invalid
-    ("x" * 500, False),  # Too long
-])
+@pytest.mark.parametrize(
+    "title,valid",
+    [
+        ("Valid Title", True),
+        ("Another Valid", True),
+        ("", False),  # Empty title invalid
+        ("x" * 500, False),  # Too long
+    ],
+)
 def test_create_resource_validation(title: str, valid: bool, db: Session) -> None:
     """Test resource creation validates input.
 
@@ -187,8 +198,9 @@ def test_create_resource_validation(title: str, valid: bool, db: Session) -> Non
     - Use parametrize to test multiple scenarios
     - Test valid and invalid cases
     """
-    from backend.models import ResourceCreate
     from pydantic import ValidationError
+
+    from backend.models import ResourceCreate
 
     try:
         resource_in = ResourceCreate(title=title, description="test")

@@ -8,9 +8,10 @@ Use this as a starting point for your CRUD functions. Add these to `backend/crud
 import uuid
 from typing import Any
 
-from sqlmodel import Session, select, func, col
+from sqlmodel import Session, col, func, select
 
 from backend.models import Project, ProjectCreate, ProjectUpdate
+
 
 def create_project(
     *,

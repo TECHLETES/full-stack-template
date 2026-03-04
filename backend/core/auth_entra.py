@@ -1,4 +1,5 @@
 import logging
+from typing import cast
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -155,7 +156,7 @@ class EntraAuthClient:
                     headers=headers,
                 )
 
-                return update_resp.status_code == 200
+                return cast(bool, update_resp.status_code == 200)
 
         except Exception as e:
             logger.error(f"Failed to sync roles to Entra: {e}")

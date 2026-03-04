@@ -15,7 +15,9 @@ def _stats_url() -> str:
     return f"{settings.API_V1_STR}/admin/jobs/stats"
 
 
-def _list_url(queue: str | None = None, status_filter: str | None = None, limit: int = 50) -> str:
+def _list_url(
+    queue: str | None = None, status_filter: str | None = None, limit: int = 50
+) -> str:
     params: list[str] = [f"limit={limit}"]
     if queue:
         params.append(f"queue={queue}")
@@ -32,7 +34,12 @@ def _mock_queue() -> MagicMock:
     return queue
 
 
-def _create_task_in_db(db: Session, owner_id: uuid.UUID, task_type: str = "process_file", status: str = "queued") -> None:
+def _create_task_in_db(
+    db: Session,
+    owner_id: uuid.UUID,
+    task_type: str = "process_file",
+    status: str = "queued",
+) -> None:
     task_in = TaskCreate(task_type=task_type, queue="default", kwargs={"file_id": str(uuid.uuid4())})  # type: ignore[call-arg]
     db_task = crud.create_task(session=db, task_in=task_in, owner_id=owner_id)
     if status != "queued":
@@ -71,8 +78,10 @@ def test_stats_returns_db_counts(
     fake_q = MagicMock()
     fake_q.get_job_ids.return_value = []
 
-    with patch("backend.api.routes.admin.get_redis_conn", return_value=fake_conn), \
-         patch("backend.api.routes.admin.Queue", return_value=fake_q):
+    with (
+        patch("backend.api.routes.admin.get_redis_conn", return_value=fake_conn),
+        patch("backend.api.routes.admin.Queue", return_value=fake_q),
+    ):
         response = client.get(_stats_url(), headers=superuser_token_headers)
 
     assert response.status_code == 200
@@ -130,7 +139,9 @@ def test_list_status_filter(
     _create_task_in_db(db, user.id, status="completed")
     _create_task_in_db(db, user.id, status="failed")
 
-    response = client.get(_list_url(status_filter="completed"), headers=superuser_token_headers)
+    response = client.get(
+        _list_url(status_filter="completed"), headers=superuser_token_headers
+    )
     assert response.status_code == 200
     data = response.json()
     for job in data["jobs"]:

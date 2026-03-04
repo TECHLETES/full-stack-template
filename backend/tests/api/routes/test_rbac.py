@@ -51,7 +51,9 @@ class TestPermissionsEndpoints:
         assert "data" in data
         assert "count" in data
 
-    def test_create_permission_requires_admin(self, client: TestClient, token: str) -> None:
+    def test_create_permission_requires_admin(
+        self, client: TestClient, token: str
+    ) -> None:
         """Test that creating permission requires admin role."""
         # First, try without auth
         response = client.post(

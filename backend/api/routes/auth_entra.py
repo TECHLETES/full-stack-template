@@ -162,9 +162,11 @@ def get_entra_config() -> dict[str, Any]:
         "enabled": settings.azure_enabled,
         "client_id": settings.AZURE_CLIENT_ID if settings.azure_enabled else None,
         "tenant_id": settings.AZURE_TENANT_ID if settings.azure_enabled else None,
-        "authority": f"{settings.AZURE_AUTHORITY}/organizations"
-        if settings.azure_enabled
-        else None,
+        "authority": (
+            f"{settings.AZURE_AUTHORITY}/organizations"
+            if settings.azure_enabled
+            else None
+        ),
     }
 
 

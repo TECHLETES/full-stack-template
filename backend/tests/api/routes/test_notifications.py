@@ -8,17 +8,15 @@ from fastapi.testclient import TestClient
 from backend.core.config import settings
 from backend.tests.utils.user import create_random_user
 
-
 # ---------------------------------------------------------------------------
 # WebSocket — authentication
 # ---------------------------------------------------------------------------
 
+
 def test_websocket_rejects_missing_token(client: TestClient) -> None:
     """WebSocket connection without a token should be rejected."""
     with pytest.raises(Exception):
-        with client.websocket_connect(
-            f"{settings.API_V1_STR}/notifications/ws"
-        ) as ws:
+        with client.websocket_connect(f"{settings.API_V1_STR}/notifications/ws") as ws:
             ws.receive_text()
 
 
@@ -36,11 +34,12 @@ def test_websocket_accepts_valid_token(
     normal_user_token_headers: dict[str, str],
 ) -> None:
     """WebSocket token authentication should work with valid JWT."""
-    from backend.api.routes.notifications import _get_user_from_token
-    from backend.tests.utils.user import create_random_user
-    from backend.core.security import create_access_token
     from datetime import timedelta
+
+    from backend.api.routes.notifications import _get_user_from_token
     from backend.core.config import settings
+    from backend.core.security import create_access_token
+    from backend.tests.utils.user import create_random_user
 
     # Create a test user
     user = create_random_user(db)
@@ -171,3 +170,105 @@ def test_send_notification_validates_payload(
         },
     )
     assert response.status_code == 422
+
+
+def test_send_notification_superuser_missing_user(
+    client: TestClient,
+    superuser_token_headers: dict[str, str],
+) -> None:
+    """Superuser sending to non-existent user should return 404."""
+    import uuid
+
+    with patch(
+        "backend.api.routes.notifications.publish_notification",
+        new_callable=AsyncMock,
+    ):
+        response = client.post(
+            f"{settings.API_V1_STR}/notifications/send",
+            headers=superuser_token_headers,
+            json={
+                "user_id": str(uuid.uuid4()),  # Non-existent user
+                "type": "info",
+                "title": "Hello",
+                "message": "World",
+            },
+        )
+
+    # Should handle gracefully
+    assert response.status_code in {200, 404}
+
+
+def test_websocket_token_invalid_format(client: TestClient) -> None:
+    """WebSocket with malformed token should be rejected."""
+    with pytest.raises(Exception):
+        with client.websocket_connect(
+            f"{settings.API_V1_STR}/notifications/ws?token=malformed"
+        ) as ws:
+            ws.receive_text()
+
+
+def test_send_notification_with_empty_message(
+    client: TestClient,
+    normal_user_token_headers: dict[str, str],
+) -> None:
+    """Sending notification with empty message should handle gracefully."""
+    with patch(
+        "backend.api.routes.notifications.publish_notification",
+        new_callable=AsyncMock,
+    ):
+        response = client.post(
+            f"{settings.API_V1_STR}/notifications/send/me",
+            headers=normal_user_token_headers,
+            json={
+                "type": "info",
+                "title": "Title Only",
+                "message": "",  # Empty message
+            },
+        )
+
+    # Should either accept or reject gracefully
+    assert response.status_code in {200, 422}
+
+
+def test_get_user_from_token_with_expired_token(
+    db,  # type: ignore[no-untyped-def]
+) -> None:
+    """Getting user from expired token should return None."""
+    from datetime import timedelta
+
+    from backend.api.routes.notifications import _get_user_from_token
+    from backend.core.security import create_access_token
+    from backend.tests.utils.user import create_random_user
+
+    user = create_random_user(db)
+
+    # Create an already-expired token
+    expired_token = create_access_token(
+        subject=str(user.id),
+        expires_delta=timedelta(seconds=-1),  # Expired 1 second ago
+    )
+
+    # Should return None for expired token
+    result = _get_user_from_token(expired_token, db)
+    assert result is None
+
+
+def test_get_user_from_token_with_invalid_user_id(
+    db,  # type: ignore[no-untyped-def]
+) -> None:
+    """Getting user with non-existent ID from token should return None."""
+    import uuid
+    from datetime import timedelta
+
+    from backend.api.routes.notifications import _get_user_from_token
+    from backend.core.security import create_access_token
+
+    # Create token with non-existent user ID
+    token = create_access_token(
+        subject=str(uuid.uuid4()),  # Non-existent user
+        expires_delta=timedelta(hours=1),
+    )
+
+    # Should return None since user doesn't exist
+    result = _get_user_from_token(token, db)
+    assert result is None

@@ -2,9 +2,9 @@ import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-import emails  # type: ignore
+import emails
 import jwt
 from jinja2 import Template
 from jwt.exceptions import InvalidTokenError
@@ -26,7 +26,7 @@ def render_email_template(*, template_name: str, context: dict[str, Any]) -> str
     template_str = (
         Path(__file__).parent.parent / "email-templates" / "build" / template_name
     ).read_text()
-    html_content = Template(template_str).render(context)
+    html_content = cast(str, Template(template_str).render(context))
     return html_content
 
 
@@ -105,10 +105,13 @@ def generate_password_reset_token(email: str) -> str:
     now = datetime.now(UTC)
     expires = now + delta
     exp = expires.timestamp()
-    encoded_jwt = jwt.encode(
-        {"exp": exp, "nbf": now, "sub": email},
-        settings.SECRET_KEY,
-        algorithm=security.ALGORITHM,
+    encoded_jwt = cast(
+        str,
+        jwt.encode(
+            {"exp": exp, "nbf": now, "sub": email},
+            settings.SECRET_KEY,
+            algorithm=security.ALGORITHM,
+        ),
     )
     return encoded_jwt
 

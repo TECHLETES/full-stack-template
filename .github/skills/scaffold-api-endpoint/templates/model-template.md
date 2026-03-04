@@ -8,9 +8,11 @@ Use this as a starting point for your database model. Copy and modify for your r
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
+
 from pydantic import Field
 from sqlalchemy import DateTime
 from sqlmodel import Relationship, SQLModel
+
 
 def get_datetime_utc() -> datetime:
     return datetime.now(timezone.utc)
@@ -82,6 +84,7 @@ priority: int = Field(ge=1, le=10)  # 1-10
 
 # Email (imported from pydantic)
 from pydantic import EmailStr
+
 email: EmailStr = Field(unique=True, index=True)
 
 # Optional with default

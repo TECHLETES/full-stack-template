@@ -189,3 +189,102 @@ def test_login_with_argon2_password_keeps_hash(client: TestClient, db: Session) 
 
     assert user.hashed_password == original_hash
     assert user.hashed_password.startswith("$argon2")
+
+
+def test_recover_password_nonexistent_email(client: TestClient) -> None:
+    """Password recovery for non-existent email should still return success (for security)."""
+    response = client.post(
+        f"{settings.API_V1_STR}/password-recovery/nonexistent@example.com"
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "message" in data
+    # Should give generic message to prevent email enumeration
+    assert "If that email is registered" in data["message"]
+
+
+def test_reset_password_invalid_token_anonymous(client: TestClient) -> None:
+    """Reset password with invalid token should fail (unauthenticated)."""
+    response = client.post(
+        f"{settings.API_V1_STR}/reset-password/",
+        json={"token": "invalid-token-xyz", "new_password": "NewPassword123"},
+    )
+    assert response.status_code == 400
+    assert "Invalid token" in response.json()["detail"]
+
+
+def test_reset_password_empty_token(client: TestClient) -> None:
+    """Reset password with empty token should fail."""
+    response = client.post(
+        f"{settings.API_V1_STR}/reset-password/",
+        json={"token": "", "new_password": "NewPassword123"},
+    )
+    assert response.status_code in {400, 422}
+
+
+def test_recover_password_html_requires_superuser(
+    client: TestClient,
+    normal_user_token_headers: dict[str, str],
+) -> None:
+    """HTML password recovery endpoint requires superuser."""
+    response = client.post(
+        f"{settings.API_V1_STR}/password-recovery-html-content/test@example.com",
+        headers=normal_user_token_headers,
+    )
+    assert response.status_code == 403
+
+
+def test_recover_password_html_nonexistent_user(
+    client: TestClient,
+    superuser_token_headers: dict[str, str],
+) -> None:
+    """HTML password recovery for non-existent user should return 404."""
+    response = client.post(
+        f"{settings.API_V1_STR}/password-recovery-html-content/nonexistent@example.com",
+        headers=superuser_token_headers,
+    )
+    assert response.status_code == 404
+
+
+def test_recover_password_html_valid_user(
+    client: TestClient,
+    superuser_token_headers: dict[str, str],
+    db: Session,
+) -> None:
+    """HTML password recovery for valid user should return HTML content."""
+    from backend.tests.utils.user import create_random_user
+
+    user = create_random_user(db)
+
+    with patch("backend.api.routes.login.send_email"):
+        response = client.post(
+            f"{settings.API_V1_STR}/password-recovery-html-content/{user.email}",
+            headers=superuser_token_headers,
+        )
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers.get("content-type", "")
+
+
+def test_reset_password_inactive_user(
+    client: TestClient,
+    db: Session,
+) -> None:
+    """Reset password for inactive user should fail."""
+    from backend.tests.utils.user import create_random_user
+    from backend.utils.utils import generate_password_reset_token
+
+    user = create_random_user(db)
+    user.is_active = False
+    db.add(user)
+    db.commit()
+
+    token = generate_password_reset_token(email=user.email)
+
+    response = client.post(
+        f"{settings.API_V1_STR}/reset-password/",
+        json={"token": token, "new_password": "NewPassword123"},
+    )
+
+    assert response.status_code == 400
+    assert "Inactive user" in response.json()["detail"]

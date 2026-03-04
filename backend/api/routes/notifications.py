@@ -23,7 +23,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
-from typing import Annotated
+from typing import Annotated, cast
 
 import jwt
 from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
@@ -64,7 +64,7 @@ def _get_user_from_token(token: str, session: Session) -> User | None:
         logger.warning("WebSocket auth rejected — token has no 'sub' claim")
         return None
     try:
-        user = session.get(User, token_data.sub)
+        user = cast(User | None, session.get(User, token_data.sub))
     except Exception:
         logger.exception(
             "WebSocket auth — database error looking up user %s", token_data.sub
@@ -146,7 +146,7 @@ async def websocket_notifications(
         with contextlib.suppress(Exception):
             await pubsub.unsubscribe(channel)
         with contextlib.suppress(Exception):
-            await pubsub.aclose()  # type: ignore[no-untyped-call]
+            await pubsub.aclose()
         with contextlib.suppress(Exception):
             await redis_client.aclose()
         logger.debug("User %s disconnected from channel %s", user.id, channel)

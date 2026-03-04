@@ -1,6 +1,7 @@
 """RBAC endpoints for managing roles and permissions."""
 
 import uuid
+from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
@@ -64,7 +65,7 @@ def get_permission_endpoint(
     permission = get_permission(session=session, permission_id=permission_id)
     if not permission:
         raise HTTPException(status_code=404, detail="Permission not found")
-    return PermissionPublic.model_validate(permission)
+    return cast(PermissionPublic, PermissionPublic.model_validate(permission))
 
 
 @router.post(
@@ -77,7 +78,7 @@ def create_permission_endpoint(
 ) -> PermissionPublic:
     """Create a new permission (Admin only)."""
     permission = create_permission(session=session, permission_in=permission_in)
-    return PermissionPublic.model_validate(permission)
+    return cast(PermissionPublic, PermissionPublic.model_validate(permission))
 
 
 @router.patch(
@@ -98,7 +99,7 @@ def update_permission_endpoint(
     updated = update_permission(
         session=session, db_permission=permission, permission_in=permission_in
     )
-    return PermissionPublic.model_validate(updated)
+    return cast(PermissionPublic, PermissionPublic.model_validate(updated))
 
 
 @router.delete(
@@ -138,7 +139,7 @@ def get_role_endpoint(*, session: SessionDep, role_id: uuid.UUID) -> RolePublic:
     role = get_role(session=session, role_id=role_id)
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
-    return RolePublic.model_validate(role, from_attributes=True)
+    return cast(RolePublic, RolePublic.model_validate(role, from_attributes=True))
 
 
 @router.post(
@@ -149,7 +150,7 @@ def get_role_endpoint(*, session: SessionDep, role_id: uuid.UUID) -> RolePublic:
 def create_role_endpoint(*, session: SessionDep, role_in: RoleCreate) -> RolePublic:
     """Create a new role (Admin only)."""
     role = create_role(session=session, role_in=role_in)
-    return RolePublic.model_validate(role, from_attributes=True)
+    return cast(RolePublic, RolePublic.model_validate(role, from_attributes=True))
 
 
 @router.patch(
@@ -168,7 +169,7 @@ def update_role_endpoint(
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     updated = update_role(session=session, db_role=role, role_in=role_in)
-    return RolePublic.model_validate(updated, from_attributes=True)
+    return cast(RolePublic, RolePublic.model_validate(updated, from_attributes=True))
 
 
 @router.delete(

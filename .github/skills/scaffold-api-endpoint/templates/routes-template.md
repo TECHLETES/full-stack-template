@@ -237,6 +237,7 @@ def read_projects(
 ```python
 from backend.api.deps import get_current_active_superuser
 
+
 @router.delete("/{project_id}", dependencies=[Depends(get_current_active_superuser)])
 def admin_delete_project(
     session: SessionDep,

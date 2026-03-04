@@ -33,7 +33,7 @@ class UserRegister(SQLModel):
 
 # Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
-    email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
+    email: EmailStr | None = Field(default=None, max_length=255)
     password: str | None = Field(default=None, min_length=8, max_length=128)
 
 
@@ -48,7 +48,7 @@ class UpdatePassword(SQLModel):
 
 
 # Many-to-many junction tables (must be defined before table models that reference them)
-class RolePermission(SQLModel, table=True):
+class RolePermission(SQLModel, table=True):  # type: ignore[call-arg]
     role_id: uuid.UUID = Field(
         foreign_key="role.id", primary_key=True, ondelete="CASCADE"
     )
@@ -57,7 +57,7 @@ class RolePermission(SQLModel, table=True):
     )
 
 
-class UserRole(SQLModel, table=True):
+class UserRole(SQLModel, table=True):  # type: ignore[call-arg]
     user_id: uuid.UUID = Field(
         foreign_key="user.id", primary_key=True, ondelete="CASCADE"
     )
@@ -370,11 +370,11 @@ class Task(TaskBase, table=True):
     )
     started_at: datetime | None = Field(
         default=None,
-        sa_type=DateTime(timezone=True),  # type: ignore
+        sa_type=DateTime(timezone=True),
     )
     completed_at: datetime | None = Field(
         default=None,
-        sa_type=DateTime(timezone=True),  # type: ignore
+        sa_type=DateTime(timezone=True),
     )
     owner: User | None = Relationship(back_populates="tasks")
 

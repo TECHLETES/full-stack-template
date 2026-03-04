@@ -4,52 +4,77 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: check-added-large-files
       - id: check-toml
+      - id: check-json
+      - id: check-symlinks
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
       - id: check-yaml
         args:
           - --unsafe
       - id: end-of-file-fixer
         exclude: |
-            (?x)^(
-                frontend/src/client/.*|
-                backend/email-templates/build/.*
-            )$
+          (?x)^(
+              frontend/src/client/.*|
+              backend/email-templates/build/.*
+          )$
       - id: trailing-whitespace
-        exclude: ^frontend/src/client/.*
+        exclude: ^frontend/src/client/.*|coverage\.svg$
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
+    hooks:
+      - id: mypy
+        name: Type check with mypy
+        args: ["--config-file=pyproject.toml"]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 8.0.1
+    hooks:
+      - id: isort
+        name: isort (import sorting)
+        args: [--profile=black]
+        types: [python]
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+        name: pyupgrade (modernize Python syntax)
+        args: [--py312-plus]
+        types: [python]
+
+    # Linting and formatting with ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.4
+    hooks:
+      - id: ruff
+        name: Ruff (linting + import sorting + formatting)
+        args: [--fix]
+        types: [python]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        name: bandit (security check)
+        args: [-ll, --skip, B101]
+        exclude: ^tests/
+        types: [python]
+
   - repo: local
     hooks:
       - id: local-biome-check
         name: biome check
-        entry: bun run lint
+        entry: bun run --filter frontend lint
         language: system
-        types: [text]
-        files: ^frontend/
-
-      - id: local-ruff-check
-        name: ruff check
-        entry: uv run ruff check --force-exclude --fix --exit-non-zero-on-fix
-        require_serial: true
-        language: unsupported
-        types: [python]
-
-      - id: local-ruff-format
-        name: ruff format
-        entry: uv run ruff format --force-exclude --exit-non-zero-on-format
-        require_serial: true
-        language: unsupported
-        types: [python]
-
-      - id: local-mypy
-        name: mypy check
-        entry: uv run mypy backend
-        require_serial: true
-        language: unsupported
         pass_filenames: false
+        files: ^frontend/
 
       - id: generate-frontend-sdk
         name: Generate Frontend SDK
         entry: bash ./scripts/generate-client.sh
         pass_filenames: false
-        language: unsupported
+        language: system
         files: ^backend/.*$|^scripts/generate-client\.sh$

@@ -1,5 +1,5 @@
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, cast
 
 import jwt
 from pwdlib import PasswordHash
@@ -22,15 +22,15 @@ ALGORITHM = "HS256"
 def create_access_token(subject: str | Any, expires_delta: timedelta) -> str:
     expire = datetime.now(UTC) + expires_delta
     to_encode = {"exp": expire, "sub": str(subject)}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = cast(str, jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM))
     return encoded_jwt
 
 
 def verify_password(
     plain_password: str, hashed_password: str
 ) -> tuple[bool, str | None]:
-    return password_hash.verify_and_update(plain_password, hashed_password)
+    return cast(tuple[bool, str | None], password_hash.verify_and_update(plain_password, hashed_password))
 
 
 def get_password_hash(password: str) -> str:
-    return password_hash.hash(password)
+    return cast(str, password_hash.hash(password))

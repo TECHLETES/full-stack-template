@@ -1,6 +1,7 @@
 """CRUD operations for RBAC (roles, permissions, role assignments)."""
 
 import uuid
+from typing import cast
 
 from sqlalchemy import delete
 from sqlmodel import Session, select
@@ -24,7 +25,7 @@ def create_permission(
     *, session: Session, permission_in: PermissionCreate
 ) -> Permission:
     """Create a new permission."""
-    db_permission = Permission.model_validate(permission_in)
+    db_permission = cast(Permission, Permission.model_validate(permission_in))
     session.add(db_permission)
     session.commit()
     session.refresh(db_permission)
@@ -33,14 +34,19 @@ def create_permission(
 
 def get_permission(*, session: Session, permission_id: uuid.UUID) -> Permission | None:
     """Get permission by ID."""
-    return session.exec(
-        select(Permission).where(Permission.id == permission_id)
-    ).first()
+    return cast(
+        Permission | None,
+        session.exec(
+            select(Permission).where(Permission.id == permission_id)
+        ).first(),
+    )
 
 
 def get_permission_by_name(*, session: Session, name: str) -> Permission | None:
     """Get permission by name."""
-    return session.exec(select(Permission).where(Permission.name == name)).first()
+    return cast(
+        Permission | None, session.exec(select(Permission).where(Permission.name == name)).first()
+    )
 
 
 def get_all_permissions(
@@ -84,7 +90,7 @@ def create_role(
     *, session: Session, role_in: RoleCreate, is_system: bool = False
 ) -> Role:
     """Create a new role with optional permissions."""
-    db_role = Role.model_validate(role_in, update={"is_system": is_system})
+    db_role = cast(Role, Role.model_validate(role_in, update={"is_system": is_system}))
     session.add(db_role)
     session.flush()  # Get the ID without committing
 
@@ -104,12 +110,12 @@ def create_role(
 
 def get_role(*, session: Session, role_id: uuid.UUID) -> Role | None:
     """Get role by ID."""
-    return session.exec(select(Role).where(Role.id == role_id)).first()
+    return cast(Role | None, session.exec(select(Role).where(Role.id == role_id)).first())
 
 
 def get_role_by_name(*, session: Session, name: str) -> Role | None:
     """Get role by name."""
-    return session.exec(select(Role).where(Role.name == name)).first()
+    return cast(Role | None, session.exec(select(Role).where(Role.name == name)).first())
 
 
 def get_all_roles(
@@ -130,7 +136,7 @@ def update_role(*, session: Session, db_role: Role, role_in: RoleUpdate) -> Role
     if role_in.permission_ids is not None:
         # Remove existing permissions
         to_delete = delete(RolePermission).where(
-            RolePermission.role_id == db_role.id  # type: ignore[arg-type]
+            RolePermission.role_id == db_role.id
         )
         session.exec(to_delete)
 

@@ -9,7 +9,7 @@ from backend.crud_rbac import user_has_permission, user_has_role
 from backend.models import User
 
 
-def require_role(role_name: str) -> Callable[[CurrentUser, SessionDep], User]:
+def require_role(role_name: str) -> Callable[..., User]:
     """
     Dependency factory to require a specific RBAC role.
 

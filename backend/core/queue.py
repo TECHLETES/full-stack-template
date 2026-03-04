@@ -10,7 +10,7 @@ from rq import Queue
 from backend.core.config import settings
 
 # Synchronous Redis connection for RQ (not the async client used for pub/sub)
-_redis_conn: redis.Redis = None  # type: ignore[assignment]
+_redis_conn: redis.Redis | None = None
 
 
 def get_redis_conn() -> redis.Redis:

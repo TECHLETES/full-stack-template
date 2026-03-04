@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 from sqlmodel import Session, col, func, select
 
@@ -18,8 +18,12 @@ from backend.models import (
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
-    db_obj = User.model_validate(
-        user_create, update={"hashed_password": get_password_hash(user_create.password)}
+    db_obj = cast(
+        User,
+        User.model_validate(
+            user_create,
+            update={"hashed_password": get_password_hash(user_create.password)},
+        ),
     )
     session.add(db_obj)
     session.commit()
@@ -27,7 +31,7 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     return db_obj
 
 
-def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
+def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> User:
     user_data = user_in.model_dump(exclude_unset=True)
     extra_data = {}
     if "password" in user_data:
@@ -43,7 +47,7 @@ def update_user(*, session: Session, db_user: User, user_in: UserUpdate) -> Any:
 
 def get_user_by_email(*, session: Session, email: str) -> User | None:
     statement = select(User).where(User.email == email)
-    session_user = session.exec(statement).first()
+    session_user = cast(User | None, session.exec(statement).first())
     return session_user
 
 
@@ -71,7 +75,7 @@ def authenticate(*, session: Session, email: str, password: str) -> User | None:
 
 
 def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -> Item:
-    db_item = Item.model_validate(item_in, update={"owner_id": owner_id})
+    db_item = cast(Item, Item.model_validate(item_in, update={"owner_id": owner_id}))
     session.add(db_item)
     session.commit()
     session.refresh(db_item)
@@ -84,7 +88,7 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
 
 
 def create_task(*, session: Session, task_in: TaskCreate, owner_id: uuid.UUID) -> Task:
-    db_task = Task.model_validate(task_in, update={"owner_id": owner_id})
+    db_task = cast(Task, Task.model_validate(task_in, update={"owner_id": owner_id}))
     session.add(db_task)
     session.commit()
     session.refresh(db_task)
@@ -92,12 +96,12 @@ def create_task(*, session: Session, task_in: TaskCreate, owner_id: uuid.UUID) -
 
 
 def get_task(*, session: Session, task_id: uuid.UUID) -> Task | None:
-    return session.get(Task, task_id)
+    return cast(Task | None, session.get(Task, task_id))
 
 
 def get_task_by_rq_job_id(*, session: Session, rq_job_id: str) -> Task | None:
     statement = select(Task).where(Task.rq_job_id == rq_job_id)
-    return session.exec(statement).first()
+    return cast(Task | None, session.exec(statement).first())
 
 
 def update_task_status(

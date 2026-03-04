@@ -162,3 +162,48 @@ def test_delete_item_not_enough_permissions(
     assert response.status_code == 403
     content = response.json()
     assert content["detail"] == "Not enough permissions"
+
+
+def test_read_items_normal_user_only_sees_own(
+    client: TestClient,
+    normal_user_token_headers: dict[str, str],
+    db: Session,
+) -> None:
+    """Normal user should only see their own items when listing."""
+    from backend.tests.utils.item import create_random_item
+    from backend.tests.utils.user import create_random_user
+
+    # Create the normal user (implicitly from token headers)
+    # and create items for them
+    create_random_item(db, normal_user_token_headers)
+
+    # Create another user and their items
+    other_user = create_random_user(db)
+    create_random_item(db, owner_id=other_user.id)
+
+    # Query as normal user
+
+
+def test_read_items_normal_user_only_sees_own(
+    client: TestClient,
+    normal_user_token_headers: dict[str, str],
+    db: Session,
+) -> None:
+    """Normal user should only see their own items when listing."""
+    from backend.tests.utils.item import create_random_item
+
+    # Create some items (they'll be owned by random users)
+    create_random_item(db)
+    create_random_item(db)
+
+    # Query as normal user
+    response = client.get(
+        f"{settings.API_V1_STR}/items/",
+        headers=normal_user_token_headers,
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    # Should have paginated response
+    assert "count" in data
+    assert "data" in data

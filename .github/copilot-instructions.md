@@ -209,6 +209,22 @@ Load from `.env` via Pydantic Settings:
 - `BACKEND_CORS_ORIGINS` — allowed frontend origins
 - `SENTRY_DSN` — error tracking (optional)
 
+### Backend Server Configuration (Docker)
+The `backend/scripts/entrypoint.sh` auto-configures the FastAPI server based on `ENVIRONMENT` variable, but can be overridden:
+- `WORKERS` — Number of Gunicorn workers (default: 4)
+- `BACKEND_HOST` — Server bind address (default: 0.0.0.0)
+- `BACKEND_PORT` — Server port (default: 8000)
+- `LOG_LEVEL` — Logging verbosity: debug, info, warning, error (default: debug/info/warning based on environment)
+- `RELOAD` — Auto-reload on code changes (default: false, set true for local development)
+
+**Example for production scaling:**
+```bash
+# In docker-compose.yml or .env for production deployment
+ENVIRONMENT=production
+WORKERS=8          # Scale workers for your CPU count
+LOG_LEVEL=warning  # Reduce log verbosity
+```
+
 ### Frontend Config
 - `.env.local` for local overrides
 - `vite.config.ts` — Vite settings (API proxy to `http://localhost:8000`)
