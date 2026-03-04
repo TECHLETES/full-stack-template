@@ -2,8 +2,8 @@
 
 **A modern, production-ready full-stack template for building custom data and AI applications at Techletes.**
 
-<a href="https://github.com/TECHLETES/full-stack-template/actions?query=workflow%3A%22Test+Docker+Compose%22" target="_blank"><img src="https://github.com/TECHLETES/full-stack-template/workflows/Test%20Docker%20Compose/badge.svg" alt="Test Docker Compose"></a>
-<a href="https://github.com/TECHLETES/full-stack-template/actions?query=workflow%3A%22Test+Backend%22" target="_blank"><img src="https://github.com/TECHLETES/full-stack-template/workflows/Test%20Backend/badge.svg" alt="Test Backend"></a>
+[![Test Docker Compose](https://github.com/TECHLETES/full-stack-template/actions/workflows/test-docker-compose.yml/badge.svg)](https://github.com/TECHLETES/full-stack-template/actions/workflows/test-docker-compose.yml)
+[![Test Backend](https://github.com/TECHLETES/full-stack-template/actions/workflows/test-backend.yml/badge.svg)](https://github.com/TECHLETES/full-stack-template/actions/workflows/test-backend.yml)
 ![Test Coverage](./coverage.svg)
 
 ---

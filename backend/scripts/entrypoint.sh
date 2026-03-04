@@ -9,27 +9,11 @@ set -e
 # Get environment variables with sensible defaults
 ENVIRONMENT="${ENVIRONMENT:-local}"
 BACKEND_PORT="${BACKEND_PORT:-8000}"
-LOG_LEVEL="${LOG_LEVEL:-}"
 WORKERS="${WORKERS:-4}"
-
-# Determine LOG_LEVEL based on environment if not explicitly set
-if [ -z "$LOG_LEVEL" ]; then
-    case "$ENVIRONMENT" in
-        production)
-            LOG_LEVEL="warning"
-            ;;
-        staging)
-            LOG_LEVEL="info"
-            ;;
-        *)
-            LOG_LEVEL="debug"
-            ;;
-    esac
-fi
 
 echo "[Entrypoint] Starting FastAPI Backend Initialization"
 echo "[Entrypoint] Environment: $ENVIRONMENT"
-echo "[Entrypoint] Workers: $WORKERS | Log Level: $LOG_LEVEL"
+echo "[Entrypoint] Workers: $WORKERS"
 
 # Step 1: Wait for database to be ready
 echo "[Entrypoint] Step 1/3: Waiting for database..."
@@ -59,7 +43,7 @@ echo "[Entrypoint] Initialization complete. Starting FastAPI server..."
 echo "[Entrypoint] Listening on port $BACKEND_PORT"
 
 # Build fastapi command based on configuration
-FASTAPI_CMD="fastapi run --port $BACKEND_PORT --log-level $LOG_LEVEL --workers $WORKERS"
+FASTAPI_CMD="fastapi run --port $BACKEND_PORT --workers $WORKERS"
 
 # Use exec to replace shell process with FastAPI, preserving PID signals
 exec $FASTAPI_CMD main.py
