@@ -89,6 +89,12 @@ jobs:
       - name: Run tests
         run: uv run bash scripts/test.sh "Coverage for ${{ github.sha }}"
         working-directory: backend
+        env:
+          PROJECT_NAME: "Full Stack Template"
+          POSTGRES_SERVER: "localhost"
+          POSTGRES_USER: "postgres"
+          FIRST_SUPERUSER: "admin@example.com"
+          FIRST_SUPERUSER_PASSWORD: "testpassword"
       - name: Store coverage files
         uses: actions/upload-artifact@v6
         with:
