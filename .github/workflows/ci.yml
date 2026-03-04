@@ -104,9 +104,11 @@ jobs:
           include-hidden-files: true
 
       - name: Generate coverage badge
+        if: github.event_name == 'pull_request'
         run: uv run genbadge coverage -i backend/coverage.xml -o coverage.svg
 
       - name: Commit badge
+        if: github.event_name == 'pull_request'
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update coverage badge"
