@@ -11,6 +11,7 @@ from backend.core import security
 from backend.core.config import settings
 from backend.models import Message, NewPassword, Token, UserPublic, UserUpdate
 from backend.utils.utils import (
+    generate_entra_account_email,
     generate_password_reset_token,
     generate_reset_password_email,
     send_email,
@@ -60,10 +61,16 @@ def recover_password(email: str, session: SessionDep) -> Message:
     # Always return the same response to prevent email enumeration attacks
     # Only send email if user actually exists
     if user:
-        password_reset_token = generate_password_reset_token(email=email)
-        email_data = generate_reset_password_email(
-            email_to=user.email, email=email, token=password_reset_token
-        )
+        if user.azure_user_id:
+            # Entra-managed users cannot reset their password here; inform them
+            email_data = generate_entra_account_email(
+                email_to=user.email, email=email
+            )
+        else:
+            password_reset_token = generate_password_reset_token(email=email)
+            email_data = generate_reset_password_email(
+                email_to=user.email, email=email, token=password_reset_token
+            )
         send_email(
             email_to=user.email,
             subject=email_data.subject,
@@ -88,6 +95,11 @@ def reset_password(session: SessionDep, body: NewPassword) -> Message:
         raise HTTPException(status_code=400, detail="Invalid token")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    elif user.azure_user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Password reset is not available for Microsoft Entra managed accounts",
+        )
     user_in_update = UserUpdate(password=body.new_password)
     crud.update_user(
         session=session,

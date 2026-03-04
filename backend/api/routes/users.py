@@ -108,6 +108,11 @@ def update_password_me(
     """
     Update own password.
     """
+    if current_user.azure_user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Password change is not available for Microsoft Entra managed accounts",
+        )
     verified, _ = verify_password(body.current_password, current_user.hashed_password)
     if not verified:
         raise HTTPException(status_code=400, detail="Incorrect password")

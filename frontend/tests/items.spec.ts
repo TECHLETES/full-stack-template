@@ -126,7 +126,9 @@ test.describe("Items empty state", () => {
 
     await page.goto("/items")
 
-    await expect(page.getByText("You don't have any items yet")).toBeVisible()
-    await expect(page.getByText("Add a new item to get started")).toBeVisible()
+    await expect(page.getByText("No items yet")).toBeVisible()
+    await expect(
+      page.getByText("Create your first item to get started"),
+    ).toBeVisible()
   })
 })

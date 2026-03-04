@@ -82,6 +82,20 @@ def generate_reset_password_email(email_to: str, email: str, token: str) -> Emai
     return EmailData(html_content=html_content, subject=subject)
 
 
+def generate_entra_account_email(email_to: str, email: str) -> EmailData:
+    project_name = settings.PROJECT_NAME
+    subject = f"{project_name} - Microsoft Entra managed account"
+    html_content = render_email_template(
+        template_name="entra_account.html",
+        context={
+            "project_name": settings.PROJECT_NAME,
+            "username": email,
+            "email": email_to,
+        },
+    )
+    return EmailData(html_content=html_content, subject=subject)
+
+
 def generate_new_account_email(
     email_to: str, username: str, password: str
 ) -> EmailData:
