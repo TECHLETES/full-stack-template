@@ -34,9 +34,40 @@ jobs:
               - docker-compose.yml
               - .github/workflows/playwright-docker.yml
 
+  build-docker-image:
+    needs:
+      - changes
+    if: ${{ needs.changes.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          outputs: type=docker,dest=/tmp/full-stack-template.tar
+          tags: full-stack-template:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+          build-args: |
+            VITE_API_URL=http://localhost:8000/api/v1
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: docker-image
+          path: /tmp/full-stack-template.tar
+          retention-days: 1
+
   test-playwright-docker:
     needs:
       - changes
+      - build-docker-image
     if: ${{ needs.changes.outputs.changed == 'true' }}
     timeout-minutes: 60
     runs-on: ubuntu-latest
@@ -80,20 +111,14 @@ jobs:
         with:
           limit-access-to-actor: true
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v7
         with:
-          context: .
-          push: false
-          load: true
-          tags: full-stack-template:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=min
-          build-args: |
-            VITE_API_URL=http://localhost:8000/api/v1
+          name: docker-image
+          path: /tmp
+
+      - name: Load Docker image
+        run: docker load -i /tmp/full-stack-template.tar
 
       - name: Create .env file for backend
         run: |
@@ -195,6 +220,7 @@ jobs:
   alls-green-playwright:
     if: always()
     needs:
+      - build-docker-image
       - test-playwright-docker
     runs-on: ubuntu-latest
     steps:
@@ -202,4 +228,4 @@ jobs:
         uses: re-actors/alls-green@release/v1
         with:
           jobs: ${{ toJSON(needs) }}
-          allowed-skips: test-playwright-docker
+          allowed-skips: build-docker-image,test-playwright-docker
