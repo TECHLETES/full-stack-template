@@ -135,7 +135,6 @@ jobs:
             --name backend \
             --network host \
             --env-file .env \
-            -e RELOAD=false \
             -e WORKERS=2 \
             full-stack-template:test
 
