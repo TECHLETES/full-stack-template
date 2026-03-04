@@ -17,7 +17,8 @@ repos:
         exclude: |
           (?x)^(
               frontend/src/client/.*|
-              backend/email-templates/build/.*
+              backend/email-templates/build/.*|
+              coverage\.svg
           )$
       - id: trailing-whitespace
         exclude: ^frontend/src/client/.*|coverage\.svg$
