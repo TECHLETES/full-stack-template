@@ -5,10 +5,30 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
+      - '.github/**'
+      - '!.github/workflows/test-backend.yml'
   pull_request:
     types:
       - opened
       - synchronize
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
+      - '.github/**'
+      - '!.github/workflows/test-backend.yml'
 
 jobs:
   test-backend:

@@ -12,6 +12,8 @@ on:
       - '.gitignore'
       - 'CONTRIBUTING.md'
       - 'SECURITY.md'
+      - '.github/**'
+      - '!.github/workflows/test-docker-compose.yml'
   pull_request:
     types:
       - opened
@@ -29,37 +31,15 @@ jobs:
 
   test-docker-compose:
     runs-on: ubuntu-latest
-    env:
-      SECRET_KEY: "test-secret-key-for-ci"
-      DOCKER_IMAGE_BACKEND: "backend"
-      TAG: "latest"
-      POSTGRES_PASSWORD: "testdb"
-      POSTGRES_USER: "testuser"
-      POSTGRES_DB: "testdb"
-      POSTGRES_PORT: "5432"
-      FRONTEND_HOST: "http://localhost"
-      DOMAIN: "localhost"
-      ENVIRONMENT: "local"
-      FIRST_SUPERUSER: "admin@example.com"
-      FIRST_SUPERUSER_PASSWORD: "testpassword"
-      EMAILS_FROM_EMAIL: "test@example.com"
-      BACKEND_CORS_ORIGINS: "http://localhost"
-      SMTP_HOST: ""
-      SMTP_USER: ""
-      SMTP_PASSWORD: ""
-      SENTRY_DSN: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Create .env file for CI
         run: |
-          cat > .env << EOF
-          SECRET_KEY=test-secret-key-for-ci
-          POSTGRES_PASSWORD=testdb
-          POSTGRES_USER=testuser
-          POSTGRES_DB=testdb
-          POSTGRES_PORT=5432
-          EOF
+          cp .env.template .env
+          # Override for Docker networking
+          sed -i 's/^POSTGRES_SERVER=.*/POSTGRES_SERVER=db/' .env
+          sed -i 's/^REDIS_URL=.*/REDIS_URL=redis:\/\/redis:6379/' .env
       - run: docker compose build
       - run: docker compose down -v --remove-orphans
       - name: Show environment and versions
