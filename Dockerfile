@@ -9,7 +9,10 @@ COPY frontend/package.json /app/frontend/
 
 WORKDIR /app/frontend
 
-RUN bun install
+# Use BuildKit cache mount for bun dependencies
+# Ref: https://docs.docker.com/build/cache/
+RUN --mount=type=cache,target=/root/.bun \
+    bun install
 
 COPY ./frontend /app/frontend
 
@@ -22,6 +25,9 @@ RUN bun run build
 FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
+
+# Install curl for healthchecks
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
 # Install uv
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv

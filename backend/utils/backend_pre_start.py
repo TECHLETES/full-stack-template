@@ -119,8 +119,9 @@ def init_rbac(db_engine: Engine) -> None:
 
 def main() -> None:
     logger.info("Initializing service")
+    # Only check DB connectivity here
+    # RBAC initialization happens after migrations in initial_data.py
     init(engine)
-    init_rbac(engine)
     logger.info("Service finished initializing")
 
 

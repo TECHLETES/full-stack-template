@@ -23,7 +23,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Step 2: Run database migrations
+# Step 2: Run database migrations (BEFORE RBAC initialization)
 echo "[Entrypoint] Step 2/3: Running database migrations..."
 alembic upgrade head
 if [ $? -ne 0 ]; then
