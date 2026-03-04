@@ -44,9 +44,22 @@ jobs:
       FIRST_SUPERUSER_PASSWORD: "testpassword"
       EMAILS_FROM_EMAIL: "test@example.com"
       BACKEND_CORS_ORIGINS: "http://localhost"
+      SMTP_HOST: ""
+      SMTP_USER: ""
+      SMTP_PASSWORD: ""
+      SENTRY_DSN: ""
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+      - name: Create .env file for CI
+        run: |
+          cat > .env << EOF
+          SECRET_KEY=test-secret-key-for-ci
+          POSTGRES_PASSWORD=testdb
+          POSTGRES_USER=testuser
+          POSTGRES_DB=testdb
+          POSTGRES_PORT=5432
+          EOF
       - run: docker compose build
       - run: docker compose down -v --remove-orphans
       - run: docker compose up -d --wait backend adminer
