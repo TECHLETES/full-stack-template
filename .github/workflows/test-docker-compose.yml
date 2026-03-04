@@ -62,9 +62,32 @@ jobs:
           EOF
       - run: docker compose build
       - run: docker compose down -v --remove-orphans
-      - run: docker compose up -d --wait backend adminer
+      - name: Show environment and versions
+        run: |
+          echo "=== Docker Versions ==="
+          docker --version
+          docker compose --version
+          echo "=== .env file ==="
+          cat .env
+          echo "=== Current directory ==="
+          pwd
+          ls -la
+      - name: Start services with debugging
+        run: docker compose up -d --wait backend adminer
+        timeout-minutes: 5
+      - name: Check Docker Compose status
+        if: failure()
+        run: |
+          echo "=== Docker Compose PS ==="
+          docker compose ps -a
+          echo "=== Redis logs ==="
+          docker compose logs redis || true
+          echo "=== Database logs ==="
+          docker compose logs db || true
+          echo "=== Backend logs ==="
+          docker compose logs backend || true
       - name: Test backend is up
-        run: curl http://localhost:8000/api/v1/utils/health-check
+        run: docker compose exec backend curl -f http://localhost:8000/api/v1/utils/health-check
       - name: Test frontend is served from backend
-        run: curl http://localhost:8000
+        run: docker compose exec backend curl -f http://localhost:8000
       - run: docker compose down -v --remove-orphans
