@@ -15,7 +15,7 @@ import { AdminService } from "@/client"
 import ChartCard from "@/components/Common/ChartCard"
 import MetricCard from "@/components/Common/MetricCard"
 import { Skeleton } from "@/components/ui/skeleton"
-import { CHART_COLORS, PIE_CHART_COLORS, TASK_METRICS } from "./data"
+import { CHART_COLORS, TASK_METRICS } from "./data"
 
 function MetricsSkeleton() {
   return (
@@ -46,6 +46,14 @@ export const JobStatusChart = () => {
   }
   if (!data) return null
 
+  const STATUS_COLORS: Record<string, string> = {
+    Queued: CHART_COLORS.info,
+    Running: CHART_COLORS.warning,
+    Completed: CHART_COLORS.success,
+    Failed: CHART_COLORS.danger,
+    Cancelled: CHART_COLORS.primary,
+  }
+
   const chartData = [
     { name: "Queued", value: data.status_counts.queued },
     { name: "Running", value: data.status_counts.running },
@@ -73,10 +81,10 @@ export const JobStatusChart = () => {
               dataKey="value"
               strokeWidth={2}
             >
-              {chartData.map((_entry, index) => (
+              {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]}
+                  fill={STATUS_COLORS[entry.name] ?? CHART_COLORS.primary}
                 />
               ))}
             </Pie>

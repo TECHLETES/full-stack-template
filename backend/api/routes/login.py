@@ -58,14 +58,10 @@ def recover_password(email: str, session: SessionDep) -> Message:
     """
     user = crud.get_user_by_email(session=session, email=email)
 
-    # Always return the same response to prevent email enumeration attacks
-    # Only send email if user actually exists
     if user:
         if user.azure_user_id:
             # Entra-managed users cannot reset their password here; inform them
-            email_data = generate_entra_account_email(
-                email_to=user.email, email=email
-            )
+            email_data = generate_entra_account_email(email_to=user.email, email=email)
         else:
             password_reset_token = generate_password_reset_token(email=email)
             email_data = generate_reset_password_email(
@@ -76,9 +72,9 @@ def recover_password(email: str, session: SessionDep) -> Message:
             subject=email_data.subject,
             html_content=email_data.html_content,
         )
-    return Message(
-        message="If that email is registered, we sent a password recovery link"
-    )
+    # Return 200 with generic message regardless of whether user exists
+    # This prevents email enumeration attacks
+    return Message(message="If that email is registered, we sent a password recovery link")
 
 
 @router.post("/reset-password/")

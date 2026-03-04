@@ -9,9 +9,11 @@ const tabs = ["My Profile", "Password & Security"]
 test("My profile tab is active by default", async ({ page }) => {
   await page.goto("/settings")
   // The settings page uses custom buttons for navigation; verify the My Profile
-  // content panel is shown by default (Full name and Email labels are present).
+  // tab is active by default by checking the panel header description is visible.
   await expect(page.getByRole("button", { name: "My Profile" })).toBeVisible()
-  await expect(page.getByLabel("Full name")).toBeVisible()
+  await expect(
+    page.getByText("Update your personal information and email address"),
+  ).toBeVisible()
 })
 
 test("All tabs are visible", async ({ page }) => {
@@ -224,33 +226,23 @@ test("User can switch between theme modes", async ({ page }) => {
 test("Selected mode is preserved across sessions", async ({ page }) => {
   await page.goto("/settings")
 
-  await page.getByTestId("theme-button").click()
-  if (
-    await page.evaluate(() =>
-      document.documentElement.classList.contains("dark"),
-    )
-  ) {
-    await page.getByTestId("light-mode").click()
-    await page.getByTestId("theme-button").click()
-  }
+  // Set a deterministic starting state: force light mode via localStorage + reload.
+  // We can't rely on system theme (resolved to dark in this env) and clicking
+  // light-mode directly from "system" mode is unreliable; going dark→light first
+  // is the proven path (see "User can switch" test).
+  await page.evaluate(() => localStorage.setItem("vite-ui-theme", "light"))
+  await page.reload()
+  await expect(page.locator("html")).toHaveClass(/light/)
 
-  const isLightMode = await page.evaluate(() =>
-    document.documentElement.classList.contains("light"),
-  )
-  expect(isLightMode).toBe(true)
-
+  // Switch to dark via the UI
   await page.getByTestId("theme-button").click()
+  await expect(page.getByTestId("dark-mode")).toBeVisible()
   await page.getByTestId("dark-mode").click()
-  let isDarkMode = await page.evaluate(() =>
-    document.documentElement.classList.contains("dark"),
-  )
-  expect(isDarkMode).toBe(true)
+  await expect(page.locator("html")).toHaveClass(/dark/)
 
+  // Dark mode should survive logout + login
   await logOutUser(page)
   await logInUser(page, firstSuperuser, firstSuperuserPassword)
 
-  isDarkMode = await page.evaluate(() =>
-    document.documentElement.classList.contains("dark"),
-  )
-  expect(isDarkMode).toBe(true)
+  await expect(page.locator("html")).toHaveClass(/dark/)
 })

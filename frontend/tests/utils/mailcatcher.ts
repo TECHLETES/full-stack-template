@@ -1,9 +1,12 @@
 import type { APIRequestContext } from "@playwright/test"
 
 type Email = {
-  id: number
+  ID: string
+  id?: number
   recipients: string[]
+  To?: Array<{ Address: string }>
   subject: string
+  Subject?: string
 }
 
 async function findEmail({
@@ -13,21 +16,39 @@ async function findEmail({
   request: APIRequestContext
   filter?: (email: Email) => boolean
 }) {
-  const response = await request.get(`${process.env.MAILCATCHER_HOST}/messages`)
+  const response = await request.get(
+    `${process.env.MAILCATCHER_HOST}/api/v1/messages`,
+  )
 
-  let emails = await response.json()
-
-  if (filter) {
-    emails = emails.filter(filter)
+  if (!response.ok()) {
+    throw new Error(
+      `Mailcatcher API request failed with status ${response.status()}: ${await response.text()}`,
+    )
   }
 
-  const email = emails[emails.length - 1]
+  const data = await response.json()
 
-  if (email) {
-    return email as Email
-  }
+  // Handle both mailpit and old mailcatcher response formats
+  const rawEmails = Array.isArray(data) ? data : data.messages || []
 
-  return null
+  // Normalize all emails first
+  const emails = rawEmails.map((email: any) => {
+    const recipients =
+      email.To?.map((t: any) => `<${t.Address}>`) || email.recipients || []
+    return {
+      ID: email.ID || email.id,
+      id: email.id || email.ID,
+      recipients,
+      subject: email.Subject || email.subject || "",
+    }
+  })
+
+  // Then apply filter to normalized emails
+  const filtered = filter ? emails.filter(filter) : emails
+
+  const email = filtered[filtered.length - 1]
+
+  return email || null
 }
 
 export function findLastEmail({
@@ -59,4 +80,28 @@ export function findLastEmail({
   }
 
   return Promise.race([timeoutPromise, checkEmails()])
+}
+
+export async function getEmailHtml({
+  request,
+  emailId,
+}: {
+  request: APIRequestContext
+  emailId: string
+}): Promise<string> {
+  const response = await request.get(
+    `${process.env.MAILCATCHER_HOST}/api/v1/message/${emailId}`,
+  )
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to fetch email ${emailId}: ${response.status()} ${await response.text()}`,
+    )
+  }
+  const data = await response.json()
+  return data.HTML || data.Text || ""
+}
+
+export function extractLink(html: string, pattern: RegExp): string | null {
+  const match = html.match(pattern)
+  return match ? match[1] || match[0] : null
 }
