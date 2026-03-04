@@ -379,7 +379,7 @@ This template is continuously improved with new capabilities for Techletes proje
 
 When these are added to the template, existing projects can pull updates via:
 ```bash
-git pull --no-commit upstream master   # Pull from template
+git pull --no-commit upstream main   # Pull from template
 # Review, resolve conflicts, merge when ready
 ```
 

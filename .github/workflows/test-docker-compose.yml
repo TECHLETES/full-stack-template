@@ -3,11 +3,27 @@ name: Test Docker Compose
 on:
   push:
     branches:
-      - master
+      - main
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
   pull_request:
     types:
       - opened
       - synchronize
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
 
 jobs:
 

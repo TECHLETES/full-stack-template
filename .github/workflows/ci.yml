@@ -7,10 +7,26 @@ on:
     branches:
       - main
       - staging
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
   push:
     branches:
       - main
       - staging
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'img/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'CONTRIBUTING.md'
+      - 'SECURITY.md'
 
 permissions:
   contents: write

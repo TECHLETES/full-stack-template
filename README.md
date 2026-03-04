@@ -1,12 +1,10 @@
 # 🚀 Techletes Full Stack FastAPI Template
 
-![Test Coverage](./coverage.svg)
-
 **A modern, production-ready full-stack template for building custom data and AI applications at Techletes.**
 
-<a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Docker+Compose%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Docker%20Compose/badge.svg" alt="Test Docker Compose"></a>
-<a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Backend%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Backend/badge.svg" alt="Test Backend"></a>
-<a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>
+<a href="https://github.com/TECHLETES/full-stack-template/actions?query=workflow%3A%22Test+Docker+Compose%22" target="_blank"><img src="https://github.com/TECHLETES/full-stack-template/workflows/Test%20Docker%20Compose/badge.svg" alt="Test Docker Compose"></a>
+<a href="https://github.com/TECHLETES/full-stack-template/actions?query=workflow%3A%22Test+Backend%22" target="_blank"><img src="https://github.com/TECHLETES/full-stack-template/workflows/Test%20Backend/badge.svg" alt="Test Backend"></a>
+![Test Coverage](./coverage.svg)
 
 ---
 
@@ -55,23 +53,23 @@ Future versions will include built-in support for:
 
 ### Dashboard Login
 
-[![API docs](img/login.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/login.png)](https://github.com/TECHLETES/full-stack-template)
 
 ### Dashboard - Admin
 
-[![API docs](img/dashboard.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/dashboard.png)](https://github.com/TECHLETES/full-stack-template)
 
 ### Dashboard - Items
 
-[![API docs](img/dashboard-items.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/dashboard-items.png)](https://github.com/TECHLETES/full-stack-template)
 
 ### Dashboard - Dark Mode
 
-[![API docs](img/dashboard-dark.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/dashboard-dark.png)](https://github.com/TECHLETES/full-stack-template)
 
 ### Interactive API Documentation
 
-[![API docs](img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
+[![API docs](img/docs.png)](https://github.com/TECHLETES/full-stack-template)
 
 ## Quick Start – Clone for Your Project
 
@@ -128,7 +126,7 @@ git remote add upstream https://github.com/Techletes/full-stack-template.git
 - Push your initial code:
 
 ```bash
-git push -u origin master
+git push -u origin main
 ```
 
 ### Keep Your Project Updated
@@ -137,7 +135,7 @@ As the template evolves with new integrations and improvements, you can pull upd
 
 ```bash
 # Pull latest changes from template (without auto-merging)
-git pull --no-commit upstream master
+git pull --no-commit upstream main
 
 # Review changes, resolve conflicts if needed
 # Then commit when ready:
