@@ -244,13 +244,11 @@ def test_init_rbac_exception_handling() -> None:
 
 
 def test_main_calls_init_and_init_rbac() -> None:
-    """Test that main function calls both init and init_rbac."""
+    """Test that main function calls init (RBAC init happens in initial_data.py)."""
     with (
         patch("backend.utils.backend_pre_start.engine") as mock_engine,
         patch("backend.utils.backend_pre_start.init") as mock_init,
-        patch("backend.utils.backend_pre_start.init_rbac") as mock_init_rbac,
         patch.object(logger, "info"),
     ):
         main()
         mock_init.assert_called_once_with(mock_engine)
-        mock_init_rbac.assert_called_once_with(mock_engine)

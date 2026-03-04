@@ -182,4 +182,4 @@ include = ["backend"]
 exclude = ["tests*"]
 
 [tool.uv]
-required-version = ">=0.9.25,<1.0.0"
+required-version = "0.9.26"
